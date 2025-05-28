@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+citas-med/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -10,18 +10,22 @@
 !.yarn/releases
 !.yarn/versions
 
+
+**/out/
+**/.env*
+**/.vercel/
+
 # testing
 /coverage
 
 # next.js
-/.next/
-/out/
+citas-med/.next/
 
 # production
-/build
+citas-med/build
 
 # misc
-.DS_Store
+citas-med/.DS_Store
 *.pem
 
 # debug
@@ -30,12 +34,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
 
-# vercel
-.vercel
+
+
 
 # typescript
-*.tsbuildinfo
+citas-med/*.tsbuildinfo
 next-env.d.ts
