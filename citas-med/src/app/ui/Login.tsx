@@ -1,7 +1,7 @@
 export default function Login() {
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+        <div className="flex items-center justify-center min-h-full bg-gray-100">
+        <div className="min-w-full max-w-md p-8 bg-white rounded-2xl shadow-md">
             <h2 className="mb-6 text-2xl font-bold text-center">Iniciar Sesión</h2>
             <form>
             <div className="mb-4">
@@ -19,14 +19,16 @@ export default function Login() {
                 <input
                 type="password"
                 id="password"
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className=" mb-1 w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Ingrese su contraseña"
                 required
                 />
+            <a href="#" className="text-sm text-blue-600 hover:underline ">¿Olvidaste tu contraseña?</a>
             </div>
+            
             <button
                 type="submit"
-                className="w-full px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-2xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
                 Iniciar Sesión
             </button>
