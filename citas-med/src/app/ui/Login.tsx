@@ -1,7 +1,7 @@
 export default function Login() {
     return (
-        <div className="flex items-center justify-center min-h-full bg-gray-100">
-        <div className="min-w-full max-w-md p-8 bg-white rounded-2xl shadow-md">
+        
+        <div className="min-w-fit max-w-md p-8 bg-white rounded-2xl shadow-md">
             <h2 className="mb-6 text-2xl font-bold text-center">Iniciar Sesión</h2>
             <form>
             <div className="mb-4">
@@ -34,6 +34,6 @@ export default function Login() {
             </button>
             </form>
         </div>
-        </div>
+        
     );
     }

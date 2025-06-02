@@ -2,19 +2,32 @@
 
 export function NavbarComponent() {
   return (
-    <nav className="bg-white ">
-      <div className="w-screen mx-auto px-4 sm:px-8 shadow ">
+    <nav>
+      <div className="w-screen mx-auto px-4 sm:px-40 shadow ">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <a href="/" className="text-xl font-bold text-gray-900">CitasMed</a>
+            <h1 className="text-xl font-bold">CitasMed</h1>
           </div>
           <div className="flex space-x-4">
-            <a href="/" className="text-gray-700 hover:text-blue-600">Home</a>
-            <a href="/about" className="text-gray-700 hover:text-blue-600">About</a>
-            <a href="/contact" className="text-gray-700 hover:text-blue-600">Contact</a>
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
           </div>
         </div>
       </div>
+      <style>
+        {
+          `nav {
+            background-color: #03045e;
+          }
+          a {
+            color: #f3f4f6;
+          }
+          a:hover {
+            color: #90e0ef;
+          }`
+        }
+      </style>
     </nav>
   );
 }
