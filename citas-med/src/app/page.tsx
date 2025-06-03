@@ -2,7 +2,7 @@ import {NavbarComponent} from './ui/navbarComponent';
 import Login from './ui/Login';
 import Register from './ui/register';
 import Image from 'next/image'
-import { Span } from 'next/dist/trace';
+import Link from 'next/link';
 export default function Home() {
   return (
     <div>
@@ -25,7 +25,7 @@ export default function Home() {
         <div className='flex flex-col md:flex-row items-center justify-center gap-y-3 md:gap-x-10'>
           <section className="w-full md:w-1/2 px-6 py-10 flex flex-col items-center gap-6 text-white">
             <h1 className="text-3xl font-bold text-center">
-              ¿Eres nuevo? Regístrate y tus reserva citas!
+              ¿Eres nuevo? Regístrate y reserva tus citas!
             </h1>
             
               <Register />
@@ -34,7 +34,7 @@ export default function Home() {
 
           <section className='w-1/2 flex items-center text-center flex-col md:flex-row h-full'>
 
-           <div className="flex flex-col py-10 w-screen  items-center text-white">
+           <div className="flex flex-col py-10 w-screen z-10  items-center text-white">
               <h1 className="font-bold text-3xl leading-tight">
                 Ofrecemos <span className="text-blue-300">servicios</span> médicos de <span className="text-blue-300">confianza</span>!
               </h1>
@@ -52,12 +52,12 @@ export default function Home() {
                 <div className="absolute bottom-0 left-0 w-full h-[30%] bg-gradient-to-t from-[#03045e] to-transparent pointer-events-none" />
                 
             </div>
-            <button
-              type="submit"
-              className="w-full max-w-3xs px-4 py-2 rounded-2xl text-white bg-transparent border hover:bg-blue-700 z-10 mt-7"
-            >
-                  Iniciar Sesión
-            </button>
+            <Link href="/login" passHref>
+              <div className="mt-6 w-80 px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-300 text-center cursor-pointer">
+                Iniciar Sesión
+              </div>
+            </Link>
+
              
           </div>
             
