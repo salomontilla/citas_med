@@ -1,14 +1,13 @@
-export function Button({
-    children,
-    className = "",
-    ...props
-    }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+import React from 'react';
+
+type ButtonProps = {
+    children: React.ReactNode;
+};
+
+export default function Button({ children }: ButtonProps) {
     return (
-        <button
-        className={`px-4 py-2 rounded-2xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
-        {...props}
-        >
-        {children}
+        <button className='mt-6 w-80  px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-300 text-center cursor-pointer'>
+            {children}
         </button>
     );
-    }
+}
