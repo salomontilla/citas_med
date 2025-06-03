@@ -1,7 +1,7 @@
 export default function Register() {
     return (
         
-            <div className="min-w-full max-w-md p-8 bg-white rounded-2xl shadow-md">
+            <div className="z-10 md:w-[80%] p-8 bg-white rounded-2xl shadow-md">
                 <h2 className="mb-6 text-2xl font-bold text-center text-gray-900">Registrarse</h2>
                 <form>
                     <div className="mb-4">
