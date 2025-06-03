@@ -1,12 +1,19 @@
-export default function CtaCard() {
+import React from 'react';
+type CardProps = {title?: string, icon?: string, number?: string, children?: React.ReactNode};
+
+export default function CtaCard({children,title, icon, number}: CardProps) {
     return(
         <div>
-            <div className="bg-[#03045e] text-gray-100 p-6 rounded-lg shadow-lg">
-                <h2 className="text-2xl font-bold mb-4">¡Agenda tu cita médica hoy!</h2>
-                <p className="mb-4">Con CitasMed, reservar tu cita nunca ha sido tan fácil. Conéctate con profesionales de la salud y cuida de tu bienestar.</p>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-300">
-                    Reservar Cita
-                </button>
+            <div className="bg-white text-blue-950 p-6 rounded-lg shadow-lg flex flex-col items-start gap-4 w-[20%] h-auto">
+                <div className='flex items-start gap-4'>
+                    <div className='rounded-full bg-blue-600 text-white w-8 h-8 flex items-center justify-center'>
+                        <p>{number}</p>
+                    </div>
+                    <h2 className="text-xl font-bold">{title}</h2>
+                </div>
+                <p className="opacity-80">{children}</p>
+                <img src={`${icon}`} alt="" className='aspect-square object-contain h-auto w-9'></img>
+                
             </div>
         </div>
     )
