@@ -1,5 +1,6 @@
 import {NavbarComponent} from './ui/navbarComponent';
 import MainHero from './ui/mainHero';
+import Cta from './ui/cta';
 
 export default function Home() {
   return (
@@ -7,11 +8,11 @@ export default function Home() {
       <header>
         <NavbarComponent />
       </header>
-      <main className='bg-[#03045e] md:min-h-screen pt-4 relative' >
+      <main className='bg-[#03045e] md:h-full lg:h-fit pt-4 relative' >
        <MainHero />
       </main>
       <section>
-        
+        <Cta/>
       </section>
       <footer>
         <div className="bg-gray- text-center py-4">
