@@ -10,13 +10,13 @@
     "postinstall": "flowbite-react patch"
   },
   "dependencies": {
-    "@heroui/react": "^2.7.9",
+    "@heroui/react": "^2.8.0-beta.7",
     "flowbite-react": "^0.11.7",
     "framer-motion": "^12.16.0",
     "motion": "^12.16.0",
     "next": "15.3.2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -26,7 +26,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.1.8",
     "typescript": "^5"
   }
 }
