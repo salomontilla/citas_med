@@ -7,35 +7,40 @@ import {
   Link,
   Button,
 } from "@heroui/react";
+ import { useState } from "react";
 
 
 export default function App() {
 
+  const [activeItem, setActiveItem] = useState<string | null>('');
+   const items = [
+    { id: 'inicio', label: 'Inicio', href: '#inicio' },
+    { id: 'servicios', label: 'Servicios', href: '#servicios' },
+    { id: 'contacto', label: 'Contacto', href: '#contacto' },
+  ];
+
   return (
-    <Navbar >
+    <Navbar shouldHideOnScroll>
       <NavbarContent>
         
         <NavbarBrand>
           <p className="font-bold text-inherit">CitasMed</p>
         </NavbarBrand>
       </NavbarContent>
+     
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem>
-          <Link color="primary" href="#inicio">
-            Inicio
-          </Link>
+        {
+          items.map((item) => (
+        <NavbarItem
+          key={item.id}
+          isActive={activeItem === item.id}
+          
+        >
+          <Link color={activeItem === item.id ? 'primary' : 'foreground'} onClick={() => setActiveItem(item.id)}  href={item.href}>{item.label}</Link>
         </NavbarItem>
-        <NavbarItem>
-          <Link href="#servicios" color="foreground" >
-            Servicios
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="#contacto">
-            Contacto
-          </Link>
-        </NavbarItem>
+      ))
+        }
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem className="">

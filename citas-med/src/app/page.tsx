@@ -5,13 +5,13 @@ import Cta from './ui/cta';
 export default function Home() {
   return (
     <div>
-      <header>
+      
         <Navbar />
-      </header>
-      <main className='bg-[#03045e] md:h-full lg:h-fit p-8'>
+      
+      <main id='inicio' className='bg-[#03045e] md:h-full lg:h-fit p-8'>
        <MainHero />
       </main>
-      <section>
+      <section id='servicios'>
         <Cta/>
       </section>
       <footer>
