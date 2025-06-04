@@ -10,7 +10,10 @@
     "postinstall": "flowbite-react patch"
   },
   "dependencies": {
+    "@heroui/react": "^2.7.9",
     "flowbite-react": "^0.11.7",
+    "framer-motion": "^12.16.0",
+    "motion": "^12.16.0",
     "next": "15.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
