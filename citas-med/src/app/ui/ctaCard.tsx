@@ -1,5 +1,11 @@
 import React from 'react';
-type CardProps = { title?: string, icon?: string, number?: string, children?: React.ReactNode };
+
+type CardProps = { 
+    title?: string, 
+    icon?: string, 
+    number?: string, 
+    children?: React.ReactNode 
+};
 
 export default function CtaCard({ children, title, icon, number }: CardProps) {
     return (
