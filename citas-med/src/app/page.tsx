@@ -1,4 +1,4 @@
-import {NavbarComponent} from './ui/navbarComponent';
+import Navbar from './ui/navbar';
 import MainHero from './ui/mainHero';
 import Cta from './ui/cta';
 
@@ -6,9 +6,9 @@ export default function Home() {
   return (
     <div>
       <header>
-        <NavbarComponent />
+        <Navbar />
       </header>
-      <main className='bg-[#03045e] md:h-full lg:h-fit pt-4 relative' >
+      <main className='bg-[#03045e] md:h-full lg:h-fit p-8'>
        <MainHero />
       </main>
       <section>

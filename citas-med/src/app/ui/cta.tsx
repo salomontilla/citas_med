@@ -14,7 +14,7 @@ export default function Cta() {
                     <p className="text-lg w-fit">
                         Te ofrecemos una plataforma intuitiva, rápida y segura para gestionar tus citas médicas en un solo lugar. Desde la reserva hasta el historial clínico, todo al alcance de un clic.
                     </p>
-                    <Link href={'#'} className='ml-2'>
+                    <Link href={'#'}>
                         <Button>Contacto</Button>
                     </Link>
                 </div>

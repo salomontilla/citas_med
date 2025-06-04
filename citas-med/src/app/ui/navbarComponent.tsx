@@ -5,9 +5,9 @@ export function NavbarComponent() {
     <nav className="bg-[#03045e] text-gray-100">
       <div className="w-full mx-auto px-4 sm:px-40 shadow">
         <div className="flex items-center justify-center h-16">
-          <div className="flex items-center">
+          
             <h1 className="text-3xl font-bold text-gray-100">CitasMed</h1>
-          </div>
+          
           <div className="ml-auto">
             <ul className="flex space-x-4">
               <li>
