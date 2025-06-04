@@ -6,8 +6,7 @@ export default function Home() {
   return (
     <div id='inicio'>
       
-        <Navbar />
-      
+      <Navbar />
       <main className='bg-[#03045e] md:h-full lg:h-fit p-8'>
        <MainHero />
       </main>

@@ -1,6 +1,12 @@
+import Navbar from '../ui/navbar';
 export default function LoginPage() {
     return (
-        <div className="relative w-full h-screen flex items-center justify-center">
+        <div className="relative w-full h-screen flex flex-col items-center justify-center">
+            <header className="bg-blue-50 absolute top-0 left-0 w-full z-20">
+                <Navbar />
+
+            </header>
+
   
             <div className="fondo-lineas">
                 {[...Array(10)].map((_, i) => (
@@ -14,7 +20,7 @@ export default function LoginPage() {
                 />
                 ))}
             </div>
-            <div className="relative z-10 flex items-center justify-center min-h-screen">
+            <div className="relative z-10 flex items-center justify-center min-h-fit">
                 <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-md">
                     <h2 className="mb-6 text-2xl font-bold text-center">Iniciar Sesión</h2>
                     <form>
