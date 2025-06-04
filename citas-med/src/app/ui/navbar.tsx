@@ -12,11 +12,11 @@ import {
 
 export default function App() {
 
-  const [activeItem, setActiveItem] = useState<string | null>('');
+  const [activeItem, setActiveItem] = useState<string | null>('inicio');
    const items = [
-    { id: 'inicio', label: 'Inicio', href: '#inicio' },
-    { id: 'servicios', label: 'Servicios', href: '#servicios' },
-    { id: 'contacto', label: 'Contacto', href: '#contacto' },
+    { id: 'inicio', label: 'Inicio', href: '/#inicio' },
+    { id: 'servicios', label: 'Servicios', href: '/#servicios' },
+    { id: 'contacto', label: 'Contacto', href: '/#contacto' },
   ];
 
   return (

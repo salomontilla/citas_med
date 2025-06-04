@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
 import "./ui/globals.css";
+import Navbar from "./ui/navbar";
 
 const raleway = Raleway({
   subsets: ["latin"],
@@ -18,10 +19,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ES" className="light">
+    <html lang="ES" className="light scroll-smooth">
+      
+      
       <body
         className={`${raleway.className} antialiased`}
       >
+        
         
           {children}
         
