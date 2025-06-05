@@ -11,7 +11,7 @@ export default function Cta() {
                 </div>
                 <div className='flex flex-col lg:flex-row  text-blue-800 gap-3'>
                     <h1 className="text-4xl font-bold">Soluciones únicas e <span className="text-blue-500">increíbles</span></h1>
-                    <p className="text-lg w-fit">
+                    <p className="text-lg w-fit max-w-xl">
                         Te ofrecemos una plataforma intuitiva, rápida y segura para gestionar tus citas médicas en un solo lugar. Desde la reserva hasta el historial clínico, todo al alcance de un clic.
                     </p>
                     <Link href={'#'}>
