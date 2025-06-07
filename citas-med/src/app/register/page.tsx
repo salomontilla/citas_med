@@ -1,3 +1,4 @@
+import Footer from "../ui/components/footer";
 import Navbar from "../ui/components/navbar";
 import RegisterForm from "../ui/components/registerForm";
 import Image from "next/image";
@@ -49,9 +50,6 @@ export default function RegisterPage() {
           </div>
         </section>
       </div>
-      <footer className="absolute bottom-0 left-0 w-full bg-blue-900 text-white py-4 text-center z-40">
-    Este es el footer superpuesto
-  </footer>
     </div>
   );
 }

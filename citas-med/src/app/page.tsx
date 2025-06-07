@@ -14,9 +14,7 @@ export default function Home() {
         <Cta/>
       </section>
       <footer>
-        <div className="bg-gray- text-center py-4">
-          <p className="text-gray-600">© 2025 CitasMed. Todos los derechos reservados.</p>
-        </div>
+        
       </footer>
       <style>
         {

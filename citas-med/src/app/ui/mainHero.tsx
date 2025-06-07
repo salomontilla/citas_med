@@ -1,8 +1,7 @@
-import Register from '../ui/register';
 import Image from 'next/image'
 import Link from 'next/link';
 import Button from './components/button';
-import HeroCard from './heroCard';
+import HeroCard from './components/heroCard';
 
 export default function MainHero() {
     return (
