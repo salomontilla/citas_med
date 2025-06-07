@@ -23,23 +23,25 @@ export default function RegisterForm() {
   };
 
   const passwordValidation = () =>{
+    if (contra.length === 0 ) {
+      return "Campo requerido";
+    }else
     if (contra.match(confirm)) {
       return "Las contraseñas no coinciden";
-    }
-    if (contra.length == 0 || confirm.length == 0) {
+    }else if (confirm.length === 0){
       return "Campo requerido";
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 items-end ">
-      <div>
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 3xl:grid-cols-3 gap-4 items-end ">
+      <div> 
         <Input
           value={name}
           onValueChange={setName}
           label="Nombres y apellidos"
           labelPlacement="outside"
-          color="default"
+          color="primary"
           size="lg"
           type="text"
           errorMessage="Campo requerido"
@@ -54,7 +56,7 @@ export default function RegisterForm() {
 
           label="Correo electrónico"
           labelPlacement="outside"
-          color="default"
+          color="primary"
           size="lg"
           type="email"
           errorMessage="Campo requerido o inválido"
@@ -69,9 +71,9 @@ export default function RegisterForm() {
 
           inputMode="numeric"
           pattern="[0-9]*"
-          label="Número de identificación"
+          label="Número de documento"
           labelPlacement="outside"
-          color="default"
+          color="primary"
           size="lg"
           type="number"
           errorMessage="Campo requerido"
@@ -87,7 +89,7 @@ export default function RegisterForm() {
           pattern="[0-9]*"
           label="Número de teléfono"
           labelPlacement="outside"
-          color="default"
+          color="primary"
           size="lg"
           type="number"
           errorMessage="Campo requerido"
@@ -96,8 +98,8 @@ export default function RegisterForm() {
       </div>
       <div>
         <Input
-          className="max-w-xs"
           size="lg"
+          color="primary"
           onValueChange={setContra}
           required
           errorMessage={passwordValidation()}
@@ -129,23 +131,27 @@ export default function RegisterForm() {
 
           label="Confirmar contraseña"
           labelPlacement="outside"
-          color="default"
+          color="primary"
           size="lg"
           type="password"
-          isInvalid={contra !== confirm}
+          
           errorMessage={passwordValidation()}
           required
         />
       </div>
       <div>
         <DatePicker
+          color="primary"
           value={fecha}
           onChange={(value) => setFecha(value)}
           size="lg"
           label="Fecha de nacimiento"
           labelPlacement="inside"
           isRequired
-          className="max-w-[284px] rounded-2xl" />
+          className="rounded-2xl" 
+          errorMessage="Campo requerido"/>
+          
+          
       </div>
 
       <Button

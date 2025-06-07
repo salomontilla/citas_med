@@ -20,7 +20,7 @@ export default function App() {
   ];
 
   return (
-    <Navbar shouldHideOnScroll>
+    <Navbar shouldHideOnScroll isBlurred= {false} >
       <NavbarContent>
         
         <NavbarBrand>

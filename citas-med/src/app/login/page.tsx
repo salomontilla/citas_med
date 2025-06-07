@@ -21,7 +21,7 @@ export default function LoginPage() {
                 ))}
             </div>
             <div className="relative z-10 flex items-center justify-center min-h-fit">
-                <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-md">
+                <div className="w-[80%] md:w-full max-w-md p-8 bg-white rounded-2xl shadow-md">
                     <h2 className="mb-6 text-2xl font-bold text-center">Iniciar Sesión</h2>
                     <form>
                         <div className="mb-4">
