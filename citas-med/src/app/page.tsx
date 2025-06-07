@@ -1,4 +1,4 @@
-import Navbar from './ui/navbar';
+import Navbar from './ui/components/navbar';
 import MainHero from './ui/mainHero';
 import Cta from './ui/cta';
 

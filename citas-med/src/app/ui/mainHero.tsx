@@ -1,7 +1,7 @@
 import Register from '../ui/register';
 import Image from 'next/image'
 import Link from 'next/link';
-import Button from '../ui/button';
+import Button from './components/button';
 import HeroCard from './heroCard';
 
 export default function MainHero() {
@@ -33,9 +33,9 @@ export default function MainHero() {
                 </section>
             </div>
 
-            <div className='relative flex flex-col px-4 sm:px-8 md:flex-row gap-8 items-center justify-end w-[60%] h-fit bg-blue-600 rounded-2xl py-8 '>
+            <div className='relative flex flex-col px-4 sm:px-8 md:flex-row gap-8 items-center justify-center xl:justify-end w-[80%] h-fit bg-blue-600 rounded-2xl py-8 max-w-5xl '>
                 <div>
-                    <Image src="/doctor2.png" alt="Hero Image" width={300} height={500} className="left-0 bottom-0 absolute object-cover h-[700px] hidden xl:flex" />
+                    <Image src="/doctor2.png" alt="Hero Image" width={300} height={500} className="left-14 bottom-0 absolute object-cover h-[700px] hidden xl:flex" />
                 </div>
                 <HeroCard img="card_1.svg" title="Servicio de emergencias"> Contamos con un equipo médico listo para actuar en cualquier momento.
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
 import "./ui/globals.css";
-import Navbar from "./ui/navbar";
+import Navbar from "./ui/components/navbar";
 
 const raleway = Raleway({
   subsets: ["latin"],

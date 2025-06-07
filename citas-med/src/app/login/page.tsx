@@ -1,4 +1,4 @@
-import Navbar from '../ui/navbar';
+import Navbar from '../ui/components/navbar';
 export default function LoginPage() {
     return (
         <div className="relative w-full h-screen flex flex-col items-center justify-center">

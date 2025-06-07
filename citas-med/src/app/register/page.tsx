@@ -1,10 +1,10 @@
-import Navbar from "../ui/navbar";
-import RegisterForm from "../ui/registerForm";
+import Navbar from "../ui/components/navbar";
+import RegisterForm from "../ui/components/registerForm";
 import Image from "next/image";
 
 export default function RegisterPage() {
   return (
-    <>
+    <div className="min-h-screen flex flex-col relative">
      
       <header className="absolute w-full z-50">
         <Navbar />
@@ -15,12 +15,12 @@ export default function RegisterPage() {
         
         
         <section className="md:col-span-3 flex justify-center items-center px-4">
-          <div className="bg-blue-50 text-gray-800 w-full max-w-2xl p-10 rounded-2xl shadow-xl my-24 md:mt-16">
+          <div className="bg-blue-50 text-gray-800 w-full max-w-2xl p-10 rounded-2xl shadow-xl my-24 md:mt-20">
             <h2 className="text-blue-600 text-lg font-semibold">¡Únete gratis!</h2>
             <h1 className="text-4xl md:text-5xl font-bold mb-2">Crea una nueva cuenta</h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 mb-4">
               ¿Ya tienes una cuenta?{" "}
-              <a href="/login" className="underline text-blue-500 hover:text-blue-700 transition-colors">
+              <a href="/login" className="underline text-blue-500 hover:text-blue-700 transition-colors ">
                 Inicia sesión
               </a>
             </p>
@@ -30,7 +30,7 @@ export default function RegisterPage() {
         </section>
 
         
-        <section className="hidden md:flex col-span-2 relative h-screen">
+        <section className="hidden md:flex col-span-2 relative h-full">
           
           <Image
             priority
@@ -41,7 +41,7 @@ export default function RegisterPage() {
             className="object-cover w-full h-full"
           />
 
-          <div className="absolute top-0 left-0 w-full h-full bg-blue-900/70 z-10" />
+          <div className="absolute top-0 left-0 w-full h-full  bg-blue-900/70 z-10" />
 
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-white text-center px-6">
             <h1 className="text-3xl md:text-4xl font-bold mb-3">Bienvenido a CistasMed</h1>
@@ -49,6 +49,9 @@ export default function RegisterPage() {
           </div>
         </section>
       </div>
-    </>
+      <footer className="absolute bottom-0 left-0 w-full bg-blue-900 text-white py-4 text-center z-40">
+    Este es el footer superpuesto
+  </footer>
+    </div>
   );
 }
