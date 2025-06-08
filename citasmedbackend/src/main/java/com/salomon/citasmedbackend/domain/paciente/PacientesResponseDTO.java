@@ -12,15 +12,4 @@ public record PacientesResponseDTO(
         String telefono,
         Date fechaNacimiento
 ) {
-    public static PacientesResponseDTO fromPaciente(Paciente paciente) {
-        Usuario u = paciente.getUsuario();
-        return new PacientesResponseDTO(
-                paciente.getId(),
-                u.getNombreCompleto(),
-                u.getDocumento(),
-                u.getEmail(),
-                u.getTelefono(),
-                paciente.getFechaNacimiento()
-        );
-    }
 }

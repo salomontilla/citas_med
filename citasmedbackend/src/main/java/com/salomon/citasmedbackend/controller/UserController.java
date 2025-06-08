@@ -2,12 +2,10 @@ package com.salomon.citasmedbackend.controller;
 
 import com.salomon.citasmedbackend.domain.usuario.UserResponseDTO;
 import com.salomon.citasmedbackend.domain.usuario.Usuario;
-import com.salomon.citasmedbackend.repository.PacienteRepository;
 import com.salomon.citasmedbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,11 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final BCryptPasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-
-    private final PacienteRepository pacienteRepository;
-
 
     @GetMapping("/users")
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
