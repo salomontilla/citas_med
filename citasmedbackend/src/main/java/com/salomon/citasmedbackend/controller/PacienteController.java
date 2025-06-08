@@ -1,11 +1,11 @@
 package com.salomon.citasmedbackend.controller;
 
 import com.salomon.citasmedbackend.domain.paciente.Paciente;
-import com.salomon.citasmedbackend.domain.paciente.UsuarioUpdateDTO;
-import com.salomon.citasmedbackend.domain.usuario.PacientesResponseDTO;
+import com.salomon.citasmedbackend.domain.paciente.PacienteUpdateDTO;
+import com.salomon.citasmedbackend.domain.paciente.PacientesResponseDTO;
 import com.salomon.citasmedbackend.domain.usuario.Rol;
 import com.salomon.citasmedbackend.domain.usuario.Usuario;
-import com.salomon.citasmedbackend.domain.usuario.UsuarioRegisterDTO;
+import com.salomon.citasmedbackend.domain.paciente.PacienteRegisterDTO;
 import com.salomon.citasmedbackend.repository.PacienteRepository;
 import com.salomon.citasmedbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class PacienteController {
 
     @PostMapping("/register")
     @Transactional
-    public ResponseEntity<String> registerUser(@RequestBody UsuarioRegisterDTO usuarioDto, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<String> registerUser(@RequestBody PacienteRegisterDTO usuarioDto, UriComponentsBuilder uriBuilder) {
         if (userRepository.existsByEmail(usuarioDto.email())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El correo electrónico ya está en uso");
         }
@@ -97,7 +97,7 @@ public class PacienteController {
 
     @PatchMapping("/{id}")
     @Transactional
-    public ResponseEntity<String> updatePaciente(@PathVariable Long id, @RequestBody UsuarioUpdateDTO usuarioDto) {
+    public ResponseEntity<String> updatePaciente(@PathVariable Long id, @RequestBody PacienteUpdateDTO usuarioDto) {
         Optional<Paciente> pacienteOptional = pacienteRepository.findById(id);
         if (pacienteOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Paciente no encontrado");

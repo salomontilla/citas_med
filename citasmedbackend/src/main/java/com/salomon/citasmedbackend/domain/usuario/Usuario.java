@@ -1,6 +1,6 @@
 package com.salomon.citasmedbackend.domain.usuario;
 
-import com.salomon.citasmedbackend.domain.paciente.UsuarioUpdateDTO;
+import com.salomon.citasmedbackend.domain.paciente.PacienteUpdateDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -43,7 +43,7 @@ public class Usuario {
         this.activo = true;
     }
 
-    public void updateUsuario (UsuarioUpdateDTO usuarioUpdateDTO) {
+    public void updateUsuario (PacienteUpdateDTO usuarioUpdateDTO) {
         if (usuarioUpdateDTO.nombreCompleto() != null) {
             this.nombreCompleto = usuarioUpdateDTO.nombreCompleto();
         }

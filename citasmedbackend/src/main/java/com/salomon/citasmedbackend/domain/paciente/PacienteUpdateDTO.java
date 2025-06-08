@@ -1,6 +1,6 @@
 package com.salomon.citasmedbackend.domain.paciente;
 
-public record UsuarioUpdateDTO(
+public record PacienteUpdateDTO(
     String nombreCompleto,
     String email,
     String contrasena,

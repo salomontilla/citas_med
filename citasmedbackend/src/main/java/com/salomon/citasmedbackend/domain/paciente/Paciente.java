@@ -1,7 +1,6 @@
 package com.salomon.citasmedbackend.domain.paciente;
 
 
-import com.salomon.citasmedbackend.domain.usuario.PacientesResponseDTO;
 import com.salomon.citasmedbackend.domain.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -34,7 +33,7 @@ public class Paciente {
         this.fechaNacimiento = fechaNacimiento;
     }
 
-    public void updatePaciente(UsuarioUpdateDTO pacientesResponseDTO) {
+    public void updatePaciente(PacienteUpdateDTO pacientesResponseDTO) {
         if (pacientesResponseDTO.fechaNacimiento() != null) {
             this.fechaNacimiento = Date.valueOf(pacientesResponseDTO.fechaNacimiento());
         }

@@ -1,6 +1,6 @@
-package com.salomon.citasmedbackend.domain.usuario;
+package com.salomon.citasmedbackend.domain.paciente;
 
-import com.salomon.citasmedbackend.domain.paciente.Paciente;
+import com.salomon.citasmedbackend.domain.usuario.Usuario;
 
 import java.sql.Date;
 

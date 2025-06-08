@@ -1,6 +1,6 @@
-package com.salomon.citasmedbackend.domain.usuario;
+package com.salomon.citasmedbackend.domain.paciente;
 
-public record UsuarioRegisterDTO (
+public record PacienteRegisterDTO(
     Long id,
     String nombreCompleto,
     String email,
