@@ -24,4 +24,9 @@ public class Medico {
 
     @Enumerated(EnumType.STRING)
     private Especialidad especialidad;
+
+    public Medico(Usuario nuevoUsuario, String especialidad) {
+        this.usuario = nuevoUsuario;
+        this.especialidad = Especialidad.valueOf(especialidad);
+    }
 }

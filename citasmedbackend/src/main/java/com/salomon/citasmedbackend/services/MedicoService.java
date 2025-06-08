@@ -3,9 +3,13 @@ package com.salomon.citasmedbackend.services;
 import com.salomon.citasmedbackend.domain.medico.Medico;
 import com.salomon.citasmedbackend.domain.medico.MedicoResponseDTO;
 import com.salomon.citasmedbackend.domain.medico.RegistrarMedicoDTO;
+import com.salomon.citasmedbackend.domain.usuario.Rol;
+import com.salomon.citasmedbackend.domain.usuario.Usuario;
 import com.salomon.citasmedbackend.repository.MedicoRepository;
+import com.salomon.citasmedbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +21,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MedicoService {
     private  final MedicoRepository medicoRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public ResponseEntity<List<MedicoResponseDTO>> obtenerMedicos(){
         List<Medico> medicos = medicoRepository.findAll();
@@ -55,8 +61,35 @@ public class MedicoService {
 
     @Transactional
     public ResponseEntity<MedicoResponseDTO> registrarMedico (RegistrarMedicoDTO registrarMedicoDTO) {
-        Medico nuevoMedico = new Medico(registrarMedicoDTO);
+
+        if(userRepository.existsByEmail(registrarMedicoDTO.email())) {
+            return ResponseEntity.badRequest().body(
+                    new MedicoResponseDTO(null, null, "El email ya está en uso", null, null, null)
+            );
+        }
+        if(userRepository.existsByDocumento(registrarMedicoDTO.documento())) {
+            return ResponseEntity.badRequest().body(
+                    new MedicoResponseDTO(null, null, "El documento ya está en uso", null, null, null)
+            );
+        }
+
+        String hashedPassword = passwordEncoder.encode(registrarMedicoDTO.contrasena());
+        Usuario nuevoUsuario = new Usuario(
+                registrarMedicoDTO.nombre(),
+                registrarMedicoDTO.documento(),
+                registrarMedicoDTO.email(),
+                registrarMedicoDTO.telefono(),
+                hashedPassword,
+                Rol.MEDICO
+        );
+
+        Medico nuevoMedico = new Medico(
+                nuevoUsuario,
+                registrarMedicoDTO.especialidad()
+        );
+        userRepository.save(nuevoUsuario);
         medicoRepository.save(nuevoMedico);
+
 
         MedicoResponseDTO medicoResponse = new MedicoResponseDTO(
                 nuevoMedico.getId(),
