@@ -19,7 +19,7 @@ import java.sql.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/citasmed/")
+@RequestMapping("/api/citasmed")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -28,7 +28,7 @@ public class UserController {
 
     private final PacienteRepository pacienteRepository;
 
-    @PostMapping("register")
+    @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UsuarioRegisterDTO usuarioDto, UriComponentsBuilder uriBuilder) {
         if (userRepository.existsByEmail(usuarioDto.email())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El correo electrónico ya está en uso");
@@ -55,8 +55,21 @@ public class UserController {
         pacienteRepository.save(paciente);
         return ResponseEntity.status(HttpStatus.CREATED).body("Usuario registrado exitosamente");
     }
-    @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getUsers() {
-        return ResponseEntity.ok("List of users");
+    @GetMapping("/users")
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        List<Usuario> usuarios = userRepository.findAll();
+        List<UserResponseDTO> userResponses = usuarios.stream()
+                .map(usuario -> new UserResponseDTO(
+                        usuario.getId(),
+                        usuario.getNombreCompleto(),
+                        usuario.getDocumento(),
+                        usuario.getEmail(),
+                        usuario.getTelefono(),
+                        usuario.isActivo(),
+                        usuario.getRol().name()
+                ))
+                .toList();
+        return ResponseEntity.ok(userResponses);
     }
+
 }
