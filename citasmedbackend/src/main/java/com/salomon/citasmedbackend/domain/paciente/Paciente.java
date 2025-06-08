@@ -27,4 +27,7 @@ public class Paciente {
 
     @Temporal(TemporalType.DATE)
     private Date fechaNacimiento;
+
+    public Paciente(Usuario nuevoUsuario, Date fechaNacimiento) {
+    }
 }

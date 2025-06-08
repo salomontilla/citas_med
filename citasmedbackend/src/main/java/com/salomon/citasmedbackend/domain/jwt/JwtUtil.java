@@ -1,4 +1,4 @@
-package com.salomon.citasmedbackend.security;
+package com.salomon.citasmedbackend.domain.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 
 @Component
 public class JwtUtil {

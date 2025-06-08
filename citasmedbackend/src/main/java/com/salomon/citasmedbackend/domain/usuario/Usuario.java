@@ -16,8 +16,8 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String nombreCompleto;
+    private String documento;
     private String email;
     private String telefono;
     private String contrasena;
@@ -25,4 +25,7 @@ public class Usuario {
 
     @Enumerated(EnumType.STRING)
     private Rol rol;
+
+    public Usuario(String s, String documento, String email, String telefono, String hashedPassword, boolean b, Rol rol) {
+    }
 }

@@ -1,2 +1,2 @@
 ALTER TABLE `db_citasmed`.`usuarios`
-    ADD COLUMN `documento` INT NULL AFTER `nombre_completo`;
+    ADD COLUMN `documento` VARCHAR(100) NULL AFTER `nombre_completo`;

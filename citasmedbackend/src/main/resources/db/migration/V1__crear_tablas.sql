@@ -1,6 +1,6 @@
 CREATE TABLE usuarios (
                           id_usuario INT AUTO_INCREMENT PRIMARY KEY,
-                          nombre VARCHAR(100) NOT NULL,
+                          nombre_completo VARCHAR(100) NOT NULL,
                           email VARCHAR(100) NOT NULL UNIQUE,
                           contraseña VARCHAR(255) NOT NULL,
                           telefono VARCHAR(20),
