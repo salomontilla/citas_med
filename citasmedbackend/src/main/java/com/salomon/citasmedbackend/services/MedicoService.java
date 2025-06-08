@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -103,4 +104,42 @@ public class MedicoService {
         return ResponseEntity.status(201).body(medicoResponse);
     }
 
+    public ResponseEntity<MedicoResponseDTO> actualizarMedico(Long id, RegistrarMedicoDTO medicoResponseDTO) {
+        Optional<Medico> medicoOptional = medicoRepository.findById(id);
+        if (medicoOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Medico medico = medicoOptional.get();
+
+        if (medicoResponseDTO.email() != null && !medicoResponseDTO.email().equals(medico.getUsuario().getEmail())) {
+            if (userRepository.existsByEmail(medicoResponseDTO.email())) {
+                return ResponseEntity.badRequest().body(
+                        new MedicoResponseDTO(null, null, "El email ya está en uso", null, null, null)
+                );
+            }
+            medico.getUsuario().setEmail(medicoResponseDTO.email());
+        }
+
+        if (medicoResponseDTO.documento() != null && !medicoResponseDTO.documento().equals(medico.getUsuario().getDocumento())) {
+            if (userRepository.existsByDocumento(medicoResponseDTO.documento())) {
+                return ResponseEntity.badRequest().body(
+                        new MedicoResponseDTO(null, null, "El documento ya está en uso", null, null, null)
+                );
+            }
+            medico.getUsuario().setDocumento(medicoResponseDTO.documento());
+        }
+
+        medico.actualizarMedico(medicoResponseDTO);
+        medicoRepository.save(medico);
+        return ResponseEntity.ok(new MedicoResponseDTO(
+                medico.getId(),
+                medico.getUsuario().getNombreCompleto(),
+                medico.getUsuario().getEmail(),
+                medico.getUsuario().getDocumento(),
+                medico.getUsuario().getTelefono(),
+                medico.getEspecialidad().toString()
+        ));
+
+    }
 }

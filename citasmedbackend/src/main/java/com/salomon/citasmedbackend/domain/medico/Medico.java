@@ -29,4 +29,25 @@ public class Medico {
         this.usuario = nuevoUsuario;
         this.especialidad = Especialidad.valueOf(especialidad);
     }
+
+    public void actualizarMedico(RegistrarMedicoDTO medico) {
+        if (medico.nombre() != null) {
+            this.usuario.setNombreCompleto(medico.nombre());
+        }
+        if(medico.email() != null) {
+            this.usuario.setEmail(medico.email());
+        }
+        if (medico.contrasena() != null) {
+            this.usuario.setContrasena(medico.contrasena());
+        }
+        if (medico.documento() != null) {
+            this.usuario.setDocumento(medico.documento());
+        }
+        if (medico.telefono() != null) {
+            this.usuario.setTelefono(medico.telefono());
+        }
+        if (medico.especialidad() != null) {
+            this.especialidad = Especialidad.valueOf(medico.especialidad());
+        }
+    }
 }

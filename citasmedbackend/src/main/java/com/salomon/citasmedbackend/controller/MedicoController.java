@@ -1,12 +1,11 @@
 package com.salomon.citasmedbackend.controller;
 
 import com.salomon.citasmedbackend.domain.medico.MedicoResponseDTO;
+import com.salomon.citasmedbackend.domain.medico.RegistrarMedicoDTO;
 import com.salomon.citasmedbackend.services.MedicoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,5 +24,15 @@ public class MedicoController {
     @GetMapping("/{id}")
     public ResponseEntity<MedicoResponseDTO> getMedicoById(Long id) {
         return medicoService.obtenerMedicoPorId(id);
+    }
+
+    @PostMapping
+    public ResponseEntity<MedicoResponseDTO> createMedico(@RequestBody RegistrarMedicoDTO medicoResponseDTO) {
+        return medicoService.registrarMedico(medicoResponseDTO);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<MedicoResponseDTO> updateMedico(@PathVariable Long id, @RequestBody RegistrarMedicoDTO medicoResponseDTO) {
+        return medicoService.actualizarMedico(id, medicoResponseDTO);
     }
 }
