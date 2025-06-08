@@ -29,5 +29,7 @@ public class Paciente {
     private Date fechaNacimiento;
 
     public Paciente(Usuario nuevoUsuario, Date fechaNacimiento) {
+        this.idUsuario = nuevoUsuario;
+        this.fechaNacimiento = fechaNacimiento;
     }
 }

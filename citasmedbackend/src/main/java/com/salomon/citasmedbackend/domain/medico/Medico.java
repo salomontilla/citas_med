@@ -15,7 +15,7 @@ import lombok.Setter;
 @Table(name = "medicos")
 public class Medico {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne

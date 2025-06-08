@@ -1,13 +1,11 @@
 package com.salomon.citasmedbackend.domain.usuario;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 @Entity
 @Table(name = "usuarios")
 @Getter
@@ -16,6 +14,7 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String nombreCompleto;
     private String documento;
     private String email;
@@ -26,6 +25,20 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private Rol rol;
 
-    public Usuario(String s, String documento, String email, String telefono, String hashedPassword, boolean b, Rol rol) {
+    public Usuario(
+            String nombreCompleto,
+            String documento,
+            String email,
+            String telefono,
+            String contrasena,
+            Rol rol
+    ) {
+        this.nombreCompleto = nombreCompleto;
+        this.documento = documento;
+        this.email = email;
+        this.telefono = telefono;
+        this.contrasena = contrasena;
+        this.rol = rol;
+        this.activo = true;
     }
 }
