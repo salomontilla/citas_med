@@ -35,4 +35,14 @@ public class MedicoController {
     public ResponseEntity<MedicoResponseDTO> updateMedico(@PathVariable Long id, @RequestBody RegistrarMedicoDTO medicoResponseDTO) {
         return medicoService.actualizarMedico(id, medicoResponseDTO);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteMedico(@PathVariable Long id) {
+        return medicoService.eliminarMedico(id);
+    }
+
+    @PatchMapping("/activar/{id}")
+    public ResponseEntity<String> activarMedico(@PathVariable Long id) {
+        return medicoService.activarMedico(id);
+    }
 }

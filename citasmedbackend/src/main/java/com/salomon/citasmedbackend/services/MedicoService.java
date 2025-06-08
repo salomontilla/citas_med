@@ -118,7 +118,6 @@ public class MedicoService {
                         new MedicoResponseDTO(null, null, "El email ya está en uso", null, null, null)
                 );
             }
-            medico.getUsuario().setEmail(medicoResponseDTO.email());
         }
 
         if (medicoResponseDTO.documento() != null && !medicoResponseDTO.documento().equals(medico.getUsuario().getDocumento())) {
@@ -127,7 +126,6 @@ public class MedicoService {
                         new MedicoResponseDTO(null, null, "El documento ya está en uso", null, null, null)
                 );
             }
-            medico.getUsuario().setDocumento(medicoResponseDTO.documento());
         }
 
         medico.actualizarMedico(medicoResponseDTO);
@@ -141,5 +139,33 @@ public class MedicoService {
                 medico.getEspecialidad().toString()
         ));
 
+    }
+
+    public ResponseEntity<String> eliminarMedico(Long id) {
+        Optional<Medico> medicoOptional = medicoRepository.findById(id);
+        if (medicoOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Medico medico = medicoOptional.get();
+        medico.desactivarMedico();
+        medicoRepository.save(medico);
+        return ResponseEntity.noContent().build();
+    }
+
+    public ResponseEntity<String> activarMedico(Long id){
+        Optional<Medico> medicoOptional = medicoRepository.findById(id);
+        if (medicoOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Medico medico = medicoOptional.get();
+        if (medico.getUsuario().isActivo()) {
+            return ResponseEntity.badRequest().body("El médico ya está activo.");
+        }
+
+        medico.activarMedico();
+        medicoRepository.save(medico);
+        return ResponseEntity.ok("Médico activado correctamente.");
     }
 }

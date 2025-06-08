@@ -50,4 +50,12 @@ public class Medico {
             this.especialidad = Especialidad.valueOf(medico.especialidad());
         }
     }
+
+    public void desactivarMedico() {
+        this.usuario.setActivo(false);
+    }
+
+    public void activarMedico() {
+        this.usuario.setActivo(true);
+    }
 }
