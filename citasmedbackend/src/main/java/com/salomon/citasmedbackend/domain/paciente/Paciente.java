@@ -1,6 +1,7 @@
 package com.salomon.citasmedbackend.domain.paciente;
 
 
+import com.salomon.citasmedbackend.domain.usuario.PacientesResponseDTO;
 import com.salomon.citasmedbackend.domain.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -23,13 +24,21 @@ public class Paciente {
 
     @OneToOne
     @JoinColumn(name = "id_usuario", nullable = false)
-    private Usuario idUsuario;
+    private Usuario usuario;
 
     @Temporal(TemporalType.DATE)
     private Date fechaNacimiento;
 
     public Paciente(Usuario nuevoUsuario, Date fechaNacimiento) {
-        this.idUsuario = nuevoUsuario;
+        this.usuario = nuevoUsuario;
         this.fechaNacimiento = fechaNacimiento;
     }
+
+    public void updatePaciente(UsuarioUpdateDTO pacientesResponseDTO) {
+        if (pacientesResponseDTO.fechaNacimiento() != null) {
+            this.fechaNacimiento = Date.valueOf(pacientesResponseDTO.fechaNacimiento());
+        }
+    }
+
+
 }

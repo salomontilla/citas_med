@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/citasmed/")
+@RequestMapping("api/citasmed")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthenticationManager authManager;
     private final JwtUtil jwtService;
 
-    @PostMapping("auth/login")
+    @PostMapping("/auth/login")
     public ResponseEntity loginUser(@RequestBody UsuarioLoginDTO usuarioDto) {
         try{
 
@@ -32,6 +32,7 @@ public class AuthController {
             Authentication authUser = authManager.authenticate(auth);
 
             String token = jwtService.generateToken((DetallesUsuario) authUser.getPrincipal());
+            System.out.println(token);
 
             return ResponseEntity.ok(new JwtResponseDTO(token));
         }catch (BadCredentialsException e) {

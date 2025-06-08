@@ -27,33 +27,7 @@ public class UserController {
 
     private final PacienteRepository pacienteRepository;
 
-    @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody UsuarioRegisterDTO usuarioDto, UriComponentsBuilder uriBuilder) {
-        if (userRepository.existsByEmail(usuarioDto.email())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El correo electrónico ya está en uso");
-        }
-        if (userRepository.existsByDocumento(usuarioDto.documento())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El documento ya está registrado");
-        }
-        String hashedPassword = passwordEncoder.encode(usuarioDto.contrasena());
-        Usuario nuevoUsuario = new Usuario(
-                usuarioDto.nombreCompleto(),
-                usuarioDto.documento(),
-                usuarioDto.email(),
-                usuarioDto.telefono(),
-                hashedPassword,
-                Rol.PACIENTE
-        );
-        System.out.println(nuevoUsuario.toString());
-        Date fechaNacimiento = Date.valueOf(usuarioDto.fechaNacimiento());
-        Paciente paciente = new Paciente(
-                nuevoUsuario,
-                fechaNacimiento
-        );
-        userRepository.save(nuevoUsuario);
-        pacienteRepository.save(paciente);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Usuario registrado exitosamente");
-    }
+
     @GetMapping("/users")
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         List<Usuario> usuarios = userRepository.findAll();
