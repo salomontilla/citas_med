@@ -3,15 +3,19 @@ package com.salomon.citasmedbackend.domain.cita;
 import com.salomon.citasmedbackend.domain.paciente.Paciente;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import com.salomon.citasmedbackend.domain.usuario.Usuario;
 import com.salomon.citasmedbackend.domain.medico.Medico;
+import lombok.Setter;
 
 import java.sql.Date;
 import java.sql.Time;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "citas")
 public class Cita {
