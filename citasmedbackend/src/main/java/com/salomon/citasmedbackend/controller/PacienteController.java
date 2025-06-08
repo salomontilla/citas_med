@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.swing.text.html.Option;
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
@@ -128,4 +127,23 @@ public class PacienteController {
         return ResponseEntity.ok("Paciente actualizado exitosamente");
 
     }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<String> deletePaciente(@PathVariable Long id) {
+        Optional<Paciente> pacienteOptional = pacienteRepository.findById(id);
+        if (pacienteOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Paciente no encontrado");
+        }
+        Paciente paciente = pacienteOptional.get();
+        Usuario usuario = paciente.getUsuario();
+
+        // Desactivar el usuario
+        usuario.setActivo(false);
+        userRepository.save(usuario);
+
+        return ResponseEntity.ok("Paciente eliminado exitosamente");
+    }
+
+
 }
