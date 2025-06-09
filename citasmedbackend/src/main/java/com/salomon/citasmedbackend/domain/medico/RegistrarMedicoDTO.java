@@ -1,7 +1,7 @@
 package com.salomon.citasmedbackend.domain.medico;
 
 public record RegistrarMedicoDTO(
-        String nombre,
+        String nombreCompleto,
         String email,
         String contrasena,
         String documento,

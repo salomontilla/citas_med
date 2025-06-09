@@ -22,11 +22,11 @@ public class MedicoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MedicoResponseDTO> getMedicoById(Long id) {
+    public ResponseEntity<MedicoResponseDTO> getMedicoById(@PathVariable Long id) {
         return medicoService.obtenerMedicoPorId(id);
     }
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<MedicoResponseDTO> createMedico(@RequestBody RegistrarMedicoDTO medicoResponseDTO) {
         return medicoService.registrarMedico(medicoResponseDTO);
     }

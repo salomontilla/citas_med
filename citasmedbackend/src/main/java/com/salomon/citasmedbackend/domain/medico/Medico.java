@@ -31,8 +31,8 @@ public class Medico {
     }
 
     public void actualizarMedico(RegistrarMedicoDTO medico) {
-        if (medico.nombre() != null) {
-            this.usuario.setNombreCompleto(medico.nombre());
+        if (medico.nombreCompleto() != null) {
+            this.usuario.setNombreCompleto(medico.nombreCompleto());
         }
         if(medico.email() != null) {
             this.usuario.setEmail(medico.email());

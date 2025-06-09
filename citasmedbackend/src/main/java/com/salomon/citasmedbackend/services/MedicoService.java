@@ -76,7 +76,7 @@ public class MedicoService {
 
         String hashedPassword = passwordEncoder.encode(registrarMedicoDTO.contrasena());
         Usuario nuevoUsuario = new Usuario(
-                registrarMedicoDTO.nombre(),
+                registrarMedicoDTO.nombreCompleto(),
                 registrarMedicoDTO.documento(),
                 registrarMedicoDTO.email(),
                 registrarMedicoDTO.telefono(),
