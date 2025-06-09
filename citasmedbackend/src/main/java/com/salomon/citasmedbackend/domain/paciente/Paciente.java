@@ -39,5 +39,11 @@ public class Paciente {
         }
     }
 
+    public void desactivarPaciente() {
+        this.usuario.setActivo(false);
+    }
 
+    public void activarPaciente() {
+        this.usuario.setActivo(true);
+    }
 }

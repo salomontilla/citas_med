@@ -27,12 +27,12 @@ public class MedicoController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<MedicoResponseDTO> createMedico(@RequestBody RegistrarMedicoDTO medicoResponseDTO) {
+    public ResponseEntity<?> createMedico(@RequestBody RegistrarMedicoDTO medicoResponseDTO) {
         return medicoService.registrarMedico(medicoResponseDTO);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<MedicoResponseDTO> updateMedico(@PathVariable Long id, @RequestBody RegistrarMedicoDTO medicoResponseDTO) {
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateMedico(@PathVariable Long id, @RequestBody RegistrarMedicoDTO medicoResponseDTO) {
         return medicoService.actualizarMedico(id, medicoResponseDTO);
     }
 

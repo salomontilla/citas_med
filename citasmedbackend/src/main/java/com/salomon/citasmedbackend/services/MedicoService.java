@@ -12,9 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +24,7 @@ public class MedicoService {
     private final PasswordEncoder passwordEncoder;
 
     public ResponseEntity<List<MedicoResponseDTO>> obtenerMedicos(){
-        List<Medico> medicos = medicoRepository.findAll();
+        List<Medico> medicos = medicoRepository.findAllByUsuarioActivoTrue();
         if (medicos.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -44,9 +42,9 @@ public class MedicoService {
     }
 
     public ResponseEntity<MedicoResponseDTO> obtenerMedicoPorId(Long id) {
-        Optional<Medico> medicoOptional = medicoRepository.findById(id);
+        Optional<Medico> medicoOptional = medicoRepository.findByIdAndUsuarioActivo(id);
         if (medicoOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         }
         Medico medico = medicoOptional.get();
         MedicoResponseDTO medicoResponse = new MedicoResponseDTO(
@@ -61,17 +59,13 @@ public class MedicoService {
     }
 
     @Transactional
-    public ResponseEntity<MedicoResponseDTO> registrarMedico (RegistrarMedicoDTO registrarMedicoDTO) {
+    public ResponseEntity<?> registrarMedico (RegistrarMedicoDTO registrarMedicoDTO) {
 
         if(userRepository.existsByEmail(registrarMedicoDTO.email())) {
-            return ResponseEntity.badRequest().body(
-                    new MedicoResponseDTO(null, null, "El email ya está en uso", null, null, null)
-            );
+            return ResponseEntity.badRequest().body("El email ya está en uso");
         }
         if(userRepository.existsByDocumento(registrarMedicoDTO.documento())) {
-            return ResponseEntity.badRequest().body(
-                    new MedicoResponseDTO(null, null, "El documento ya está en uso", null, null, null)
-            );
+            return ResponseEntity.badRequest().body("El documento ya está registrado");
         }
 
         String hashedPassword = passwordEncoder.encode(registrarMedicoDTO.contrasena());
@@ -104,7 +98,7 @@ public class MedicoService {
         return ResponseEntity.status(201).body(medicoResponse);
     }
 
-    public ResponseEntity<MedicoResponseDTO> actualizarMedico(Long id, RegistrarMedicoDTO medicoResponseDTO) {
+    public ResponseEntity<?> actualizarMedico(Long id, RegistrarMedicoDTO medicoResponseDTO) {
         Optional<Medico> medicoOptional = medicoRepository.findById(id);
         if (medicoOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -114,17 +108,13 @@ public class MedicoService {
 
         if (medicoResponseDTO.email() != null && !medicoResponseDTO.email().equals(medico.getUsuario().getEmail())) {
             if (userRepository.existsByEmail(medicoResponseDTO.email())) {
-                return ResponseEntity.badRequest().body(
-                        new MedicoResponseDTO(null, null, "El email ya está en uso", null, null, null)
-                );
+                return ResponseEntity.badRequest().body("El email ya está en uso");
             }
         }
 
         if (medicoResponseDTO.documento() != null && !medicoResponseDTO.documento().equals(medico.getUsuario().getDocumento())) {
             if (userRepository.existsByDocumento(medicoResponseDTO.documento())) {
-                return ResponseEntity.badRequest().body(
-                        new MedicoResponseDTO(null, null, "El documento ya está en uso", null, null, null)
-                );
+                return ResponseEntity.badRequest().body("El documento ya está registrado");
             }
         }
 
@@ -148,9 +138,14 @@ public class MedicoService {
         }
 
         Medico medico = medicoOptional.get();
+
+        if (!medico.getUsuario().isActivo()) {
+            return ResponseEntity.badRequest().body("El médico ya está eliminado.");
+        }
+
         medico.desactivarMedico();
         medicoRepository.save(medico);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Médico eliminado correctamente.");
     }
 
     public ResponseEntity<String> activarMedico(Long id){
