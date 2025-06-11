@@ -93,7 +93,7 @@ public class PacienteService {
                 paciente.getFechaNacimiento()
         );
 
-        return ResponseEntity.status(201).body("Paciente registrado exitosamente" + response );
+        return ResponseEntity.status(201).body(response );
     }
 
     @Transactional
