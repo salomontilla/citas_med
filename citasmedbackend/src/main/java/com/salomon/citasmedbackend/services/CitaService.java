@@ -1,7 +1,9 @@
 package com.salomon.citasmedbackend.services;
 
 import com.salomon.citasmedbackend.domain.cita.Cita;
+import com.salomon.citasmedbackend.domain.cita.CitaActualizarDTO;
 import com.salomon.citasmedbackend.domain.cita.CitaRegisterDTO;
+import com.salomon.citasmedbackend.domain.cita.EstadoCita;
 import com.salomon.citasmedbackend.domain.medico.Medico;
 import com.salomon.citasmedbackend.domain.paciente.Paciente;
 import com.salomon.citasmedbackend.repository.CitasRepository;
@@ -79,5 +81,28 @@ public class CitaService {
         Medico medico = medicoRepository.findByIdAndUsuarioActivo(medicoId)
                 .orElseThrow(() -> new RuntimeException("Médico no encontrado o inactivo"));
         return citasRepository.findByMedicoId(medico.getId());
+    }
+
+    public Cita actualizarCita(Long id, CitaActualizarDTO citaDto) {
+        Cita cita = citasRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Cita no encontrada")
+        );
+        cita.actualizarCita(citaDto);
+        citasRepository.save(cita);
+        return cita;
+    }
+
+    public String eliminarCita(Long id) {
+        Cita cita = citasRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Cita no encontrada")
+        );
+
+        if (cita.getEstado() == EstadoCita.CANCELADA) {
+            return "La cita ya está cancelada.";
+        }
+
+        cita.setEstado(EstadoCita.CANCELADA);
+        citasRepository.save(cita);
+        return "Cita cancelada correctamente.";
     }
 }

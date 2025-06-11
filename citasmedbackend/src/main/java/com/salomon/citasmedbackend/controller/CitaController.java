@@ -1,6 +1,7 @@
 package com.salomon.citasmedbackend.controller;
 
 import com.salomon.citasmedbackend.domain.cita.Cita;
+import com.salomon.citasmedbackend.domain.cita.CitaActualizarDTO;
 import com.salomon.citasmedbackend.domain.cita.CitaRegisterDTO;
 import com.salomon.citasmedbackend.domain.cita.CitaResponseDTO;
 import com.salomon.citasmedbackend.services.CitaService;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -103,23 +105,26 @@ public class CitaController {
     }
 
     @PatchMapping("/{id}")
+    @Transactional
     public ResponseEntity<?> updateCita(@PathVariable Long id, @RequestBody CitaActualizarDTO citaDto) {
-        return citaService.actualizarCita(id, citaDto);
-    }
 
-    @PatchMapping("/estado/{id}")
-    public ResponseEntity<?> updateEstadoCita(@PathVariable Long id) {
-        return citaService.actualizarEstadoCita(id);
+        Cita updatedCita = citaService.actualizarCita(id, citaDto);
+        CitaResponseDTO response = new CitaResponseDTO(
+                updatedCita.getId(),
+                updatedCita.getPaciente().getId(),
+                updatedCita.getMedico().getId(),
+                updatedCita.getFecha().toString(),
+                updatedCita.getHora().toString(),
+                updatedCita.getEstado().toString()
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
+    @Transactional
     public ResponseEntity<?> deleteCita(@PathVariable Long id) {
-        return citaService.eliminarCita(id);
+        return ResponseEntity.ok(citaService.eliminarCita(id));
     }
-
-
-
-
-
 
 }
