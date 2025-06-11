@@ -40,4 +40,12 @@ public class Cita {
     @Enumerated(EnumType.STRING)
     private EstadoCita estado;
 
+    public Cita (Paciente paciente, Medico medico, Date fecha, Time hora) {
+        this.paciente = paciente;
+        this.medico = medico;
+        this.fecha = fecha;
+        this.hora = hora;
+        this.estado = EstadoCita.CONFIRMADA;
+    }
+
 }
