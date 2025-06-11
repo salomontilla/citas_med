@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/citasmed/citas")
@@ -30,12 +32,34 @@ public class CitaController {
 
     @GetMapping
     public ResponseEntity<?> getCitas(){
-        return citaService.obtenerCitas();
+        List<Cita> citas = citaService.obtenerCitas();
+        if (citas.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        List<CitaResponseDTO> citasResponse = citas.stream()
+                .map(cita -> new CitaResponseDTO(
+                        cita.getId(),
+                        cita.getPaciente().getId(),
+                        cita.getMedico().getId(),
+                        cita.getFecha().toString(),
+                        cita.getHora().toString(),
+                        cita.getEstado().toString()
+                )).toList();
+        return ResponseEntity.ok(citasResponse);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getCitaById(@PathVariable Long id){
-        return citaService.obtenerCitaPorId(id);
+        Cita cita = citaService.obtenerCitaById(id);
+        CitaResponseDTO response = new CitaResponseDTO(
+                cita.getId(),
+                cita.getPaciente().getId(),
+                cita.getMedico().getId(),
+                cita.getFecha().toString(),
+                cita.getHora().toString(),
+                cita.getEstado().toString()
+        );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/paciente/{pacienteId}")

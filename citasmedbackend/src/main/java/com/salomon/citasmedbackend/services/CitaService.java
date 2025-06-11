@@ -16,6 +16,7 @@ import java.sql.Time;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -52,5 +53,18 @@ public class CitaService {
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Formato de fecha inválido. Usa dd-MM-yyyy");
         }
+    }
+
+    public List<Cita> obtenerCitas() {
+        List<Cita> citas = citasRepository.findAll();
+        if (citas.isEmpty()) {
+            return List.of();
+        }
+        return citas;
+    }
+
+    public Cita obtenerCitaById(Long id) {
+        return citasRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
     }
 }
