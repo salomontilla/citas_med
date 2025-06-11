@@ -1,12 +1,13 @@
 package com.salomon.citasmedbackend.domain.cita;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 
-public record CitaRegisterDTO(
-    @NotBlank
+public record CitaAgendarDTO(
+    @NotNull
     Long pacienteId,
-    @NotBlank
+    @NotNull
     Long medicoId,
     @NotBlank
     String fecha,

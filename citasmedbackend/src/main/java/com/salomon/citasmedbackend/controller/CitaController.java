@@ -2,18 +2,16 @@ package com.salomon.citasmedbackend.controller;
 
 import com.salomon.citasmedbackend.domain.cita.Cita;
 import com.salomon.citasmedbackend.domain.cita.CitaActualizarDTO;
-import com.salomon.citasmedbackend.domain.cita.CitaRegisterDTO;
+import com.salomon.citasmedbackend.domain.cita.CitaAgendarDTO;
 import com.salomon.citasmedbackend.domain.cita.CitaResponseDTO;
 import com.salomon.citasmedbackend.services.CitaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -23,7 +21,7 @@ public class CitaController {
     private final CitaService citaService;
 
     @PostMapping("/agendar")
-    public ResponseEntity<CitaResponseDTO> agendarCita(@RequestBody @Valid CitaRegisterDTO citaDto) {
+    public ResponseEntity<CitaResponseDTO> agendarCita(@RequestBody @Valid CitaAgendarDTO citaDto) {
         Cita cita = citaService.agendarCita(citaDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(new CitaResponseDTO(cita.getId(),
                 cita.getPaciente().getId(),
@@ -124,7 +122,7 @@ public class CitaController {
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<?> deleteCita(@PathVariable Long id) {
-        return ResponseEntity.ok(citaService.eliminarCita(id));
+        return ResponseEntity.ok(citaService.cancelarCita(id));
     }
 
 }

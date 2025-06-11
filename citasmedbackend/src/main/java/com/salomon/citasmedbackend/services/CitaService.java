@@ -2,7 +2,7 @@ package com.salomon.citasmedbackend.services;
 
 import com.salomon.citasmedbackend.domain.cita.Cita;
 import com.salomon.citasmedbackend.domain.cita.CitaActualizarDTO;
-import com.salomon.citasmedbackend.domain.cita.CitaRegisterDTO;
+import com.salomon.citasmedbackend.domain.cita.CitaAgendarDTO;
 import com.salomon.citasmedbackend.domain.cita.EstadoCita;
 import com.salomon.citasmedbackend.domain.medico.Medico;
 import com.salomon.citasmedbackend.domain.paciente.Paciente;
@@ -10,7 +10,6 @@ import com.salomon.citasmedbackend.repository.CitasRepository;
 import com.salomon.citasmedbackend.repository.MedicoRepository;
 import com.salomon.citasmedbackend.repository.PacienteRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -27,7 +26,7 @@ public class CitaService {
     private final PacienteRepository pacienteRepository;
     private final MedicoRepository medicoRepository;
 
-    public Cita agendarCita( CitaRegisterDTO citaDto) {
+    public Cita agendarCita( CitaAgendarDTO citaDto) {
         Paciente paciente = pacienteRepository.findByIdAndUsuarioActivo(citaDto.pacienteId())
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado o inactivo"));
         Medico medico = medicoRepository.findByIdAndUsuarioActivo(citaDto.medicoId())
@@ -38,7 +37,8 @@ public class CitaService {
                 paciente,
                 medico,
                 formattedDate,
-                Time.valueOf(citaDto.hora())
+                Time.valueOf(citaDto.hora()),
+                EstadoCita.CONFIRMADA
         );
 
         citasRepository.save(nuevaCita);
@@ -92,7 +92,7 @@ public class CitaService {
         return cita;
     }
 
-    public String eliminarCita(Long id) {
+    public String cancelarCita(Long id) {
         Cita cita = citasRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Cita no encontrada")
         );
