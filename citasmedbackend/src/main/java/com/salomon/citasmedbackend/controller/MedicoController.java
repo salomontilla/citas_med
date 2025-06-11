@@ -16,6 +16,9 @@ public class MedicoController {
 
     private final MedicoService medicoService;
 
+    // CRUD operations for Medico
+
+    //READ
     @GetMapping
     public ResponseEntity<List<MedicoResponseDTO>> getAllMedicos (){
         return medicoService.obtenerMedicos();
@@ -25,17 +28,18 @@ public class MedicoController {
     public ResponseEntity<MedicoResponseDTO> getMedicoById(@PathVariable Long id) {
         return medicoService.obtenerMedicoPorId(id);
     }
-
+    //READ
     @PostMapping("/register")
     public ResponseEntity<?> createMedico(@RequestBody RegistrarMedicoDTO medicoResponseDTO) {
         return medicoService.registrarMedico(medicoResponseDTO);
     }
-
+    //UPDATE
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateMedico(@PathVariable Long id, @RequestBody RegistrarMedicoDTO medicoResponseDTO) {
         return medicoService.actualizarMedico(id, medicoResponseDTO);
     }
 
+    //DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteMedico(@PathVariable Long id) {
         return medicoService.eliminarMedico(id);

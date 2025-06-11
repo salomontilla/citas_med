@@ -17,17 +17,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/citasmed")
+@RequestMapping("api/citasmed/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthenticationManager authManager;
     private final JwtUtil jwtService;
 
-    @PostMapping("/auth/login")
-    public ResponseEntity loginUser(@RequestBody UsuarioLoginDTO usuarioDto) {
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody UsuarioLoginDTO usuarioDto) {
         try{
-
             Authentication auth = new UsernamePasswordAuthenticationToken(usuarioDto.email(), usuarioDto.contrasena());
             Authentication authUser = authManager.authenticate(auth);
 

@@ -17,11 +17,13 @@ import java.util.List;
 public class PacienteController {
     private final PacienteService pacienteService;
 
+    //CREATE
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody PacienteRegisterDTO usuarioDto, UriComponentsBuilder uriBuilder) {
         return pacienteService.registrarPaciente(usuarioDto);
     }
 
+    //READ
     @GetMapping
     public ResponseEntity<List<PacientesResponseDTO>> getAllPacientes() {
         return pacienteService.obtenerPacientes();
@@ -32,16 +34,18 @@ public class PacienteController {
         return pacienteService.obtenerPacientePorId(id);
     }
 
+    //UPDATE
     @PatchMapping("/{id}")
     public ResponseEntity<?> updatePaciente(@PathVariable Long id, @RequestBody PacienteUpdateDTO usuarioDto) {
         return pacienteService.actualizarPaciente(id, usuarioDto);
     }
 
+    //DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePaciente(@PathVariable Long id) {
-
         return pacienteService.eliminarPaciente(id);
     }
+
 
     @PatchMapping("/activar/{id}")
     public ResponseEntity<?> activarPaciente (@PathVariable Long id){
