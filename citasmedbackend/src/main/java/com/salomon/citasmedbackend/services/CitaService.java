@@ -67,4 +67,17 @@ public class CitaService {
         return citasRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
     }
+
+    public List<Cita> obtenerCitasPorPacienteId(Long pacienteId) {
+        Paciente paciente = pacienteRepository.findByIdAndUsuarioActivo(pacienteId)
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado o inactivo"));
+        return citasRepository.findByPacienteId(paciente.getId());
+
+    }
+
+    public List<Cita> obtenerCitasPorMedicoId(Long medicoId) {
+        Medico medico = medicoRepository.findByIdAndUsuarioActivo(medicoId)
+                .orElseThrow(() -> new RuntimeException("Médico no encontrado o inactivo"));
+        return citasRepository.findByMedicoId(medico.getId());
+    }
 }

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -34,7 +35,7 @@ public class CitaController {
     public ResponseEntity<?> getCitas(){
         List<Cita> citas = citaService.obtenerCitas();
         if (citas.isEmpty()) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok(List.of());
         }
         List<CitaResponseDTO> citasResponse = citas.stream()
                 .map(cita -> new CitaResponseDTO(
@@ -64,12 +65,41 @@ public class CitaController {
 
     @GetMapping("/paciente/{pacienteId}")
     public ResponseEntity<?> getCitasByPacienteId(@PathVariable Long pacienteId) {
-        return citaService.obtenerCitasPorPacienteId(pacienteId);
+        List<Cita> citas = citaService.obtenerCitasPorPacienteId(pacienteId);
+        if (citas.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+        List<CitaResponseDTO> citasResponse = citas.stream()
+                .map(cita -> new CitaResponseDTO(
+                        cita.getId(),
+                        cita.getPaciente().getId(),
+                        cita.getMedico().getId(),
+                        cita.getFecha().toString(),
+                        cita.getHora().toString(),
+                        cita.getEstado().toString()
+                )).toList();
+
+        return ResponseEntity.ok(citasResponse);
     }
 
     @GetMapping("/medico/{medicoId}")
     public ResponseEntity<?> getCitasByMedicoId(@PathVariable Long medicoId) {
-        return citaService.obtenerCitasPorMedicoId(medicoId);
+        List<Cita> citas = citaService.obtenerCitasPorMedicoId(medicoId);
+        if (citas.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+        List<CitaResponseDTO> citasResponse = citas.stream()
+                .map(cita -> new CitaResponseDTO(
+                        cita.getId(),
+                        cita.getPaciente().getId(),
+                        cita.getMedico().getId(),
+                        cita.getFecha().toString(),
+                        cita.getHora().toString(),
+                        cita.getEstado().toString()
+                )).toList();
+
+        return ResponseEntity.ok(citasResponse);
+
     }
 
     @PatchMapping("/{id}")
