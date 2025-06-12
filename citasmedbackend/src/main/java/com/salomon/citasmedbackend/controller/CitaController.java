@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/citasmed/citas")
+@RequestMapping("/api/citasmed/pacientes/citas")
 public class CitaController {
     private final CitaService citaService;
 

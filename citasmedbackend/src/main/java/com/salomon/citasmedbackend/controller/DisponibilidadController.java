@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/citasmed/disponibilidades")
+@RequestMapping("/api/citasmed/medicos/disponibilidades")
 public class DisponibilidadController {
     private final DisponibilidadService disponibilidadService;
 
