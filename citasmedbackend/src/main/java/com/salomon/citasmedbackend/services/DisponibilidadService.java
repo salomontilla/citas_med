@@ -54,11 +54,7 @@ public class DisponibilidadService {
     }
 
     public List<Disponibilidad> obtenerDisponibilidades(){
-        List<Disponibilidad> disponibilidades = disponibilidadRepository.findAll();
-        if (disponibilidades.isEmpty()) {
-            return List.of();
-        }
-        return disponibilidades;
+        return disponibilidadRepository.findAll();
     }
 
     public List<Disponibilidad> obtenerDisponibilidadesPorMedico(Long medicoId) {
