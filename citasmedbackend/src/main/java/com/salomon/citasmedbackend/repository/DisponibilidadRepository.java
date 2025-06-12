@@ -1,7 +1,7 @@
 package com.salomon.citasmedbackend.repository;
 
-import com.salomon.citasmedbackend.domain.medico.DiaSemana;
-import com.salomon.citasmedbackend.domain.medico.Disponibilidad;
+import com.salomon.citasmedbackend.domain.disponibilidad.DiaSemana;
+import com.salomon.citasmedbackend.domain.disponibilidad.Disponibilidad;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

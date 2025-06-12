@@ -1,4 +1,4 @@
-package com.salomon.citasmedbackend.domain.medico;
+package com.salomon.citasmedbackend.domain.disponibilidad;
 
 public enum DiaSemana {
     LUNES,

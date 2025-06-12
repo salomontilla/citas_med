@@ -1,14 +1,13 @@
 package com.salomon.citasmedbackend.services;
 
 import com.salomon.citasmedbackend.domain.disponibilidad.DisponibilidadDTO;
-import com.salomon.citasmedbackend.domain.medico.Disponibilidad;
+import com.salomon.citasmedbackend.domain.disponibilidad.Disponibilidad;
 import com.salomon.citasmedbackend.domain.medico.Medico;
 import com.salomon.citasmedbackend.repository.DisponibilidadRepository;
 import com.salomon.citasmedbackend.repository.MedicoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 

@@ -1,6 +1,5 @@
 package com.salomon.citasmedbackend.domain.disponibilidad;
 
-import com.salomon.citasmedbackend.domain.medico.DiaSemana;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
