@@ -19,7 +19,6 @@ public class DisponibilidadController {
     public ResponseEntity<?> registrarDisponibilidad(@RequestBody @Valid DisponibilidadDTO dto) {
         Disponibilidad nueva = disponibilidadService.agregarDisponibilidad(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(nueva);
-
     }
 
 
