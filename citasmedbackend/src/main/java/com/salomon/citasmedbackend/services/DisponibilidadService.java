@@ -67,4 +67,11 @@ public class DisponibilidadService {
         return disponibilidadRepository.findByMedicoId(medico.getId());
     }
 
+    public String eliminarDisponibilidad(Long id) {
+        Disponibilidad disponibilidad = disponibilidadRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Disponibilidad no encontrada"));
+        disponibilidadRepository.delete(disponibilidad);
+        return "Disponibilidad eliminada correctamente.";
+    }
+
 }

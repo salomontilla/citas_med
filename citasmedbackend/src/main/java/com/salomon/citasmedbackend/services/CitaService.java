@@ -124,16 +124,21 @@ public class CitaService {
 
     private void validarDisponibilidad(Long medicoId, Date fechaAgendada, Time horaInicio) {
         DiaSemana dia = DIA_SEMANA_MAP.get(fechaAgendada.toLocalDate().getDayOfWeek());
-        Disponibilidad disponibilidad = diponibilidadRepository
-                .findDisponibilidadByMedicoIdAndDiaSemana(medicoId, dia)
-                .orElseThrow(
-                        () -> new RuntimeException("El médico no tiene disponibilidad para el día seleccionado")
-                );
+        List<Disponibilidad> disponibilidad = diponibilidadRepository
+                .findDisponibilidadByMedicoIdAndDiaSemana(medicoId, dia);
+        if (disponibilidad.isEmpty()) {
+            throw new RuntimeException("No hay disponibilidad para el médico en este día");
+        }
+
         LocalTime horaInicioDeseada = horaInicio.toLocalTime();
         LocalTime horaFin = horaInicioDeseada.plusMinutes(30);
 
-        if (horaInicioDeseada.isBefore(disponibilidad.getHoraInicio().toLocalTime()) ||
-                horaFin.isAfter(disponibilidad.getHoraFin().toLocalTime())) {
+        boolean dentroDeHorario = disponibilidad.stream().anyMatch(d ->
+                !horaInicioDeseada.isBefore(d.getHoraInicio().toLocalTime()) &&
+                        !horaFin.isAfter(d.getHoraFin().toLocalTime())
+        );
+
+        if (!dentroDeHorario) {
             throw new RuntimeException("La hora está fuera del horario de atención del médico");
         }
         // Validar que no se cruce con otra cita

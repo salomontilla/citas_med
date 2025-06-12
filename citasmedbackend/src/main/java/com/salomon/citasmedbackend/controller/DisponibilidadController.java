@@ -52,5 +52,10 @@ public class DisponibilidadController {
                 )).toList());
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarDisponibilidad(@PathVariable Long id) {
+        return ResponseEntity.ok(disponibilidadService.eliminarDisponibilidad(id));
+    }
+
 
 }
