@@ -1,12 +1,15 @@
 package com.salomon.citasmedbackend.infra.errors;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +37,22 @@ public class ValidationExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler({ HttpMessageNotReadableException.class })
+    public ResponseEntity<?> handleEnumConversionError(HttpMessageNotReadableException ex) {
+        if (ex.getCause() instanceof InvalidFormatException invalidFormatException) {
+            Class<?> targetType = invalidFormatException.getTargetType();
+            if (targetType.isEnum()) {
+                String[] acceptedValues = Arrays.stream(targetType.getEnumConstants())
+                        .map(Object::toString)
+                        .toArray(String[]::new);
+                return ResponseEntity.badRequest().body(
+                        "Estado inválido. Los valores válidos son: " + String.join(", ", acceptedValues)
+                );
+            }
+        }
+        return ResponseEntity.badRequest().body("Error al procesar la solicitud");
     }
 
 }

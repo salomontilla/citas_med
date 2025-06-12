@@ -104,7 +104,7 @@ public class CitaController {
 
     @PatchMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> updateCita(@PathVariable Long id, @RequestBody CitaActualizarDTO citaDto) {
+    public ResponseEntity<?> updateCita(@PathVariable Long id, @RequestBody  @Valid CitaActualizarDTO citaDto) {
 
         Cita updatedCita = citaService.actualizarCita(id, citaDto);
         CitaResponseDTO response = new CitaResponseDTO(
