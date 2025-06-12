@@ -20,9 +20,6 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         List<Usuario> usuarios = userRepository.findAll();
-        if (usuarios.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        }
         List<UserResponseDTO> userResponses = usuarios.stream()
                 .map(usuario -> new UserResponseDTO(
                         usuario.getId(),

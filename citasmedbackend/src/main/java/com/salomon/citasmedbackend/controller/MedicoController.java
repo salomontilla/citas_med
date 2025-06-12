@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -24,7 +26,8 @@ public class MedicoController {
     //CREATE
     @PostMapping("/register")
     @Transactional
-    public ResponseEntity<?> createMedico(@RequestBody @Valid RegistrarMedicoDTO medicoResponseDTO) {
+    public ResponseEntity<?> createMedico(@RequestBody @Valid RegistrarMedicoDTO medicoResponseDTO,
+                                          UriComponentsBuilder uriBuilder) {
         Medico nuevoMedico = medicoService.registrarMedico(medicoResponseDTO);
         MedicoResponseDTO medicoResponse = new MedicoResponseDTO(
                 nuevoMedico.getId(),
@@ -34,7 +37,11 @@ public class MedicoController {
                 nuevoMedico.getUsuario().getTelefono(),
                 nuevoMedico.getEspecialidad().toString()
         );
-        return ResponseEntity.ok().body(medicoResponse);
+        URI location = uriBuilder
+                .path("/api/citasmed/medicos/{id}")
+                .buildAndExpand(nuevoMedico.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(medicoResponse);
     }
     //READ
     @GetMapping
@@ -67,8 +74,11 @@ public class MedicoController {
     //UPDATE
     @PatchMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> updateMedico(@PathVariable Long id, @RequestBody @Valid RegistrarMedicoDTO medicoResponseDTO) {
+    public ResponseEntity<?> updateMedico(@PathVariable Long id,
+                                          @RequestBody RegistrarMedicoDTO medicoResponseDTO,
+                                          UriComponentsBuilder uriBuilder) {
         Medico medico = medicoService.actualizarMedico(id, medicoResponseDTO);
+
         return ResponseEntity.ok(new MedicoResponseDTO(
                 medico.getId(),
                 medico.getUsuario().getNombreCompleto(),
