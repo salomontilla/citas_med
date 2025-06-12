@@ -4,9 +4,12 @@ import com.salomon.citasmedbackend.domain.cita.Cita;
 import com.salomon.citasmedbackend.domain.cita.CitaActualizarDTO;
 import com.salomon.citasmedbackend.domain.cita.CitaAgendarDTO;
 import com.salomon.citasmedbackend.domain.cita.EstadoCita;
+import com.salomon.citasmedbackend.domain.medico.DiaSemana;
+import com.salomon.citasmedbackend.domain.medico.Disponibilidad;
 import com.salomon.citasmedbackend.domain.medico.Medico;
 import com.salomon.citasmedbackend.domain.paciente.Paciente;
-import com.salomon.citasmedbackend.repository.CitasRepository;
+import com.salomon.citasmedbackend.repository.CitaRepository;
+import com.salomon.citasmedbackend.repository.DisponibilidadRepository;
 import com.salomon.citasmedbackend.repository.MedicoRepository;
 import com.salomon.citasmedbackend.repository.PacienteRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.List;
 
 import static com.salomon.citasmedbackend.infra.utils.FechaUtils.convertirFecha;
@@ -22,7 +26,8 @@ import static com.salomon.citasmedbackend.infra.utils.FechaUtils.convertirHora;
 @Service
 @RequiredArgsConstructor
 public class CitaService {
-    private final CitasRepository citasRepository;
+    private final DisponibilidadRepository diponibilidadRepository;
+    private final CitaRepository citasRepository;
     private final PacienteRepository pacienteRepository;
     private final MedicoRepository medicoRepository;
 
@@ -34,6 +39,7 @@ public class CitaService {
 
         Date formattedDate = convertirFecha(citaDto.fecha());
         Time formattedTime = convertirHora(citaDto.hora());
+        validarDisponibilidad(medico.getId(), formattedDate, formattedTime);
         Cita nuevaCita = new Cita(
                 paciente,
                 medico,
@@ -88,8 +94,7 @@ public class CitaService {
 
             citasRepository.save(cita);
             return cita;
-
-    }
+   }
 
     public String cancelarCita(Long id) {
         Cita cita = citasRepository.findById(id).orElseThrow(
@@ -104,5 +109,31 @@ public class CitaService {
         citasRepository.save(cita);
         return "Cita cancelada correctamente.";
     }
+    private void validarDisponibilidad(Long medicoId, Date fechaAgendada, Time horaInicio) {
+        DiaSemana dia = DiaSemana.valueOf(fechaAgendada.toLocalDate().getDayOfWeek().name());
+        Disponibilidad disponibilidad = diponibilidadRepository
+                .findDisponibilidadByMedicoIdAndDiaSemana(medicoId, dia)
+                .orElseThrow(
+                        () -> new RuntimeException("El médico no tiene disponibilidad para el día seleccionado")
+                );
+        LocalTime horaInicioDeseada = horaInicio.toLocalTime();
+        LocalTime horaFin = horaInicioDeseada.plusMinutes(30);
 
+        if (horaInicioDeseada.isBefore(disponibilidad.getHoraInicio().toLocalTime()) ||
+                horaFin.isAfter(disponibilidad.getHoraFin().toLocalTime())) {
+            throw new RuntimeException("La hora está fuera del horario de atención del médico");
+        }
+        // Validar que no se cruce con otra cita
+        List<Cita> citasEseDia = citasRepository.findByMedicoIdAndFecha(medicoId, fechaAgendada);
+
+        for (Cita cita : citasEseDia) {
+            LocalTime citaInicio = cita.getHora().toLocalTime();
+            LocalTime citaFin = citaInicio.plusMinutes(30);
+
+            // Verificar si se cruzan (hay solapamiento)
+            if (!(horaFin.isBefore(citaInicio) || horaInicioDeseada.isAfter(citaFin.minusNanos(1)))) {
+                throw new RuntimeException("Ya hay una cita agendada en ese horario");
+            }
+        }
+    }
 }

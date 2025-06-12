@@ -31,7 +31,6 @@ public class AuthController {
             Authentication authUser = authManager.authenticate(auth);
 
             String token = jwtService.generateToken((DetallesUsuario) authUser.getPrincipal());
-            System.out.println(token);
 
             return ResponseEntity.ok(new JwtResponseDTO(token));
         }catch (BadCredentialsException e) {
