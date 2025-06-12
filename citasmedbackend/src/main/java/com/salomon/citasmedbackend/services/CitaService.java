@@ -17,8 +17,10 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 import static com.salomon.citasmedbackend.infra.utils.FechaUtils.convertirFecha;
 import static com.salomon.citasmedbackend.infra.utils.FechaUtils.convertirHora;
@@ -30,6 +32,16 @@ public class CitaService {
     private final CitaRepository citasRepository;
     private final PacienteRepository pacienteRepository;
     private final MedicoRepository medicoRepository;
+
+    private static final Map<DayOfWeek, DiaSemana> DIA_SEMANA_MAP = Map.of(
+            DayOfWeek.MONDAY, DiaSemana.LUNES,
+            DayOfWeek.TUESDAY, DiaSemana.MARTES,
+            DayOfWeek.WEDNESDAY, DiaSemana.MIERCOLES,
+            DayOfWeek.THURSDAY, DiaSemana.JUEVES,
+            DayOfWeek.FRIDAY, DiaSemana.VIERNES,
+            DayOfWeek.SATURDAY, DiaSemana.SABADO,
+            DayOfWeek.SUNDAY, DiaSemana.DOMINGO
+    );
 
     public Cita agendarCita( CitaAgendarDTO citaDto) {
         Paciente paciente = pacienteRepository.findByIdAndUsuarioActivo(citaDto.pacienteId())
@@ -109,8 +121,9 @@ public class CitaService {
         citasRepository.save(cita);
         return "Cita cancelada correctamente.";
     }
+
     private void validarDisponibilidad(Long medicoId, Date fechaAgendada, Time horaInicio) {
-        DiaSemana dia = DiaSemana.valueOf(fechaAgendada.toLocalDate().getDayOfWeek().name());
+        DiaSemana dia = DIA_SEMANA_MAP.get(fechaAgendada.toLocalDate().getDayOfWeek());
         Disponibilidad disponibilidad = diponibilidadRepository
                 .findDisponibilidadByMedicoIdAndDiaSemana(medicoId, dia)
                 .orElseThrow(

@@ -35,8 +35,8 @@ public class DisponibilidadService {
                 .findByMedicoIdAndDiaSemana(medico.getId(), dto.diaSemana());
 
         boolean seCruza = existentes.stream().anyMatch(d ->
-                (horaInicio.isBefore(d.getHoraInicio().toLocalTime()) &&
-                        horaFin.isAfter(d.getHoraInicio().toLocalTime()))
+                horaInicio.isBefore(d.getHoraFin().toLocalTime()) &&
+                        horaFin.isAfter(d.getHoraInicio().toLocalTime())
         );
 
         if (seCruza) {
