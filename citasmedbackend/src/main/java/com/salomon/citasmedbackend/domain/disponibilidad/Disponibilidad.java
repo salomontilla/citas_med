@@ -1,5 +1,6 @@
-package com.salomon.citasmedbackend.domain.medico;
+package com.salomon.citasmedbackend.domain.disponibilidad;
 
+import com.salomon.citasmedbackend.domain.medico.Medico;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +21,7 @@ public class Disponibilidad {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "id_medico", nullable = false)
     private Medico medico;
 
     @Enumerated(EnumType.STRING)
