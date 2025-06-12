@@ -24,49 +24,27 @@ public class MedicoService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public ResponseEntity<List<MedicoResponseDTO>> obtenerMedicos(){
+    public List<Medico> obtenerMedicos(){
         List<Medico> medicos = medicoRepository.findAllByUsuarioActivoTrue();
         if (medicos.isEmpty()) {
-            return ResponseEntity.noContent().build();
+            return List.of();
         }
-        List<MedicoResponseDTO> medicosResponse =  medicos.stream()
-                .map(medico -> new MedicoResponseDTO(
-                        medico.getId(),
-                        medico.getUsuario().getNombreCompleto(),
-                        medico.getUsuario().getEmail(),
-                        medico.getUsuario().getDocumento(),
-                        medico.getUsuario().getTelefono(),
-                        medico.getEspecialidad().toString()
-                )).toList();
-
-        return ResponseEntity.ok(medicosResponse);
+        return medicos;
     }
 
-    public ResponseEntity<MedicoResponseDTO> obtenerMedicoPorId(Long id) {
-        Optional<Medico> medicoOptional = medicoRepository.findByIdAndUsuarioActivo(id);
-        if (medicoOptional.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        Medico medico = medicoOptional.get();
-        MedicoResponseDTO medicoResponse = new MedicoResponseDTO(
-                medico.getId(),
-                medico.getUsuario().getNombreCompleto(),
-                medico.getUsuario().getEmail(),
-                medico.getUsuario().getDocumento(),
-                medico.getUsuario().getTelefono(),
-                medico.getEspecialidad().toString()
+    public Medico obtenerMedicoPorId(Long id) {
+        return medicoRepository.findByIdAndUsuarioActivo(id).orElseThrow(
+                () -> new RuntimeException("Médico no encontrado o inactivo")
         );
-        return ResponseEntity.ok(medicoResponse);
     }
 
-    @Transactional
-    public ResponseEntity<?> registrarMedico (RegistrarMedicoDTO registrarMedicoDTO) {
+    public Medico registrarMedico (RegistrarMedicoDTO registrarMedicoDTO) {
 
-        if(userRepository.existsByEmail(registrarMedicoDTO.email())) {
-            return ResponseEntity.badRequest().body("El email ya está en uso");
+        if (userRepository.existsByEmail(registrarMedicoDTO.email())) {
+            throw new RuntimeException("El email ya está en uso");
         }
-        if(userRepository.existsByDocumento(registrarMedicoDTO.documento())) {
-            return ResponseEntity.badRequest().body("El documento ya está registrado");
+        if (userRepository.existsByDocumento(registrarMedicoDTO.documento())) {
+            throw new RuntimeException("El documento ya está registrado");
         }
 
         String hashedPassword = passwordEncoder.encode(registrarMedicoDTO.contrasena());
@@ -86,82 +64,55 @@ public class MedicoService {
         userRepository.save(nuevoUsuario);
         medicoRepository.save(nuevoMedico);
 
-
-        MedicoResponseDTO medicoResponse = new MedicoResponseDTO(
-                nuevoMedico.getId(),
-                nuevoMedico.getUsuario().getNombreCompleto(),
-                nuevoMedico.getUsuario().getEmail(),
-                nuevoMedico.getUsuario().getDocumento(),
-                nuevoMedico.getUsuario().getTelefono(),
-                nuevoMedico.getEspecialidad().toString()
-        );
-
-        return ResponseEntity.status(201).body(medicoResponse);
+        return nuevoMedico;
     }
 
-    public ResponseEntity<?> actualizarMedico(Long id, RegistrarMedicoDTO medicoResponseDTO) {
-        Optional<Medico> medicoOptional = medicoRepository.findById(id);
-        if (medicoOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
+    public Medico actualizarMedico(Long id, RegistrarMedicoDTO medicoResponseDTO) {
+
+        Medico medico = medicoRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Médico no encontrado")
+        );
+
+        if (!medicoResponseDTO.email().equals(medico.getUsuario().getEmail()) && userRepository.existsByEmail(medicoResponseDTO.email())) {
+            throw new RuntimeException("El email ya está en uso");
         }
 
-        Medico medico = medicoOptional.get();
-
-        if (medicoResponseDTO.email() != null && !medicoResponseDTO.email().equals(medico.getUsuario().getEmail())) {
-            if (userRepository.existsByEmail(medicoResponseDTO.email())) {
-                return ResponseEntity.badRequest().body("El email ya está en uso");
-            }
-        }
-
-        if (medicoResponseDTO.documento() != null && !medicoResponseDTO.documento().equals(medico.getUsuario().getDocumento())) {
-            if (userRepository.existsByDocumento(medicoResponseDTO.documento())) {
-                return ResponseEntity.badRequest().body("El documento ya está registrado");
-            }
+        if (!medicoResponseDTO.documento().equals(medico.getUsuario().getDocumento())
+                && userRepository.existsByDocumento(medicoResponseDTO.documento())) {
+            throw new RuntimeException("El documento ya está registrado");
         }
 
         medico.actualizarMedico(medicoResponseDTO);
         medicoRepository.save(medico);
-        return ResponseEntity.ok(new MedicoResponseDTO(
-                medico.getId(),
-                medico.getUsuario().getNombreCompleto(),
-                medico.getUsuario().getEmail(),
-                medico.getUsuario().getDocumento(),
-                medico.getUsuario().getTelefono(),
-                medico.getEspecialidad().toString()
-        ));
 
+        return medico;
     }
 
-    public ResponseEntity<String> eliminarMedico(Long id) {
-        Optional<Medico> medicoOptional = medicoRepository.findById(id);
-        if (medicoOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+    public String eliminarMedico(Long id) {
 
-        Medico medico = medicoOptional.get();
+        Medico medico = medicoRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Médico no encontrado")
+        );
 
         if (!medico.getUsuario().isActivo()) {
-            return ResponseEntity.badRequest().body("El médico ya está eliminado.");
+            return "El médico ya está inactivo.";
         }
 
         medico.desactivarMedico();
         medicoRepository.save(medico);
-        return ResponseEntity.ok("Médico eliminado correctamente.");
+        return "Médico eliminado correctamente.";
     }
 
-    public ResponseEntity<String> activarMedico(Long id){
-        Optional<Medico> medicoOptional = medicoRepository.findById(id);
-        if (medicoOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Medico medico = medicoOptional.get();
+    public String activarMedico(Long id){
+        Medico medico = medicoRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Médico no encontrado")
+        );
         if (medico.getUsuario().isActivo()) {
-            return ResponseEntity.badRequest().body("El médico ya está activo.");
+            return "El médico ya está activo.";
         }
 
         medico.activarMedico();
         medicoRepository.save(medico);
-        return ResponseEntity.ok("Médico activado correctamente.");
+        return "Médico activado correctamente.";
     }
 }
