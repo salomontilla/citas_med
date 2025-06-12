@@ -48,15 +48,4 @@ public class Cita {
         this.estado = estado;
     }
 
-    public void actualizarCita(CitaActualizarDTO citaDto) {
-        if (citaDto.fecha() != null) {
-            this.fecha = Date.valueOf(citaDto.fecha());
-        }
-        if (citaDto.hora() != null) {
-            this.hora = Time.valueOf(citaDto.hora());
-        }
-        if (citaDto.estado() != null) {
-            this.estado = citaDto.estado();
-        }
-    }
 }
