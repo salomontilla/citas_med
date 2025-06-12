@@ -33,28 +33,17 @@ public class CitaService {
                 .orElseThrow(() -> new RuntimeException("Médico no encontrado o inactivo"));
 
         Date formattedDate = convertirFecha(citaDto.fecha());
+        Time formattedTime = convertirHora(citaDto.hora());
         Cita nuevaCita = new Cita(
                 paciente,
                 medico,
                 formattedDate,
-                Time.valueOf(citaDto.hora()),
-                EstadoCita.CONFIRMADA
+                formattedTime,
+                EstadoCita.PENDIENTE
         );
 
         citasRepository.save(nuevaCita);
         return nuevaCita;
-    }
-
-
-
-    public Date convertirFecha(String fechaString) {
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            LocalDate localDate = LocalDate.parse(fechaString, formatter);
-            return Date.valueOf(localDate);
-        } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Formato de fecha inválido. Usa dd-MM-yyyy");
-        }
     }
 
     public List<Cita> obtenerCitas() {
@@ -83,13 +72,23 @@ public class CitaService {
         return citasRepository.findByMedicoId(medico.getId());
     }
 
-    public Cita actualizarCita(Long id, CitaActualizarDTO citaDto) {
-        Cita cita = citasRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Cita no encontrada")
-        );
-        cita.actualizarCita(citaDto);
-        citasRepository.save(cita);
-        return cita;
+   public Cita actualizarCita(Long id, CitaActualizarDTO citaDto) {
+            Cita cita = citasRepository.findById(id).orElseThrow(
+                    () -> new RuntimeException("Cita no encontrada")
+            );
+            if (citaDto.fecha() != null) {
+                cita.setFecha(convertirFecha(citaDto.fecha()));
+            }
+            if (citaDto.hora() != null) {
+                cita.setHora(convertirHora(citaDto.hora()));
+            }
+            if (citaDto.estado() != null) {
+                cita.setEstado(citaDto.estado());
+            }
+
+            citasRepository.save(cita);
+            return cita;
+
     }
 
     public String cancelarCita(Long id) {
@@ -104,5 +103,24 @@ public class CitaService {
         cita.setEstado(EstadoCita.CANCELADA);
         citasRepository.save(cita);
         return "Cita cancelada correctamente.";
+    }
+
+    //VALIDATION METHODS
+    public  Date convertirFecha(String fechaString) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            LocalDate localDate = LocalDate.parse(fechaString, formatter);
+            return Date.valueOf(localDate);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Formato de fecha inválido. Usa dd-MM-yyyy");
+        }
+    }
+
+    public  Time convertirHora(String horaString) {
+        try {
+            return Time.valueOf(horaString);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Formato de hora inválido. Usa HH:mm:ss");
+        }
     }
 }
