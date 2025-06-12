@@ -3,6 +3,7 @@ package com.salomon.citasmedbackend.controller;
 import com.salomon.citasmedbackend.domain.disponibilidad.DisponibilidadDTO;
 import com.salomon.citasmedbackend.domain.disponibilidad.DisponibilidadResponseDTO;
 import com.salomon.citasmedbackend.domain.disponibilidad.Disponibilidad;
+import com.salomon.citasmedbackend.domain.disponibilidad.UpdateDisponibilidadDTO;
 import com.salomon.citasmedbackend.services.DisponibilidadService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,18 @@ public class DisponibilidadController {
                         disponibilidad.getHoraInicio().toLocalTime().toString(),
                         disponibilidad.getHoraFin().toLocalTime().toString()
                 )).toList());
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> modificarDisponibilidad(@PathVariable Long id, @RequestBody UpdateDisponibilidadDTO dto) {
+        Disponibilidad actualizada = disponibilidadService.modificarDisponibilidad(id, dto);
+        return ResponseEntity.ok(new DisponibilidadResponseDTO(
+                actualizada.getId(),
+                actualizada.getMedico().getId(),
+                actualizada.getDiaSemana().toString(),
+                actualizada.getHoraInicio().toLocalTime().toString(),
+                actualizada.getHoraFin().toLocalTime().toString()
+        ));
     }
 
     @DeleteMapping("/{id}")
