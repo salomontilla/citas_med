@@ -14,10 +14,10 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.sql.Time;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
+
+import static com.salomon.citasmedbackend.infra.utils.FechaUtils.convertirFecha;
+import static com.salomon.citasmedbackend.infra.utils.FechaUtils.convertirHora;
 
 @Service
 @RequiredArgsConstructor
@@ -105,22 +105,4 @@ public class CitaService {
         return "Cita cancelada correctamente.";
     }
 
-    //VALIDATION METHODS
-    public  Date convertirFecha(String fechaString) {
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            LocalDate localDate = LocalDate.parse(fechaString, formatter);
-            return Date.valueOf(localDate);
-        } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Formato de fecha inválido. Usa dd-MM-yyyy");
-        }
-    }
-
-    public  Time convertirHora(String horaString) {
-        try {
-            return Time.valueOf(horaString);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Formato de hora inválido. Usa HH:mm:ss");
-        }
-    }
 }

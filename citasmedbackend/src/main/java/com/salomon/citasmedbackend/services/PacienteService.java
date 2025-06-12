@@ -11,13 +11,14 @@ import com.salomon.citasmedbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
+
+import static com.salomon.citasmedbackend.infra.utils.FechaUtils.convertirFecha;
 
 @Service
 @RequiredArgsConstructor
@@ -26,44 +27,12 @@ public class PacienteService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final PacienteRepository pacienteRepository;
 
-    public ResponseEntity<List<PacientesResponseDTO>> obtenerPacientes(){
-        List<Paciente> pacientes = pacienteRepository.findAllByUsuarioActivoTrue();
-        if (pacientes.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        List<PacientesResponseDTO> pacientesResponse = pacientes.stream()
-                .map(paciente -> new PacientesResponseDTO(
-                        paciente.getId(),
-                        paciente.getUsuario().getNombreCompleto(),
-                        paciente.getUsuario().getDocumento(),
-                        paciente.getUsuario().getEmail(),
-                        paciente.getUsuario().getTelefono(),
-                        paciente.getFechaNacimiento()
-                        )).toList();
-        return ResponseEntity.ok(pacientesResponse);
-    }
-
-    public ResponseEntity<PacientesResponseDTO> obtenerPacientePorId(Long id){
-
-        Optional<Paciente> pacienteOptional = pacienteRepository.findById(id);
-
-        return pacienteOptional.map(paciente -> ResponseEntity.ok(new PacientesResponseDTO(
-                paciente.getId(),
-                paciente.getUsuario().getNombreCompleto(),
-                paciente.getUsuario().getDocumento(),
-                paciente.getUsuario().getEmail(),
-                paciente.getUsuario().getTelefono(),
-                paciente.getFechaNacimiento()
-        ))).orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @Transactional
-    public ResponseEntity<?> registrarPaciente(PacienteRegisterDTO pacienteDto) {
+    public Paciente registrarPaciente(PacienteRegisterDTO pacienteDto) {
         if (userRepository.existsByEmail(pacienteDto.email())) {
-            return ResponseEntity.badRequest().body("El correo electrónico ya está en uso");
+            throw new RuntimeException("El email ya está en uso");
         }
         if (userRepository.existsByDocumento(pacienteDto.documento())) {
-            return ResponseEntity.badRequest().body("El documento ya está registrado");
+            throw new RuntimeException("El documento ya está registrado");
         }
 
         String hashedPassword = passwordEncoder.encode(pacienteDto.contrasena());
@@ -75,7 +44,7 @@ public class PacienteService {
                 hashedPassword,
                 Rol.PACIENTE
         );
-        Date fechaNacimiento = Date.valueOf(pacienteDto.fechaNacimiento());
+        Date fechaNacimiento = convertirFecha(pacienteDto.fechaNacimiento());
         Paciente paciente = new Paciente(
                 nuevoUsuario,
                 fechaNacimiento
@@ -84,34 +53,36 @@ public class PacienteService {
         userRepository.save(nuevoUsuario);
         pacienteRepository.save(paciente);
 
-        PacientesResponseDTO response = new PacientesResponseDTO(
-                paciente.getId(),
-                paciente.getUsuario().getNombreCompleto(),
-                paciente.getUsuario().getDocumento(),
-                paciente.getUsuario().getEmail(),
-                paciente.getUsuario().getTelefono(),
-                paciente.getFechaNacimiento()
-        );
-
-        return ResponseEntity.status(201).body(response );
+        return paciente;
     }
 
-    @Transactional
-    public ResponseEntity<?> actualizarPaciente(Long id, PacienteUpdateDTO pacienteDto) {
-        Optional<Paciente> pacienteOptional = pacienteRepository.findById(id);
-        if (pacienteOptional.isEmpty()) {
-            return ResponseEntity.status(404).body("Paciente no encontrado");
+    public List<Paciente> obtenerPacientes(){
+        List<Paciente> pacientes = pacienteRepository.findAllByUsuarioActivoTrue();
+        if (pacientes.isEmpty()) {
+            return List.of();
         }
+        return pacientes;
+    }
 
-        Paciente paciente = pacienteOptional.get();
+    public Paciente obtenerPacientePorId(Long id){
+
+        return pacienteRepository.findByIdAndUsuarioActivo(id)
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado o inactivo"));
+    }
+
+    public Paciente actualizarPaciente(Long id, PacienteUpdateDTO pacienteDto) {
+        Paciente paciente = pacienteRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Paciente no encontrado")
+        );
+
         Usuario usuario = paciente.getUsuario();
 
         if (!usuario.getEmail().equals(pacienteDto.email()) && userRepository.existsByEmail(pacienteDto.email())) {
-            return ResponseEntity.badRequest().body("El correo electrónico ya está en uso");
+            throw new RuntimeException("El correo electrónico ya está en uso");
         }
 
         if (!usuario.getDocumento().equals(pacienteDto.documento()) && userRepository.existsByDocumento(pacienteDto.documento())) {
-            return ResponseEntity.badRequest().body("El documento ya está registrado");
+            throw new RuntimeException("El documento ya está registrado");
         }
 
         if (pacienteDto.contrasena() != null && !pacienteDto.contrasena().isEmpty()) {
@@ -125,53 +96,37 @@ public class PacienteService {
         userRepository.save(usuario);
         pacienteRepository.save(paciente);
 
-        PacientesResponseDTO response = new PacientesResponseDTO(
-                paciente.getId(),
-                paciente.getUsuario().getNombreCompleto(),
-                paciente.getUsuario().getDocumento(),
-                paciente.getUsuario().getEmail(),
-                paciente.getUsuario().getTelefono(),
-                paciente.getFechaNacimiento()
+        return paciente;
+    }
+
+    public String eliminarPaciente(Long id) {
+
+        Paciente paciente = pacienteRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Paciente no encontrado")
         );
 
-        return ResponseEntity.ok(response);
-    }
-
-    @Transactional
-    public ResponseEntity<?> eliminarPaciente(Long id) {
-        Optional<Paciente> pacienteOptional = pacienteRepository.findByIdAndUsuarioActivo(id);
-        if (pacienteOptional.isEmpty()) {
-            return ResponseEntity.status(404).body("Paciente no encontrado");
-        }
-
-        Paciente paciente = pacienteOptional.get();
-
         if (!paciente.getUsuario().isActivo()) {
-            return ResponseEntity.badRequest().body("El paciente ya está eliminado");
+            return ("El paciente ya está eliminado");
         }
         paciente.desactivarPaciente();
-
         pacienteRepository.save(paciente);
 
-        return ResponseEntity.ok("Paciente eliminado exitosamente");
+        return ("Paciente eliminado exitosamente");
     }
 
-    @Transactional
-    public ResponseEntity<?> activarPaciente (Long id){
-        Optional<Paciente> pacienteOptional = pacienteRepository.findById(id);
-        if (pacienteOptional.isEmpty()) {
-            return ResponseEntity.status(404).body("Paciente no encontrado");
-        }
+    public String activarPaciente (Long id){
 
-        Paciente paciente = pacienteOptional.get();
+        Paciente paciente = pacienteRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Paciente no encontrado")
+        );
 
         if(paciente.getUsuario().isActivo()){
-            return ResponseEntity.badRequest().body("El paciente ya está activo");
+            return ("El paciente ya está activo");
         }
 
         paciente.activarPaciente();
         pacienteRepository.save(paciente);
 
-        return ResponseEntity.ok("Paciente activado exitosamente");
+        return ("Paciente activado exitosamente");
     }
 }
