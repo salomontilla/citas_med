@@ -21,6 +21,21 @@ public class MedicoController {
 
     // CRUD operations for Medico
 
+    //CREATE
+    @PostMapping("/register")
+    @Transactional
+    public ResponseEntity<?> createMedico(@RequestBody @Valid RegistrarMedicoDTO medicoResponseDTO) {
+        Medico nuevoMedico = medicoService.registrarMedico(medicoResponseDTO);
+        MedicoResponseDTO medicoResponse = new MedicoResponseDTO(
+                nuevoMedico.getId(),
+                nuevoMedico.getUsuario().getNombreCompleto(),
+                nuevoMedico.getUsuario().getEmail(),
+                nuevoMedico.getUsuario().getDocumento(),
+                nuevoMedico.getUsuario().getTelefono(),
+                nuevoMedico.getEspecialidad().toString()
+        );
+        return ResponseEntity.ok().body(medicoResponse);
+    }
     //READ
     @GetMapping
     public ResponseEntity<List<MedicoResponseDTO>> getAllMedicos (){
@@ -49,23 +64,9 @@ public class MedicoController {
                 medico.getEspecialidad().toString()
         ));
     }
-    //READ
-    @PostMapping("/register")
-    @Transactional
-    public ResponseEntity<?> createMedico(@RequestBody @Valid RegistrarMedicoDTO medicoResponseDTO) {
-        Medico nuevoMedico = medicoService.registrarMedico(medicoResponseDTO);
-        MedicoResponseDTO medicoResponse = new MedicoResponseDTO(
-                nuevoMedico.getId(),
-                nuevoMedico.getUsuario().getNombreCompleto(),
-                nuevoMedico.getUsuario().getEmail(),
-                nuevoMedico.getUsuario().getDocumento(),
-                nuevoMedico.getUsuario().getTelefono(),
-                nuevoMedico.getEspecialidad().toString()
-        );
-        return ResponseEntity.ok().body(medicoResponse);
-    }
     //UPDATE
     @PatchMapping("/{id}")
+    @Transactional
     public ResponseEntity<?> updateMedico(@PathVariable Long id, @RequestBody @Valid RegistrarMedicoDTO medicoResponseDTO) {
         Medico medico = medicoService.actualizarMedico(id, medicoResponseDTO);
         return ResponseEntity.ok(new MedicoResponseDTO(
@@ -78,14 +79,17 @@ public class MedicoController {
         ));
     }
 
+    @PatchMapping("/activar/{id}")
+    @Transactional
+    public ResponseEntity<String> activarMedico(@PathVariable Long id) {
+        return ResponseEntity.ok().body( medicoService.activarMedico(id));
+    }
+
     //DELETE
     @DeleteMapping("/{id}")
+    @Transactional
     public ResponseEntity<String> deleteMedico(@PathVariable Long id) {
         return ResponseEntity.ok().body(medicoService.eliminarMedico(id));
     }
 
-    @PatchMapping("/activar/{id}")
-    public ResponseEntity<String> activarMedico(@PathVariable Long id) {
-        return ResponseEntity.ok().body( medicoService.activarMedico(id));
-    }
 }

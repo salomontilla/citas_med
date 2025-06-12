@@ -1,21 +1,15 @@
 package com.salomon.citasmedbackend.services;
 
 import com.salomon.citasmedbackend.domain.medico.Medico;
-import com.salomon.citasmedbackend.domain.medico.MedicoResponseDTO;
 import com.salomon.citasmedbackend.domain.medico.RegistrarMedicoDTO;
 import com.salomon.citasmedbackend.domain.usuario.Rol;
 import com.salomon.citasmedbackend.domain.usuario.Usuario;
 import com.salomon.citasmedbackend.repository.MedicoRepository;
 import com.salomon.citasmedbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,20 +17,6 @@ public class MedicoService {
     private  final MedicoRepository medicoRepository;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-
-    public List<Medico> obtenerMedicos(){
-        List<Medico> medicos = medicoRepository.findAllByUsuarioActivoTrue();
-        if (medicos.isEmpty()) {
-            return List.of();
-        }
-        return medicos;
-    }
-
-    public Medico obtenerMedicoPorId(Long id) {
-        return medicoRepository.findByIdAndUsuarioActivo(id).orElseThrow(
-                () -> new RuntimeException("Médico no encontrado o inactivo")
-        );
-    }
 
     public Medico registrarMedico (RegistrarMedicoDTO registrarMedicoDTO) {
 
@@ -65,6 +45,20 @@ public class MedicoService {
         medicoRepository.save(nuevoMedico);
 
         return nuevoMedico;
+    }
+
+    public List<Medico> obtenerMedicos(){
+        List<Medico> medicos = medicoRepository.findAllByUsuarioActivoTrue();
+        if (medicos.isEmpty()) {
+            return List.of();
+        }
+        return medicos;
+    }
+
+    public Medico obtenerMedicoPorId(Long id) {
+        return medicoRepository.findByIdAndUsuarioActivo(id).orElseThrow(
+                () -> new RuntimeException("Médico no encontrado o inactivo")
+        );
     }
 
     public Medico actualizarMedico(Long id, RegistrarMedicoDTO medicoResponseDTO) {
