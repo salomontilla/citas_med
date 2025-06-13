@@ -23,8 +23,8 @@ public class DisponibilidadService {
     private final MedicoRepository medicoRepository;
     private final DisponibilidadRepository disponibilidadRepository;
 
-    public Disponibilidad agregarDisponibilidad(DisponibilidadDTO dto) {
-        Medico medico = medicoRepository.findByIdAndUsuarioActivo(dto.medicoId())
+    public Disponibilidad agregarDisponibilidad(DisponibilidadDTO dto, Long medicoId) {
+        Medico medico = medicoRepository.findByIdAndUsuarioActivo(medicoId)
                 .orElseThrow(() -> new RuntimeException("Médico no encontrado o inactivo"));
 
         disponibilidadValidation(dto.horaInicio(), dto.horaFin(), medico, dto.diaSemana());
