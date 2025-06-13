@@ -154,4 +154,9 @@ public class CitaService {
             }
         }
     }
+
+    public Medico obtenerMedicoPorEmail(String email) {
+        return medicoRepository.findByUsuarioEmailAndUsuarioActivo(email)
+                .orElseThrow(() -> new RuntimeException("Médico no encontrado o inactivo"));
+    }
 }

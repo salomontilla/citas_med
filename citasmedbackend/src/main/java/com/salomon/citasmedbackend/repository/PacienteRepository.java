@@ -15,4 +15,7 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
     @Query("SELECT p FROM Paciente p WHERE p.usuario.activo = true")
     List<Paciente> findAllByUsuarioActivoTrue();
+
+    @Query("SELECT p FROM Paciente p WHERE p.usuario.email = :email AND p.usuario.activo = true")
+    Optional<Paciente> findByUsuarioEmailAndUsuarioActivo(@Param("email") String email);
 }

@@ -43,7 +43,7 @@ public class MedicoController {
                 .toUri();
         return ResponseEntity.created(location).body(medicoResponse);
     }
-    //READ
+    //READ TODO
     @GetMapping
     public ResponseEntity<List<MedicoResponseDTO>> getAllMedicos (){
 

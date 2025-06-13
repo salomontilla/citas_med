@@ -1,13 +1,16 @@
 package com.salomon.citasmedbackend.controller;
 
+import com.salomon.citasmedbackend.domain.cita.Cita;
 import com.salomon.citasmedbackend.domain.paciente.Paciente;
 import com.salomon.citasmedbackend.domain.paciente.PacienteUpdateDTO;
 import com.salomon.citasmedbackend.domain.paciente.PacientesResponseDTO;
 import com.salomon.citasmedbackend.domain.paciente.PacienteRegisterDTO;
+import com.salomon.citasmedbackend.domain.usuario.DetallesUsuario;
 import com.salomon.citasmedbackend.services.PacienteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -16,13 +19,13 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/citasmed/pacientes")
+@RequestMapping("api/citasmed")
 @RequiredArgsConstructor
 public class PacienteController {
     private final PacienteService pacienteService;
 
     //CREATE
-    @PostMapping("/register")
+    @PostMapping("/pacientes/register")
     @Transactional
     public ResponseEntity<?> registrarPaciente(@RequestBody @Valid PacienteRegisterDTO usuarioDto,
                                                UriComponentsBuilder uriBuilder) {
@@ -43,7 +46,7 @@ public class PacienteController {
     }
 
     //READ
-    @GetMapping
+    @GetMapping("/admin/pacientes")
     public ResponseEntity<List<PacientesResponseDTO>> getAllPacientes() {
         List<Paciente> pacientes = pacienteService.obtenerPacientes();
         return ResponseEntity.ok().body(pacientes.stream()
@@ -57,7 +60,7 @@ public class PacienteController {
                 )).toList());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/admin/pacientes/{id}")
     public ResponseEntity<PacientesResponseDTO> getPacienteById(@PathVariable Long id) {
         Paciente paciente = pacienteService.obtenerPacientePorId(id);
         return ResponseEntity.ok(new PacientesResponseDTO(
@@ -71,7 +74,7 @@ public class PacienteController {
     }
 
     //UPDATE
-    @PatchMapping("/{id}")
+    @PatchMapping("admin/{id}")
     @Transactional
     public ResponseEntity<?> updatePaciente(@PathVariable Long id, @RequestBody PacienteUpdateDTO usuarioDto) {
         Paciente pacienteActualizado = pacienteService.actualizarPaciente(id, usuarioDto);
@@ -85,14 +88,32 @@ public class PacienteController {
         ));
     }
 
-    @PatchMapping("/activar/{id}")
+    //UPDATE
+    @PatchMapping("pacientes/editar-perfil")
+    @Transactional
+    public ResponseEntity<?> updatePaciente(@AuthenticationPrincipal DetallesUsuario user, @RequestBody PacienteUpdateDTO usuarioDto) {
+
+        Paciente paciente = pacienteService.obtenerPacientePorEmail(user.getUsername());
+        Paciente pacienteActualizado = pacienteService.actualizarPaciente(paciente.getId(), usuarioDto);
+
+        return ResponseEntity.ok(new PacientesResponseDTO(
+                pacienteActualizado.getId(),
+                pacienteActualizado.getUsuario().getNombreCompleto(),
+                pacienteActualizado.getUsuario().getDocumento(),
+                pacienteActualizado.getUsuario().getEmail(),
+                pacienteActualizado.getUsuario().getTelefono(),
+                pacienteActualizado.getFechaNacimiento()
+        ));
+    }
+
+    @PatchMapping("/admin/pacientes/activar/{id}")
     @Transactional
     public ResponseEntity<?> activarPaciente (@PathVariable Long id){
         return ResponseEntity.ok().body(pacienteService.activarPaciente(id));
     }
 
     //DELETE
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/pacientes/{id}")
     @Transactional
     public ResponseEntity<?> deletePaciente(@PathVariable Long id) {
         return ResponseEntity.ok().body(pacienteService.eliminarPaciente(id));

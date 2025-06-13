@@ -129,4 +129,9 @@ public class PacienteService {
 
         return ("Paciente activado exitosamente");
     }
+
+    public Paciente obtenerPacientePorEmail(String email) {
+        return pacienteRepository.findByUsuarioEmailAndUsuarioActivo(email)
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado o inactivo"));
+    }
 }

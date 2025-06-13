@@ -6,8 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public record PacienteRegisterDTO(
-    @NotNull
-    Long id,
+
     @NotBlank
     String nombreCompleto,
     @NotBlank
