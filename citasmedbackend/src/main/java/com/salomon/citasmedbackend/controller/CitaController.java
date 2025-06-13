@@ -8,6 +8,7 @@ import com.salomon.citasmedbackend.domain.medico.Medico;
 import com.salomon.citasmedbackend.domain.paciente.Paciente;
 import com.salomon.citasmedbackend.domain.usuario.DetallesUsuario;
 import com.salomon.citasmedbackend.services.CitaService;
+import com.salomon.citasmedbackend.services.MedicoService;
 import com.salomon.citasmedbackend.services.PacienteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import java.util.List;
 public class CitaController {
     private final CitaService citaService;
     private final PacienteService pacienteService;
+    private final MedicoService medicoService;
 
     @PostMapping("/pacientes/citas/agendar")
     public ResponseEntity<CitaResponseDTO> agendarCita(@RequestBody @Valid CitaAgendarDTO citaDto) {
@@ -126,7 +128,7 @@ public class CitaController {
     }
     @GetMapping("/medicos/mis-citas")
     public ResponseEntity<?> getCitasByMedicoId(@AuthenticationPrincipal DetallesUsuario user) {
-        Medico medico = citaService.obtenerMedicoPorEmail(user.getUsername());
+        Medico medico = medicoService.obtenerMedicoPorEmail(user.getUsername());
         List<Cita> citas = citaService.obtenerCitasPorMedicoId(medico.getId());
 
         List<CitaResponseDTO> citasResponse = citas.stream()

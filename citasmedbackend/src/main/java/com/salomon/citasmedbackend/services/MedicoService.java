@@ -61,6 +61,11 @@ public class MedicoService {
         );
     }
 
+    public Medico obtenerMedicoPorEmail(String email) {
+        return medicoRepository.findByUsuarioEmailAndUsuarioActivo(email)
+                .orElseThrow(() -> new RuntimeException("Médico no encontrado o inactivo"));
+    }
+
     public Medico actualizarMedico(Long id, RegistrarMedicoDTO medicoResponseDTO) {
 
         Medico medico = medicoRepository.findById(id).orElseThrow(
