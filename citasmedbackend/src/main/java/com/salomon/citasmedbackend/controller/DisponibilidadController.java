@@ -17,24 +17,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/citasmed")
+@RequestMapping("/api/citasmed/medicos")
 public class DisponibilidadController {
     private final DisponibilidadService disponibilidadService;
     private final MedicoService medicoService;
 
-    @PostMapping("/admin/medicos/registrar-disponibilidad/{medicoId}")
-    public ResponseEntity<?> registrarDisponibilidad(@RequestBody @Valid DisponibilidadDTO dto,
-                                                     @PathVariable Long medicoId) {
-        Disponibilidad nueva = disponibilidadService.agregarDisponibilidad(dto, medicoId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new DisponibilidadResponseDTO(
-                nueva.getId(),
-                nueva.getMedico().getId(),
-                nueva.getDiaSemana().toString(),
-                nueva.getHoraInicio().toLocalTime().toString(),
-                nueva.getHoraFin().toLocalTime().toString()
-        ));
-    }
-    @PostMapping("/medicos/registrar-disponibilidad")
+    @PostMapping("/registrar-disponibilidad")
     public ResponseEntity<?> registrarDisponibilidadAuth(@RequestBody @Valid DisponibilidadDTO dto,
                                                          @AuthenticationPrincipal DetallesUsuario user) {
         Medico medico = medicoService.obtenerMedicoPorEmail(user.getUsername());
@@ -60,42 +48,8 @@ public class DisponibilidadController {
                 )).toList());
     }
 
-    @GetMapping("/admin/disponibilidades/{medicoId}")
-    public ResponseEntity<?> obtenerDisponibilidadesPorMedico(@PathVariable Long medicoId) {
-        return ResponseEntity.ok(disponibilidadService.obtenerDisponibilidadesPorMedico(medicoId).stream()
-                .map(disponibilidad -> new DisponibilidadResponseDTO(
-                        disponibilidad.getId(),
-                        disponibilidad.getMedico().getId(),
-                        disponibilidad.getDiaSemana().toString(),
-                        disponibilidad.getHoraInicio().toLocalTime().toString(),
-                        disponibilidad.getHoraFin().toLocalTime().toString()
-                )).toList());
-    }
-    @GetMapping("/admin/mis-disponibilidades")
-    public ResponseEntity<?> obtenerMisDisponibilidadeso(@AuthenticationPrincipal DetallesUsuario user) {
-        Medico medico = medicoService.obtenerMedicoPorEmail(user.getUsername());
-        return ResponseEntity.ok(disponibilidadService.obtenerDisponibilidadesPorMedico(medico.getId()).stream()
-                .map(disponibilidad -> new DisponibilidadResponseDTO(
-                        disponibilidad.getId(),
-                        disponibilidad.getMedico().getId(),
-                        disponibilidad.getDiaSemana().toString(),
-                        disponibilidad.getHoraInicio().toLocalTime().toString(),
-                        disponibilidad.getHoraFin().toLocalTime().toString()
-                )).toList());
-    }
 
-    @PatchMapping("/admin/medicos/{id}/modificar-disponibilidades")
-    public ResponseEntity<?> modificarDisponibilidad(@PathVariable Long id, @RequestBody UpdateDisponibilidadDTO dto) {
-        Disponibilidad actualizada = disponibilidadService.modificarDisponibilidad(id, dto);
-        return ResponseEntity.ok(new DisponibilidadResponseDTO(
-                actualizada.getId(),
-                actualizada.getMedico().getId(),
-                actualizada.getDiaSemana().toString(),
-                actualizada.getHoraInicio().toLocalTime().toString(),
-                actualizada.getHoraFin().toLocalTime().toString()
-        ));
-    }
-    @PatchMapping("/admin/medicos/modificar-disponibilidades")
+    @PatchMapping("/modificar-disponibilidades")
     public ResponseEntity<?> modificarDisponibilidad(@AuthenticationPrincipal DetallesUsuario user, @RequestBody UpdateDisponibilidadDTO dto) {
         Medico medico = medicoService.obtenerMedicoPorEmail(user.getUsername());
         Disponibilidad actualizada = disponibilidadService.modificarDisponibilidad(medico.getId(), dto);
@@ -109,9 +63,17 @@ public class DisponibilidadController {
         ));
     }
 
-    @DeleteMapping("/admin/medicos/eliminar-disponibilidad/{id}")
-    public ResponseEntity<?> eliminarDisponibilidad(@PathVariable Long id) {
-        return ResponseEntity.ok(disponibilidadService.eliminarDisponibilidad(id));
+    @GetMapping("/mis-disponibilidades")
+    public ResponseEntity<?> obtenerMisDisponibilidadeso(@AuthenticationPrincipal DetallesUsuario user) {
+        Medico medico = medicoService.obtenerMedicoPorEmail(user.getUsername());
+        return ResponseEntity.ok(disponibilidadService.obtenerDisponibilidadesPorMedico(medico.getId()).stream()
+                .map(disponibilidad -> new DisponibilidadResponseDTO(
+                        disponibilidad.getId(),
+                        disponibilidad.getMedico().getId(),
+                        disponibilidad.getDiaSemana().toString(),
+                        disponibilidad.getHoraInicio().toLocalTime().toString(),
+                        disponibilidad.getHoraFin().toLocalTime().toString()
+                )).toList());
     }
 
 

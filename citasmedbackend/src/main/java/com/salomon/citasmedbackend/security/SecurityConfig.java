@@ -31,9 +31,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/citasmed/auth/login").permitAll()
                         .requestMatchers("/login.html", "/css/**", "/js/**").permitAll()
-                        .requestMatchers("/api/citasmed/**").hasAnyRole("ADMIN")
-                        .requestMatchers("/api/citasmed/pacientes/**").hasAnyRole("PACIENTE")
-                        .requestMatchers("/api/citasmed/medicos/**").hasAnyRole("MEDICO")
+                        .requestMatchers("/api/citasmed/**").hasRole("ADMIN")
+                        .requestMatchers("/api/citasmed/pacientes/**").hasRole("PACIENTE")
+                        .requestMatchers("/api/citasmed/medicos/**").hasRole("MEDICO")
 
                         .anyRequest().authenticated()
 
