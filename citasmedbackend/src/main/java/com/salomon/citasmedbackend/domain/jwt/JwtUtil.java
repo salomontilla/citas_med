@@ -37,17 +37,13 @@ public class JwtUtil {
     }
 
     public boolean validateToken(String token) {
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
-            JWTVerifier verifier = JWT.require(algorithm)
-                    .withIssuer("Salomontilla")
-                    .build();
+        Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
+        JWTVerifier verifier = JWT.require(algorithm)
+                .withIssuer("Salomontilla")
+                .build();
 
-            verifier.verify(token);
-            return true;
-        } catch (JWTVerificationException e) {
-            return false;
-        }
+        verifier.verify(token);
+        return true;
     }
 
     public String extractUsername(String token){
