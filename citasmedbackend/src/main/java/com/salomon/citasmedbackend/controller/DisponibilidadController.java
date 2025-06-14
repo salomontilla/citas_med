@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,10 +50,11 @@ public class DisponibilidadController {
     }
 
 
-    @PatchMapping("/modificar-disponibilidades")
-    public ResponseEntity<?> modificarDisponibilidad(@AuthenticationPrincipal DetallesUsuario user, @RequestBody UpdateDisponibilidadDTO dto) {
-        Medico medico = medicoService.obtenerMedicoPorEmail(user.getUsername());
-        Disponibilidad actualizada = disponibilidadService.modificarDisponibilidad(medico.getId(), dto);
+    @PreAuthorize("@disponibilidadService.obtenerPorId(#id).medico.usuario.email == authentication.name")
+    @PatchMapping("/editar-disponibilidades/{id}")
+    public ResponseEntity<?> modificarDisponibilidad(@RequestBody UpdateDisponibilidadDTO dto,
+                                                     @PathVariable Long id) {
+        Disponibilidad actualizada = disponibilidadService.modificarDisponibilidad(dto, id);
 
         return ResponseEntity.ok(new DisponibilidadResponseDTO(
                 actualizada.getId(),

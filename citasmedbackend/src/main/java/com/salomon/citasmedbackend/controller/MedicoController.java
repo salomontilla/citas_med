@@ -25,9 +25,7 @@ public class MedicoController {
 
     // CRUD operations for Medico
 
-
-    //READ TODO
-    @GetMapping("/medicos/mis-datos")
+    @GetMapping("/mis-datos")
     public ResponseEntity<MedicoResponseDTO> getMedicoById(@AuthenticationPrincipal DetallesUsuario user) {
         Medico medico = medicoService.obtenerMedicoPorEmail(user.getUsername());
         return ResponseEntity.ok(new MedicoResponseDTO(

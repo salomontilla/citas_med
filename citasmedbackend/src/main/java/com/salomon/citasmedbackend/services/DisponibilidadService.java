@@ -48,7 +48,7 @@ public class DisponibilidadService {
         return disponibilidadRepository.findByMedicoId(medico.getId());
     }
 
-    public Disponibilidad modificarDisponibilidad(Long id, UpdateDisponibilidadDTO dto) {
+    public Disponibilidad modificarDisponibilidad(UpdateDisponibilidadDTO dto, Long id) {
         Disponibilidad disponibilidad = disponibilidadRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Disponibilidad no encontrada"));
 
@@ -103,4 +103,8 @@ public class DisponibilidadService {
         }
     }
 
+    public Disponibilidad obtenerPorId(Long id) {
+        return disponibilidadRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Disponibilidad no encontrada"));
+    }
 }

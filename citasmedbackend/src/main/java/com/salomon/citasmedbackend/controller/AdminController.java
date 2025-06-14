@@ -14,6 +14,9 @@ import com.salomon.citasmedbackend.domain.paciente.Paciente;
 import com.salomon.citasmedbackend.domain.paciente.PacienteUpdateDTO;
 import com.salomon.citasmedbackend.domain.paciente.PacientesResponseDTO;
 import com.salomon.citasmedbackend.domain.usuario.DetallesUsuario;
+import com.salomon.citasmedbackend.domain.usuario.UserResponseDTO;
+import com.salomon.citasmedbackend.domain.usuario.Usuario;
+import com.salomon.citasmedbackend.repository.UserRepository;
 import com.salomon.citasmedbackend.services.CitaService;
 import com.salomon.citasmedbackend.services.DisponibilidadService;
 import com.salomon.citasmedbackend.services.MedicoService;
@@ -41,6 +44,25 @@ public class AdminController {
     private final MedicoService medicoService;
     private final DisponibilidadService disponibilidadService;
     private final CitaService citaService;
+    private final UserRepository userRepository;
+
+    // operations for Usuarios
+    @GetMapping("/users")
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        List<Usuario> usuarios = userRepository.findAll();
+        List<UserResponseDTO> userResponses = usuarios.stream()
+                .map(usuario -> new UserResponseDTO(
+                        usuario.getId(),
+                        usuario.getNombreCompleto(),
+                        usuario.getEmail(),
+                        usuario.getTelefono(),
+                        usuario.getDocumento(),
+                        usuario.isActivo(),
+                        usuario.getRol().name()
+                ))
+                .toList();
+        return ResponseEntity.ok(userResponses);
+    }
 
     // CRUD operations for Paciente
     @GetMapping("/pacientes")
@@ -204,9 +226,9 @@ public class AdminController {
     }
 
 
-    @PatchMapping("/medicos/{id}/modificar-disponibilidades")
+    @PatchMapping("/disponibilidades/modificar/{id}")
     public ResponseEntity<?> modificarDisponibilidad(@PathVariable Long id, @RequestBody UpdateDisponibilidadDTO dto) {
-        Disponibilidad actualizada = disponibilidadService.modificarDisponibilidad(id, dto);
+        Disponibilidad actualizada = disponibilidadService.modificarDisponibilidad(dto, id);
         return ResponseEntity.ok(new DisponibilidadResponseDTO(
                 actualizada.getId(),
                 actualizada.getMedico().getId(),
@@ -216,7 +238,7 @@ public class AdminController {
         ));
     }
 
-    @DeleteMapping("/medicos/eliminar-disponibilidad/{id}")
+    @DeleteMapping("/disponibilidades/eliminar/{id}")
     public ResponseEntity<?> eliminarDisponibilidad(@PathVariable Long id) {
         return ResponseEntity.ok(disponibilidadService.eliminarDisponibilidad(id));
     }
@@ -240,7 +262,7 @@ public class AdminController {
         return ResponseEntity.ok(citasResponse);
     }
 
-    @GetMapping("/admin/cita/{id}")
+    @GetMapping("/citas/{id}")
     public ResponseEntity<?> getCitaById(@PathVariable Long id){
         Cita cita = citaService.obtenerCitaById(id);
         CitaResponseDTO response = new CitaResponseDTO(
@@ -254,7 +276,7 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/citas/paciente/{pacienteId}")
+    @GetMapping("/citas/pacientes/{pacienteId}")
     public ResponseEntity<?> getCitasByPacienteId(@PathVariable Long pacienteId) {
         List<Cita> citas = citaService.obtenerCitasPorPacienteId(pacienteId);
         if (citas.isEmpty()) {
@@ -273,7 +295,7 @@ public class AdminController {
         return ResponseEntity.ok(citasResponse);
     }
 
-    @GetMapping("/medicos/citas/{medicoId}")
+    @GetMapping("/citas/medicos/{medicoId}")
     public ResponseEntity<?> getCitasByMedicoId(@PathVariable Long medicoId) {
         List<Cita> citas = citaService.obtenerCitasPorMedicoId(medicoId);
         if (citas.isEmpty()) {
