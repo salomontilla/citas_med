@@ -4,14 +4,13 @@ import com.salomon.citasmedbackend.domain.usuario.UserResponseDTO;
 import com.salomon.citasmedbackend.domain.usuario.Usuario;
 import com.salomon.citasmedbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("api/citasmed")
+@RequestMapping("api/citasmed/admin")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -24,9 +23,9 @@ public class UserController {
                 .map(usuario -> new UserResponseDTO(
                         usuario.getId(),
                         usuario.getNombreCompleto(),
-                        usuario.getDocumento(),
                         usuario.getEmail(),
                         usuario.getTelefono(),
+                        usuario.getDocumento(),
                         usuario.isActivo(),
                         usuario.getRol().name()
                 ))

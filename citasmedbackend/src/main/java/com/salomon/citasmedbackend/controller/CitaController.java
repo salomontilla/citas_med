@@ -39,37 +39,6 @@ public class CitaController {
                 cita.getEstado().toString()));
     }
 
-    @GetMapping("/admin/citas")
-    public ResponseEntity<?> getCitas(){
-        List<Cita> citas = citaService.obtenerCitas();
-        if (citas.isEmpty()) {
-            return ResponseEntity.ok(List.of());
-        }
-        List<CitaResponseDTO> citasResponse = citas.stream()
-                .map(cita -> new CitaResponseDTO(
-                        cita.getId(),
-                        cita.getPaciente().getId(),
-                        cita.getMedico().getId(),
-                        cita.getFecha().toString(),
-                        cita.getHora().toString(),
-                        cita.getEstado().toString()
-                )).toList();
-        return ResponseEntity.ok(citasResponse);
-    }
-
-    @GetMapping("/admin/cita/{id}")
-    public ResponseEntity<?> getCitaById(@PathVariable Long id){
-        Cita cita = citaService.obtenerCitaById(id);
-        CitaResponseDTO response = new CitaResponseDTO(
-                cita.getId(),
-                cita.getPaciente().getId(),
-                cita.getMedico().getId(),
-                cita.getFecha().toString(),
-                cita.getHora().toString(),
-                cita.getEstado().toString()
-        );
-        return ResponseEntity.ok(response);
-    }
 
     @GetMapping("/pacientes/mis-citas")
     public ResponseEntity<?> getCitasPacienteAuth(@AuthenticationPrincipal DetallesUsuario user) {
@@ -88,44 +57,9 @@ public class CitaController {
 
         return ResponseEntity.ok(citasResponse);
     }
-    @GetMapping("/admin/citas/paciente/{pacienteId}")
-    public ResponseEntity<?> getCitasByPacienteId(@PathVariable Long pacienteId) {
-        List<Cita> citas = citaService.obtenerCitasPorPacienteId(pacienteId);
-        if (citas.isEmpty()) {
-            return ResponseEntity.ok(List.of());
-        }
-        List<CitaResponseDTO> citasResponse = citas.stream()
-                .map(cita -> new CitaResponseDTO(
-                        cita.getId(),
-                        cita.getPaciente().getId(),
-                        cita.getMedico().getId(),
-                        cita.getFecha().toString(),
-                        cita.getHora().toString(),
-                        cita.getEstado().toString()
-                )).toList();
 
-        return ResponseEntity.ok(citasResponse);
-    }
 
-    @GetMapping("/admin/medicos/citas/{medicoId}")
-    public ResponseEntity<?> getCitasByMedicoId(@PathVariable Long medicoId) {
-        List<Cita> citas = citaService.obtenerCitasPorMedicoId(medicoId);
-        if (citas.isEmpty()) {
-            return ResponseEntity.ok(List.of());
-        }
-        List<CitaResponseDTO> citasResponse = citas.stream()
-                .map(cita -> new CitaResponseDTO(
-                        cita.getId(),
-                        cita.getPaciente().getId(),
-                        cita.getMedico().getId(),
-                        cita.getFecha().toString(),
-                        cita.getHora().toString(),
-                        cita.getEstado().toString()
-                )).toList();
 
-        return ResponseEntity.ok(citasResponse);
-
-    }
     @GetMapping("/medicos/mis-citas")
     public ResponseEntity<?> getCitasByMedicoId(@AuthenticationPrincipal DetallesUsuario user) {
         Medico medico = medicoService.obtenerMedicoPorEmail(user.getUsername());
@@ -145,11 +79,24 @@ public class CitaController {
 
     }
 
-    @PatchMapping("/{id}")
+
+    @PatchMapping("/editar-cita/{id}")
     @Transactional
-    public ResponseEntity<?> updateCita(@PathVariable Long id, @RequestBody  CitaActualizarDTO citaDto) {
+    public ResponseEntity<?> updateCita(@PathVariable Long id,
+                                        @RequestBody CitaActualizarDTO citaDto,
+                                        @AuthenticationPrincipal DetallesUsuario user) {
+        Cita cita = citaService.obtenerCitaById(id);
+
+        String emailUsuario = user.getUsername();
+        boolean esPaciente = cita.getPaciente().getUsuario().getEmail().equals(emailUsuario);
+        boolean esMedico = cita.getMedico().getUsuario().getEmail().equals(emailUsuario);
+
+        if (!esPaciente && !esMedico) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para editar esta cita");
+        }
 
         Cita updatedCita = citaService.actualizarCita(id, citaDto);
+
         CitaResponseDTO response = new CitaResponseDTO(
                 updatedCita.getId(),
                 updatedCita.getPaciente().getId(),
@@ -162,10 +109,6 @@ public class CitaController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{id}")
-    @Transactional
-    public ResponseEntity<?> deleteCita(@PathVariable Long id) {
-        return ResponseEntity.ok(citaService.cancelarCita(id));
-    }
+
 
 }
