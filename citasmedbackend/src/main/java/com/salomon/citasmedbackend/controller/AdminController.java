@@ -70,9 +70,9 @@ public class AdminController {
 
     // CRUD operations for Paciente
     @GetMapping("/pacientes")
-    public ResponseEntity<List<PacientesResponseDTO>> getAllPacientes() {
-        List<Paciente> pacientes = pacienteService.obtenerPacientes();
-        return ResponseEntity.ok().body(pacientes.stream()
+    public ResponseEntity<Page<PacientesResponseDTO>> getAllPacientes(@PageableDefault(size = 8) Pageable paginacion) {
+        Page<Paciente> pacientes = pacienteService.obtenerPacientes(paginacion);
+        return ResponseEntity.ok().body(pacientes
                 .map(paciente -> new PacientesResponseDTO(
                         paciente.getId(),
                         paciente.getUsuario().getNombreCompleto(),
@@ -80,7 +80,7 @@ public class AdminController {
                         paciente.getUsuario().getEmail(),
                         paciente.getUsuario().getTelefono(),
                         paciente.getFechaNacimiento()
-                )).toList());
+                )));
     }
 
     @GetMapping("/pacientes/{id}")
@@ -145,9 +145,9 @@ public class AdminController {
     }
 
     @GetMapping("/medicos")
-    public ResponseEntity<List<MedicoResponseDTO>> getAllMedicos (){
+    public ResponseEntity<Page<MedicoResponseDTO>> getAllMedicos (@PageableDefault(size = 8) Pageable paginacion) {
 
-        return ResponseEntity.ok(medicoService.obtenerMedicos().stream().map(
+        return ResponseEntity.ok(medicoService.obtenerMedicos(paginacion).map(
                 medico -> new MedicoResponseDTO(
                         medico.getId(),
                         medico.getUsuario().getNombreCompleto(),
@@ -156,7 +156,7 @@ public class AdminController {
                         medico.getUsuario().getTelefono(),
                         medico.getEspecialidad().toString()
                 )
-        ).toList());
+        ));
     }
 
     @GetMapping("/medicos/{id}")
@@ -218,15 +218,15 @@ public class AdminController {
     }
 
     @GetMapping("/disponibilidades/{medicoId}")
-    public ResponseEntity<?> obtenerDisponibilidadesPorMedico(@PathVariable Long medicoId) {
-        return ResponseEntity.ok(disponibilidadService.obtenerDisponibilidadesPorMedico(medicoId).stream()
+    public ResponseEntity<?> obtenerDisponibilidadesPorMedico(@PathVariable Long medicoId, @PageableDefault(size = 8) Pageable paginacion) {
+        return ResponseEntity.ok(disponibilidadService.obtenerDisponibilidadesPorMedico(medicoId, paginacion)
                 .map(disponibilidad -> new DisponibilidadResponseDTO(
                         disponibilidad.getId(),
                         disponibilidad.getMedico().getId(),
                         disponibilidad.getDiaSemana().toString(),
                         disponibilidad.getHoraInicio().toLocalTime().toString(),
                         disponibilidad.getHoraFin().toLocalTime().toString()
-                )).toList());
+                )));
     }
 
 
@@ -249,12 +249,9 @@ public class AdminController {
 
     //CRUD OPS FOR CITAS
     @GetMapping("/citas")
-    public ResponseEntity<?> getCitas(){
-        List<Cita> citas = citaService.obtenerCitas();
-        if (citas.isEmpty()) {
-            return ResponseEntity.ok(List.of());
-        }
-        List<CitaResponseDTO> citasResponse = citas.stream()
+    public ResponseEntity<?> getCitas(@PageableDefault (size = 8) Pageable paginacion) {
+        Page<Cita> citas = citaService.obtenerCitas(paginacion);
+        Page<CitaResponseDTO> citasResponse = citas
                 .map(cita -> new CitaResponseDTO(
                         cita.getId(),
                         cita.getPaciente().getId(),
@@ -262,7 +259,7 @@ public class AdminController {
                         cita.getFecha().toString(),
                         cita.getHora().toString(),
                         cita.getEstado().toString()
-                )).toList();
+                ));
         return ResponseEntity.ok(citasResponse);
     }
 
@@ -281,12 +278,10 @@ public class AdminController {
     }
 
     @GetMapping("/citas/pacientes/{pacienteId}")
-    public ResponseEntity<?> getCitasByPacienteId(@PathVariable Long pacienteId) {
-        List<Cita> citas = citaService.obtenerCitasPorPacienteId(pacienteId);
-        if (citas.isEmpty()) {
-            return ResponseEntity.ok(List.of());
-        }
-        List<CitaResponseDTO> citasResponse = citas.stream()
+    public ResponseEntity<?> getCitasByPacienteId(@PathVariable Long pacienteId, @PageableDefault Pageable paginacion) {
+        Page<Cita> citas = citaService.obtenerCitasPorPacienteId(pacienteId, paginacion);
+
+        Page<CitaResponseDTO> citasResponse = citas
                 .map(cita -> new CitaResponseDTO(
                         cita.getId(),
                         cita.getPaciente().getId(),
@@ -294,18 +289,15 @@ public class AdminController {
                         cita.getFecha().toString(),
                         cita.getHora().toString(),
                         cita.getEstado().toString()
-                )).toList();
+                ));
 
         return ResponseEntity.ok(citasResponse);
     }
 
     @GetMapping("/citas/medicos/{medicoId}")
-    public ResponseEntity<?> getCitasByMedicoId(@PathVariable Long medicoId) {
-        List<Cita> citas = citaService.obtenerCitasPorMedicoId(medicoId);
-        if (citas.isEmpty()) {
-            return ResponseEntity.ok(List.of());
-        }
-        List<CitaResponseDTO> citasResponse = citas.stream()
+    public ResponseEntity<?> getCitasByMedicoId(@PathVariable Long medicoId, @PageableDefault Pageable paginacion) {
+        Page<Cita> citas = citaService.obtenerCitasPorMedicoId(medicoId, paginacion);
+        Page<CitaResponseDTO> citasResponse = citas
                 .map(cita -> new CitaResponseDTO(
                         cita.getId(),
                         cita.getPaciente().getId(),
@@ -313,7 +305,7 @@ public class AdminController {
                         cita.getFecha().toString(),
                         cita.getHora().toString(),
                         cita.getEstado().toString()
-                )).toList();
+                ));
 
         return ResponseEntity.ok(citasResponse);
 

@@ -12,13 +12,15 @@ import com.salomon.citasmedbackend.services.MedicoService;
 import com.salomon.citasmedbackend.services.PacienteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,11 +43,12 @@ public class CitaController {
 
 
     @GetMapping("/pacientes/mis-citas")
-    public ResponseEntity<?> getCitasPacienteAuth(@AuthenticationPrincipal DetallesUsuario user) {
+    public ResponseEntity<?> getCitasPacienteAuth(@AuthenticationPrincipal DetallesUsuario user,
+                                                  @PageableDefault(size = 10) Pageable pageable) {
         Paciente paciente = pacienteService.obtenerPacientePorEmail(user.getUsername());
-        List<Cita> citas = citaService.obtenerCitasPorPacienteId(paciente.getId());
+        Page<Cita> citas = citaService.obtenerCitasPorPacienteId(paciente.getId(), pageable);
 
-        List<CitaResponseDTO> citasResponse = citas.stream()
+        Page<CitaResponseDTO> citasResponse = citas
                 .map(cita -> new CitaResponseDTO(
                         cita.getId(),
                         cita.getPaciente().getId(),
@@ -53,7 +56,7 @@ public class CitaController {
                         cita.getFecha().toString(),
                         cita.getHora().toString(),
                         cita.getEstado().toString()
-                )).toList();
+                ));
 
         return ResponseEntity.ok(citasResponse);
     }
@@ -61,11 +64,12 @@ public class CitaController {
 
 
     @GetMapping("/medicos/mis-citas")
-    public ResponseEntity<?> getCitasByMedicoId(@AuthenticationPrincipal DetallesUsuario user) {
+    public ResponseEntity<?> getCitasByMedicoId(@AuthenticationPrincipal DetallesUsuario user,
+                                                @PageableDefault(size = 10) Pageable pageable) {
         Medico medico = medicoService.obtenerMedicoPorEmail(user.getUsername());
-        List<Cita> citas = citaService.obtenerCitasPorMedicoId(medico.getId());
+        Page<Cita> citas = citaService.obtenerCitasPorMedicoId(medico.getId(), pageable);
 
-        List<CitaResponseDTO> citasResponse = citas.stream()
+        Page<CitaResponseDTO> citasResponse = citas
                 .map(cita -> new CitaResponseDTO(
                         cita.getId(),
                         cita.getPaciente().getId(),
@@ -73,7 +77,7 @@ public class CitaController {
                         cita.getFecha().toString(),
                         cita.getHora().toString(),
                         cita.getEstado().toString()
-                )).toList();
+                ));
 
         return ResponseEntity.ok(citasResponse);
 

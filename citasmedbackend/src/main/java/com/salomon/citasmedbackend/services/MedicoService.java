@@ -7,6 +7,8 @@ import com.salomon.citasmedbackend.domain.usuario.Usuario;
 import com.salomon.citasmedbackend.repository.MedicoRepository;
 import com.salomon.citasmedbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -47,10 +49,10 @@ public class MedicoService {
         return nuevoMedico;
     }
 
-    public List<Medico> obtenerMedicos(){
-        List<Medico> medicos = medicoRepository.findAllByUsuarioActivoTrue();
+    public Page<Medico> obtenerMedicos(Pageable pageable) {
+        Page<Medico> medicos = medicoRepository.findAllByUsuarioActivoTrue(pageable);
         if (medicos.isEmpty()) {
-            return List.of();
+            return Page.empty();
         }
         return medicos;
     }

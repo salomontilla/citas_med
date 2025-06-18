@@ -10,6 +10,8 @@ import com.salomon.citasmedbackend.services.DisponibilidadService;
 import com.salomon.citasmedbackend.services.MedicoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -66,16 +68,17 @@ public class DisponibilidadController {
     }
 
     @GetMapping("/mis-disponibilidades")
-    public ResponseEntity<?> obtenerMisDisponibilidadeso(@AuthenticationPrincipal DetallesUsuario user) {
+    public ResponseEntity<?> obtenerMisDisponibilidadeso(@AuthenticationPrincipal DetallesUsuario user,
+                                                         @PageableDefault(size = 10) Pageable pageable) {
         Medico medico = medicoService.obtenerMedicoPorEmail(user.getUsername());
-        return ResponseEntity.ok(disponibilidadService.obtenerDisponibilidadesPorMedico(medico.getId()).stream()
+        return ResponseEntity.ok(disponibilidadService.obtenerDisponibilidadesPorMedico(medico.getId(), pageable)
                 .map(disponibilidad -> new DisponibilidadResponseDTO(
                         disponibilidad.getId(),
                         disponibilidad.getMedico().getId(),
                         disponibilidad.getDiaSemana().toString(),
                         disponibilidad.getHoraInicio().toLocalTime().toString(),
                         disponibilidad.getHoraFin().toLocalTime().toString()
-                )).toList());
+                )));
     }
 
 

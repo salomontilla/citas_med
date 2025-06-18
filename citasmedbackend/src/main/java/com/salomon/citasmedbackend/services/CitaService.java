@@ -13,6 +13,8 @@ import com.salomon.citasmedbackend.repository.DisponibilidadRepository;
 import com.salomon.citasmedbackend.repository.MedicoRepository;
 import com.salomon.citasmedbackend.repository.PacienteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -64,10 +66,10 @@ public class CitaService {
         return nuevaCita;
     }
 
-    public List<Cita> obtenerCitas() {
-        List<Cita> citas = citasRepository.findAll();
+    public Page<Cita> obtenerCitas(Pageable pageable) {
+        Page<Cita> citas = citasRepository.findAll(pageable);
         if (citas.isEmpty()) {
-            return List.of();
+            return Page.empty();
         }
         return citas;
     }
@@ -77,17 +79,17 @@ public class CitaService {
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
     }
 
-    public List<Cita> obtenerCitasPorPacienteId(Long pacienteId) {
+    public Page<Cita> obtenerCitasPorPacienteId(Long pacienteId, Pageable pageable) {
         Paciente paciente = pacienteRepository.findByIdAndUsuarioActivo(pacienteId)
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado o inactivo"));
-        return citasRepository.findByPacienteId(paciente.getId());
+        return citasRepository.findByPacienteId(paciente.getId(), pageable);
 
     }
 
-    public List<Cita> obtenerCitasPorMedicoId(Long medicoId) {
+    public Page<Cita> obtenerCitasPorMedicoId(Long medicoId, Pageable pageable) {
         Medico medico = medicoRepository.findByIdAndUsuarioActivo(medicoId)
                 .orElseThrow(() -> new RuntimeException("Médico no encontrado o inactivo"));
-        return citasRepository.findByMedicoId(medico.getId());
+        return citasRepository.findByMedicoId(medico.getId(), pageable);
     }
 
    public Cita actualizarCita(Long id, CitaActualizarDTO citaDto) {

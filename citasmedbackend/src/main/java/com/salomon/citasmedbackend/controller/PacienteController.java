@@ -45,6 +45,21 @@ public class PacienteController {
         return ResponseEntity.created(location).body(pacienteResponse);
     }
 
+    //READ
+    @GetMapping("/mis-datos")
+    public ResponseEntity<PacientesResponseDTO> getPacienteById(@AuthenticationPrincipal DetallesUsuario user) {
+        Paciente paciente = pacienteService.obtenerPacientePorEmail(user.getUsername());
+        PacientesResponseDTO pacienteResponse = new PacientesResponseDTO(
+                paciente.getId(),
+                paciente.getUsuario().getNombreCompleto(),
+                paciente.getUsuario().getDocumento(),
+                paciente.getUsuario().getEmail(),
+                paciente.getUsuario().getTelefono(),
+                paciente.getFechaNacimiento()
+        );
+        return ResponseEntity.ok(pacienteResponse);
+    }
+
     //UPDATE
     @PatchMapping("/editar-perfil")
     @Transactional
@@ -62,6 +77,8 @@ public class PacienteController {
                 pacienteActualizado.getFechaNacimiento()
         ));
     }
+
+
 
 
 

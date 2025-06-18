@@ -8,6 +8,8 @@ import com.salomon.citasmedbackend.domain.medico.Medico;
 import com.salomon.citasmedbackend.repository.DisponibilidadRepository;
 import com.salomon.citasmedbackend.repository.MedicoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -42,10 +44,10 @@ public class DisponibilidadService {
         return disponibilidadRepository.findAll();
     }
 
-    public List<Disponibilidad> obtenerDisponibilidadesPorMedico(Long medicoId) {
+    public Page<Disponibilidad> obtenerDisponibilidadesPorMedico(Long medicoId, Pageable pageable) {
         Medico medico = medicoRepository.findByIdAndUsuarioActivo(medicoId)
                 .orElseThrow(() -> new RuntimeException("Médico no encontrado o inactivo"));
-        return disponibilidadRepository.findByMedicoId(medico.getId());
+        return disponibilidadRepository.findByMedicoId(medico.getId(), pageable);
     }
 
     public Disponibilidad modificarDisponibilidad(UpdateDisponibilidadDTO dto, Long id) {
