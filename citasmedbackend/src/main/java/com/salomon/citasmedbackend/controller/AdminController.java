@@ -23,6 +23,9 @@ import com.salomon.citasmedbackend.services.MedicoService;
 import com.salomon.citasmedbackend.services.PacienteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,9 +51,11 @@ public class AdminController {
 
     // operations for Usuarios
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
-        List<Usuario> usuarios = userRepository.findAll();
-        List<UserResponseDTO> userResponses = usuarios.stream()
+    public ResponseEntity<Page<UserResponseDTO>> getAllUsers(
+            @PageableDefault(size = 2) Pageable paginacion
+    ) {
+        Page<Usuario> usuarios = userRepository.findAll(paginacion);
+        return ResponseEntity.ok( usuarios
                 .map(usuario -> new UserResponseDTO(
                         usuario.getId(),
                         usuario.getNombreCompleto(),
@@ -60,8 +65,7 @@ public class AdminController {
                         usuario.isActivo(),
                         usuario.getRol().name()
                 ))
-                .toList();
-        return ResponseEntity.ok(userResponses);
+        );
     }
 
     // CRUD operations for Paciente
