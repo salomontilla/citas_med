@@ -7,10 +7,7 @@ import com.salomon.citasmedbackend.domain.disponibilidad.Disponibilidad;
 import com.salomon.citasmedbackend.domain.disponibilidad.DisponibilidadDTO;
 import com.salomon.citasmedbackend.domain.disponibilidad.DisponibilidadResponseDTO;
 import com.salomon.citasmedbackend.domain.disponibilidad.UpdateDisponibilidadDTO;
-import com.salomon.citasmedbackend.domain.medico.ActualizarMedicoDTO;
-import com.salomon.citasmedbackend.domain.medico.Medico;
-import com.salomon.citasmedbackend.domain.medico.MedicoResponseDTO;
-import com.salomon.citasmedbackend.domain.medico.RegistrarMedicoDTO;
+import com.salomon.citasmedbackend.domain.medico.*;
 import com.salomon.citasmedbackend.domain.paciente.Paciente;
 import com.salomon.citasmedbackend.domain.paciente.PacienteUpdateDTO;
 import com.salomon.citasmedbackend.domain.paciente.PacientesResponseDTO;
@@ -53,7 +50,7 @@ public class AdminController {
     // operations for Usuarios
     @GetMapping("/users")
     public ResponseEntity<Page<UserResponseDTO>> getAllUsers(
-            @PageableDefault(size = 2) Pageable paginacion
+            @PageableDefault(size = 5) Pageable paginacion
     ) {
         Page<Usuario> usuarios = userRepository.findAll(paginacion);
         return ResponseEntity.ok( usuarios
@@ -177,9 +174,8 @@ public class AdminController {
     @PatchMapping("/medicos/editar/{id}")
     @Transactional
     public ResponseEntity<?> updateMedico(@PathVariable Long id,
-                                          @RequestBody ActualizarMedicoDTO medicoResponseDTO,
-                                          UriComponentsBuilder uriBuilder) {
-        Medico medico = medicoService.actualizarMedico(id, medicoResponseDTO);
+                                          @RequestBody ActualizarMedicoAdminDTO medicoResponseDTO) {
+        Medico medico = medicoService.actualizarMedicoAdmin(id, medicoResponseDTO);
 
         return ResponseEntity.ok(new MedicoResponseDTO(
                 medico.getId(),

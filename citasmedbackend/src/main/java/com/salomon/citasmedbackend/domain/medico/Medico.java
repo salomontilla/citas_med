@@ -55,4 +55,26 @@ public class Medico {
     public void activarMedico() {
         this.usuario.setActivo(true);
     }
+
+    public void actualizarMedicoAdmin(ActualizarMedicoAdminDTO medicoResponseDTO)
+{
+        if (medicoResponseDTO.nombreCompleto() != null) {
+            this.usuario.setNombreCompleto(medicoResponseDTO.nombreCompleto());
+        }
+        if (medicoResponseDTO.email() != null) {
+            this.usuario.setEmail(medicoResponseDTO.email());
+        }
+        if (medicoResponseDTO.contrasena() != null) {
+            this.usuario.setContrasena(medicoResponseDTO.contrasena());
+        }
+        if (medicoResponseDTO.documento() != null) {
+            this.usuario.setDocumento(medicoResponseDTO.documento());
+        }
+        if (medicoResponseDTO.telefono() != null) {
+            this.usuario.setTelefono(medicoResponseDTO.telefono());
+        }
+        if (medicoResponseDTO.especialidad() != null) {
+            this.especialidad = Especialidad.valueOf(medicoResponseDTO.especialidad());
+        }
+    }
 }
