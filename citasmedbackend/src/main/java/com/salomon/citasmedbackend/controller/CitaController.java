@@ -1,9 +1,6 @@
 package com.salomon.citasmedbackend.controller;
 
-import com.salomon.citasmedbackend.domain.cita.Cita;
-import com.salomon.citasmedbackend.domain.cita.CitaActualizarDTO;
-import com.salomon.citasmedbackend.domain.cita.CitaAgendarDTO;
-import com.salomon.citasmedbackend.domain.cita.CitaResponseDTO;
+import com.salomon.citasmedbackend.domain.cita.*;
 import com.salomon.citasmedbackend.domain.medico.Medico;
 import com.salomon.citasmedbackend.domain.paciente.Paciente;
 import com.salomon.citasmedbackend.domain.usuario.DetallesUsuario;
@@ -31,8 +28,9 @@ public class CitaController {
     private final MedicoService medicoService;
 
     @PostMapping("/pacientes/citas/agendar")
-    public ResponseEntity<CitaResponseDTO> agendarCita(@RequestBody @Valid CitaAgendarDTO citaDto) {
-        Cita cita = citaService.agendarCita(citaDto);
+    public ResponseEntity<CitaResponseDTO> agendarCita(@RequestBody @Valid CitaAgendarDTO citaDto,
+                                                       @AuthenticationPrincipal DetallesUsuario user) {
+        Cita cita = citaService.agendarCita(citaDto, user.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(new CitaResponseDTO(cita.getId(),
                 cita.getPaciente().getId(),
                 cita.getMedico().getId(),
@@ -84,22 +82,13 @@ public class CitaController {
     }
 
 
-    @PatchMapping("/editar-cita/{id}")
+    @PatchMapping("/pacientes/editar-cita/{id}")
     @Transactional
     public ResponseEntity<?> updateCita(@PathVariable Long id,
-                                        @RequestBody CitaActualizarDTO citaDto,
+                                        @RequestBody CitaPacienteActualizarDTO citaDto,
                                         @AuthenticationPrincipal DetallesUsuario user) {
-        Cita cita = citaService.obtenerCitaById(id);
 
-        String emailUsuario = user.getUsername();
-        boolean esPaciente = cita.getPaciente().getUsuario().getEmail().equals(emailUsuario);
-        boolean esMedico = cita.getMedico().getUsuario().getEmail().equals(emailUsuario);
-
-        if (!esPaciente && !esMedico) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para editar esta cita");
-        }
-
-        Cita updatedCita = citaService.actualizarCita(id, citaDto);
+        Cita updatedCita = citaService.actualizarCitaPaciente(id, citaDto, user.getUsername());
 
         CitaResponseDTO response = new CitaResponseDTO(
                 updatedCita.getId(),
@@ -110,6 +99,23 @@ public class CitaController {
                 updatedCita.getEstado().toString()
         );
 
+        return ResponseEntity.ok(response);
+    }
+    @PatchMapping("/pacientes/cancelar-cita/{id}")
+    public ResponseEntity<?> cancelarCita(@PathVariable Long id,
+                                                  @AuthenticationPrincipal DetallesUsuario user) {
+        Cita cita = citaService.obtenerCitaById(id);
+        if (cita.getEstado() == EstadoCita.CANCELADA) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La cita ya está cancelada");
+        }
+        CitaResponseDTO response = new CitaResponseDTO(
+                cita.getId(),
+                cita.getPaciente().getId(),
+                cita.getMedico().getId(),
+                cita.getFecha().toString(),
+                cita.getHora().toString(),
+                EstadoCita.CANCELADA.toString()
+        );
         return ResponseEntity.ok(response);
     }
 

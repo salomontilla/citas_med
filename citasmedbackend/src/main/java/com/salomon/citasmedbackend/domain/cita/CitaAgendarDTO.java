@@ -5,8 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 
 public record CitaAgendarDTO(
-    @NotNull
-    Long pacienteId,
+
     @NotNull
     Long medicoId,
     @NotBlank
