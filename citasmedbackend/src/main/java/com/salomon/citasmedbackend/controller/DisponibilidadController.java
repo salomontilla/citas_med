@@ -20,12 +20,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/citasmed/medicos")
+@RequestMapping("/api/citasmed")
 public class DisponibilidadController {
     private final DisponibilidadService disponibilidadService;
     private final MedicoService medicoService;
 
-    @PostMapping("/registrar-disponibilidad")
+    @PostMapping("/medicos/registrar-disponibilidad")
     public ResponseEntity<?> registrarDisponibilidadAuth(@RequestBody @Valid DisponibilidadDTO dto,
                                                          @AuthenticationPrincipal DetallesUsuario user) {
         Medico medico = medicoService.obtenerMedicoPorEmail(user.getUsername());
@@ -39,7 +39,7 @@ public class DisponibilidadController {
         ));
     }
 
-    @GetMapping
+    @GetMapping("admin/disponibilidades")
     public ResponseEntity<?> obtenerDisponibilidades() {
         return ResponseEntity.ok(disponibilidadService.obtenerDisponibilidades().stream()
                 .map(disponibilidad -> new DisponibilidadResponseDTO(
@@ -53,7 +53,7 @@ public class DisponibilidadController {
 
 
     @PreAuthorize("@disponibilidadService.obtenerPorId(#id).medico.usuario.email == authentication.name")
-    @PatchMapping("/editar-disponibilidades/{id}")
+    @PatchMapping("/medicos/editar-disponibilidades/{id}")
     public ResponseEntity<?> modificarDisponibilidad(@RequestBody UpdateDisponibilidadDTO dto,
                                                      @PathVariable Long id) {
         Disponibilidad actualizada = disponibilidadService.modificarDisponibilidad(dto, id);
@@ -67,11 +67,25 @@ public class DisponibilidadController {
         ));
     }
 
-    @GetMapping("/mis-disponibilidades")
+    @GetMapping("/medicos/mis-disponibilidades")
     public ResponseEntity<?> obtenerMisDisponibilidadeso(@AuthenticationPrincipal DetallesUsuario user,
                                                          @PageableDefault(size = 10) Pageable pageable) {
         Medico medico = medicoService.obtenerMedicoPorEmail(user.getUsername());
         return ResponseEntity.ok(disponibilidadService.obtenerDisponibilidadesPorMedico(medico.getId(), pageable)
+                .map(disponibilidad -> new DisponibilidadResponseDTO(
+                        disponibilidad.getId(),
+                        disponibilidad.getMedico().getId(),
+                        disponibilidad.getDiaSemana().toString(),
+                        disponibilidad.getHoraInicio().toLocalTime().toString(),
+                        disponibilidad.getHoraFin().toLocalTime().toString()
+                )));
+    }
+
+@GetMapping("/pacientes/{medicoId}/disponibilidades")
+    public ResponseEntity<?> obtenerDisponibilidadesMedicoId(
+            @PathVariable Long medicoId,
+            @PageableDefault(size = 8) Pageable pageable) {
+        return ResponseEntity.ok(disponibilidadService.obtenerDisponibilidadesPorMedico(medicoId, pageable)
                 .map(disponibilidad -> new DisponibilidadResponseDTO(
                         disponibilidad.getId(),
                         disponibilidad.getMedico().getId(),
