@@ -21,7 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity()
 public class SecurityConfig {
     private final JwtFilter jwtFilter;
 
@@ -33,9 +33,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/citasmed/auth/login").permitAll()
                         .requestMatchers("/login.html", "/css/**", "/js/**").permitAll()
-                        .requestMatchers("/api/citasmed/**").hasRole("ADMIN")
                         .requestMatchers("/api/citasmed/pacientes/**").hasRole("PACIENTE")
                         .requestMatchers("/api/citasmed/medicos/**").hasRole("MEDICO")
+                        .requestMatchers("/api/citasmed/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
 

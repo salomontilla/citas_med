@@ -104,19 +104,8 @@ public class CitaController {
     @PatchMapping("/pacientes/cancelar-cita/{id}")
     public ResponseEntity<?> cancelarCita(@PathVariable Long id,
                                                   @AuthenticationPrincipal DetallesUsuario user) {
-        Cita cita = citaService.obtenerCitaById(id);
-        if (cita.getEstado() == EstadoCita.CANCELADA) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La cita ya está cancelada");
-        }
-        CitaResponseDTO response = new CitaResponseDTO(
-                cita.getId(),
-                cita.getPaciente().getId(),
-                cita.getMedico().getId(),
-                cita.getFecha().toString(),
-                cita.getHora().toString(),
-                EstadoCita.CANCELADA.toString()
-        );
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(citaService.cancelarCita(id, user.getUsername()));
     }
 
 

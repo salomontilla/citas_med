@@ -121,6 +121,20 @@ public class CitaService {
     }
 
 
+    public String cancelarCitaAdmin(Long id){
+        Cita cita = citasRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
+
+        if (cita.getEstado() == EstadoCita.CANCELADA) {
+            return "La cita ya está cancelada.";
+        }
+
+        cita.setEstado(EstadoCita.CANCELADA);
+        citasRepository.save(cita);
+
+        return "Cita cancelada correctamente.";
+    }
+
     public String cancelarCita(Long id, String emailUsuario) {
         // Buscar el usuario por su email
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)

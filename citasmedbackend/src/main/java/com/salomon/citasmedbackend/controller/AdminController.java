@@ -315,7 +315,7 @@ public class AdminController {
     @Transactional
     public ResponseEntity<?> updateCita(@PathVariable Long id, @RequestBody CitaActualizarDTO citaDto) {
 
-        Cita updatedCita = citaService.actualizarCita(id, citaDto);
+        Cita updatedCita = citaService.actualizarCitaAdmin(id, citaDto);
         CitaResponseDTO response = new CitaResponseDTO(
                 updatedCita.getId(),
                 updatedCita.getPaciente().getId(),
@@ -331,6 +331,6 @@ public class AdminController {
     @DeleteMapping("/citas/eliminar/{id}")
     @Transactional
     public ResponseEntity<?> deleteCita(@PathVariable Long id) {
-        return ResponseEntity.ok(citaService.cancelarCita(id));
+        return ResponseEntity.ok(citaService.cancelarCitaAdmin(id));
     }
 }
