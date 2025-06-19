@@ -121,21 +121,36 @@ public class CitaService {
     }
 
 
+    public String cancelarCita(Long id, String emailUsuario) {
+        // Buscar el usuario por su email
+        Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        // Verificar que el usuario tenga rol de paciente
+        Paciente paciente = pacienteRepository.findPacienteByUsuarioIdActivo(usuario.getId())
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado o inactivo"));
 
-    public String cancelarCita(Long id) {
-        Cita cita = citasRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Cita no encontrada")
-        );
+        // Buscar la cita por su ID
+        Cita cita = citasRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
 
+        // Verificar que la cita pertenece al paciente autenticado
+        if (!cita.getPaciente().getId().equals(paciente.getId())) {
+            throw new RuntimeException("No tienes permiso para cancelar esta cita");
+        }
+
+        // Validar si ya está cancelada
         if (cita.getEstado() == EstadoCita.CANCELADA) {
             return "La cita ya está cancelada.";
         }
 
+        // Cancelar la cita
         cita.setEstado(EstadoCita.CANCELADA);
         citasRepository.save(cita);
+
         return "Cita cancelada correctamente.";
     }
+
 
     private Cita validatedCitaPaciente(CitaPacienteActualizarDTO dto, Cita cita) {
         Date nuevaFecha = dto.fecha() != null ? convertirFecha(dto.fecha()) : cita.getFecha();
