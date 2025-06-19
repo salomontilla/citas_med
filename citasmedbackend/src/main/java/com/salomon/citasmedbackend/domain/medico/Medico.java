@@ -30,7 +30,7 @@ public class Medico {
         this.especialidad = Especialidad.valueOf(especialidad);
     }
 
-    public void actualizarMedico(RegistrarMedicoDTO medico) {
+    public void actualizarMedico(ActualizarMedicoDTO medico) {
         if (medico.nombreCompleto() != null) {
             this.usuario.setNombreCompleto(medico.nombreCompleto());
         }
@@ -45,9 +45,6 @@ public class Medico {
         }
         if (medico.telefono() != null) {
             this.usuario.setTelefono(medico.telefono());
-        }
-        if (medico.especialidad() != null) {
-            this.especialidad = Especialidad.valueOf(medico.especialidad());
         }
     }
 

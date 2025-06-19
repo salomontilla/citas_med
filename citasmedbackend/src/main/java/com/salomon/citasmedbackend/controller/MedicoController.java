@@ -1,5 +1,6 @@
 package com.salomon.citasmedbackend.controller;
 
+import com.salomon.citasmedbackend.domain.medico.ActualizarMedicoDTO;
 import com.salomon.citasmedbackend.domain.medico.Medico;
 import com.salomon.citasmedbackend.domain.medico.MedicoResponseDTO;
 import com.salomon.citasmedbackend.domain.medico.RegistrarMedicoDTO;
@@ -41,9 +42,9 @@ public class MedicoController {
     @PatchMapping("/editar-perfil")
     @Transactional
     public ResponseEntity<?> updateMyInfo(@AuthenticationPrincipal DetallesUsuario user,
-                                          @RequestBody RegistrarMedicoDTO medicoResponseDTO) {
+                                          @RequestBody ActualizarMedicoDTO medicoActualizarDTO) {
         Medico medico = medicoService.obtenerMedicoPorEmail(user.getUsername());
-        Medico medicoActualizado = medicoService.actualizarMedico(medico.getId(), medicoResponseDTO);
+        Medico medicoActualizado = medicoService.actualizarMedico(medico.getId(), medicoActualizarDTO);
 
         return ResponseEntity.ok(new MedicoResponseDTO(
                 medicoActualizado.getId(),

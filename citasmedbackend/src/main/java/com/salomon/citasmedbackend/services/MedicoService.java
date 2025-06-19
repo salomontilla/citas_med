@@ -1,5 +1,6 @@
 package com.salomon.citasmedbackend.services;
 
+import com.salomon.citasmedbackend.domain.medico.ActualizarMedicoDTO;
 import com.salomon.citasmedbackend.domain.medico.Medico;
 import com.salomon.citasmedbackend.domain.medico.RegistrarMedicoDTO;
 import com.salomon.citasmedbackend.domain.usuario.Rol;
@@ -68,26 +69,30 @@ public class MedicoService {
                 .orElseThrow(() -> new RuntimeException("Médico no encontrado o inactivo"));
     }
 
-    public Medico actualizarMedico(Long id, RegistrarMedicoDTO medicoResponseDTO) {
+    public Medico actualizarMedico(Long id, ActualizarMedicoDTO medicoResponseDTO) {
 
         Medico medico = medicoRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Médico no encontrado")
         );
 
-        if (!medicoResponseDTO.email().equals(medico.getUsuario().getEmail()) && userRepository.existsByEmail(medicoResponseDTO.email())) {
+        // Validaciones antes de actualizar
+        if (medicoResponseDTO.email() != null &&
+                !medicoResponseDTO.email().equals(medico.getUsuario().getEmail()) &&
+                userRepository.existsByEmail(medicoResponseDTO.email())) {
             throw new RuntimeException("El email ya está en uso");
         }
 
-        if (!medicoResponseDTO.documento().equals(medico.getUsuario().getDocumento())
-                && userRepository.existsByDocumento(medicoResponseDTO.documento())) {
+        if (medicoResponseDTO.documento() != null &&
+                !medicoResponseDTO.documento().equals(medico.getUsuario().getDocumento()) &&
+                userRepository.existsByDocumento(medicoResponseDTO.documento())) {
             throw new RuntimeException("El documento ya está registrado");
         }
 
+        // Ahora sí se actualizan los datos
         medico.actualizarMedico(medicoResponseDTO);
-        medicoRepository.save(medico);
-
-        return medico;
+        return medicoRepository.save(medico);
     }
+
 
     public String eliminarMedico(Long id) {
 
