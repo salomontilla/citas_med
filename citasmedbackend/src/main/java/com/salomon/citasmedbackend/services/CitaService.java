@@ -55,7 +55,7 @@ public class CitaService {
 
         Date formattedDate = convertirFecha(citaDto.fecha());
         Time formattedTime = convertirHora(citaDto.hora());
-        validarDisponibilidad(medico.getId(), formattedDate, formattedTime);
+        validarDisponibilidad(medico.getId(), formattedDate, formattedTime, null);
         Cita nuevaCita = new Cita(
                 paciente,
                 medico,
@@ -120,6 +120,25 @@ public class CitaService {
         return validatedCitaPaciente(citaDto, cita);
     }
 
+    public Cita actualizarCitaMedico(Long id, CitaActualizarDTO citaDto, String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Medico medico = medicoRepository.findByUsuarioEmailAndUsuarioActivo(usuario.getEmail())
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado o inactivo"));
+
+        Cita cita = citasRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
+
+        if (!cita.getMedico().getId().equals(medico.getId())) {
+            throw  new RuntimeException("No tienes permiso para editar esta cita");
+        }
+        if (cita.getEstado() == EstadoCita.CANCELADA) {
+            throw new RuntimeException("No se puede editar una cita cancelada");
+        }
+        return validatedCitaAdmin(citaDto, cita);
+    }
+
 
     public String cancelarCitaAdmin(Long id){
         Cita cita = citasRepository.findById(id)
@@ -170,7 +189,7 @@ public class CitaService {
         Date nuevaFecha = dto.fecha() != null ? convertirFecha(dto.fecha()) : cita.getFecha();
         Time nuevaHora = dto.hora() != null ? convertirHora(dto.hora()) : cita.getHora();
 
-        validarDisponibilidad(cita.getMedico().getId(), nuevaFecha, nuevaHora);
+        validarDisponibilidad(cita.getMedico().getId(), nuevaFecha, nuevaHora, cita.getId());
 
         if (dto.fecha() != null) cita.setFecha(nuevaFecha);
         if (dto.hora() != null) cita.setHora(nuevaHora);
@@ -182,7 +201,7 @@ public class CitaService {
         Date nuevaFecha = citaDto.fecha() != null ? convertirFecha(citaDto.fecha()) : cita.getFecha();
         Time nuevaHora = citaDto.hora() != null ? convertirHora(citaDto.hora()) : cita.getHora();
 
-        validarDisponibilidad(cita.getMedico().getId(), nuevaFecha, nuevaHora);
+        validarDisponibilidad(cita.getMedico().getId(), nuevaFecha, nuevaHora, cita.getId());
 
         if (citaDto.fecha() != null) {
             cita.setFecha(nuevaFecha);
@@ -197,7 +216,7 @@ public class CitaService {
         return citasRepository.save(cita);
     }
 
-    private void validarDisponibilidad(Long medicoId, Date fechaAgendada, Time horaInicio) {
+    private void validarDisponibilidad(Long medicoId, Date fechaAgendada, Time horaInicio, Long citaIdAExcluir) {
         DiaSemana dia = DIA_SEMANA_MAP.get(fechaAgendada.toLocalDate().getDayOfWeek());
 
         LocalDate fecha = fechaAgendada.toLocalDate();
@@ -222,23 +241,24 @@ public class CitaService {
         if (!dentroDeHorario) {
             throw new RuntimeException("La hora está fuera del horario de atención del médico");
         }
-        // Validar que no se cruce con otra cita activa (no cancelada)
+
         List<Cita> citasEseDia = citasRepository.findByMedicoIdAndFecha(medicoId, fechaAgendada)
                 .stream()
-                .filter(c -> c.getEstado() != EstadoCita.CANCELADA) // Ignorar canceladas
+                .filter(c -> c.getEstado() != EstadoCita.CANCELADA)
+                .filter(c -> citaIdAExcluir == null || !c.getId().equals(citaIdAExcluir)) // excluir esta cita
                 .toList();
 
         for (Cita cita : citasEseDia) {
             LocalTime citaInicio = cita.getHora().toLocalTime();
             LocalTime citaFin = citaInicio.plusMinutes(30);
 
-            // Verificar si se cruzan (hay solapamiento)
             if (!(horaFin.isBefore(citaInicio) || horaInicioDeseada.isAfter(citaFin.minusNanos(1)))) {
                 throw new RuntimeException("Ya hay una cita agendada en ese horario");
             }
         }
-
     }
+
+
 
 
 }

@@ -63,7 +63,7 @@ public class CitaController {
 
     @GetMapping("/medicos/mis-citas")
     public ResponseEntity<?> getCitasByMedicoId(@AuthenticationPrincipal DetallesUsuario user,
-                                                @PageableDefault(size = 10) Pageable pageable) {
+                                                @PageableDefault(size = 8) Pageable pageable) {
         Medico medico = medicoService.obtenerMedicoPorEmail(user.getUsername());
         Page<Cita> citas = citaService.obtenerCitasPorMedicoId(medico.getId(), pageable);
 
@@ -101,13 +101,31 @@ public class CitaController {
 
         return ResponseEntity.ok(response);
     }
+    @PatchMapping("/medicos/editar-cita/{id}")
+    @Transactional
+    public ResponseEntity<?> updateCitaMedico(@PathVariable Long id,
+                                        @RequestBody CitaActualizarDTO citaDto,
+                                        @AuthenticationPrincipal DetallesUsuario user) {
+
+        Cita updatedCita = citaService.actualizarCitaMedico(id, citaDto, user.getUsername());
+
+        CitaResponseDTO response = new CitaResponseDTO(
+                updatedCita.getId(),
+                updatedCita.getPaciente().getId(),
+                updatedCita.getMedico().getId(),
+                updatedCita.getFecha().toString(),
+                updatedCita.getHora().toString(),
+                updatedCita.getEstado().toString()
+        );
+
+        return ResponseEntity.ok(response);
+    }
     @PatchMapping("/pacientes/cancelar-cita/{id}")
     public ResponseEntity<?> cancelarCita(@PathVariable Long id,
                                                   @AuthenticationPrincipal DetallesUsuario user) {
 
         return ResponseEntity.ok(citaService.cancelarCita(id, user.getUsername()));
     }
-
 
 
 }

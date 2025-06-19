@@ -2,7 +2,9 @@ package com.salomon.citasmedbackend.services;
 
 import com.salomon.citasmedbackend.domain.medico.ActualizarMedicoDTO;
 import com.salomon.citasmedbackend.domain.medico.Medico;
+import com.salomon.citasmedbackend.domain.medico.MedicoResponseDTO;
 import com.salomon.citasmedbackend.domain.medico.RegistrarMedicoDTO;
+import com.salomon.citasmedbackend.domain.paciente.Paciente;
 import com.salomon.citasmedbackend.domain.usuario.Rol;
 import com.salomon.citasmedbackend.domain.usuario.Usuario;
 import com.salomon.citasmedbackend.repository.MedicoRepository;
@@ -120,5 +122,10 @@ public class MedicoService {
         medico.activarMedico();
         medicoRepository.save(medico);
         return "Médico activado correctamente.";
+    }
+
+    public Page<Paciente> obtenerPacientesPorMedico(Long id, Pageable pageable) {
+        Medico medico = obtenerMedicoPorId(id);
+        return medicoRepository.findPacientesByMedicoId(medico.getId(), pageable);
     }
 }
