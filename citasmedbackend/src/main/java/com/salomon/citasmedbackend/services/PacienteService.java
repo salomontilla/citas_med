@@ -79,15 +79,21 @@ public class PacienteService {
 
         Usuario usuario = paciente.getUsuario();
 
-        if (!usuario.getEmail().equals(pacienteDto.email()) && userRepository.existsByEmail(pacienteDto.email())) {
+        // Validación de email
+        if (pacienteDto.email() != null &&
+                !usuario.getEmail().equals(pacienteDto.email()) &&
+                userRepository.existsByEmail(pacienteDto.email())) {
             throw new RuntimeException("El correo electrónico ya está en uso");
         }
 
-        if (!usuario.getDocumento().equals(pacienteDto.documento()) && userRepository.existsByDocumento(pacienteDto.documento())) {
+        // Validación de documento
+        if (pacienteDto.documento() != null &&
+                !usuario.getDocumento().equals(pacienteDto.documento()) &&
+                userRepository.existsByDocumento(pacienteDto.documento())) {
             throw new RuntimeException("El documento ya está registrado");
         }
 
-        if (pacienteDto.contrasena() != null && !pacienteDto.contrasena().isEmpty()) {
+        if (pacienteDto.contrasena() != null && !pacienteDto.contrasena().isBlank()) {
             String hashedPassword = passwordEncoder.encode(pacienteDto.contrasena());
             usuario.setContrasena(hashedPassword);
         }
@@ -100,6 +106,7 @@ public class PacienteService {
 
         return paciente;
     }
+
 
     public String eliminarPaciente(Long id) {
 

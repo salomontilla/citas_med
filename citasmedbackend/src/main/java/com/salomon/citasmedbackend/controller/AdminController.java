@@ -7,6 +7,7 @@ import com.salomon.citasmedbackend.domain.disponibilidad.Disponibilidad;
 import com.salomon.citasmedbackend.domain.disponibilidad.DisponibilidadDTO;
 import com.salomon.citasmedbackend.domain.disponibilidad.DisponibilidadResponseDTO;
 import com.salomon.citasmedbackend.domain.disponibilidad.UpdateDisponibilidadDTO;
+import com.salomon.citasmedbackend.domain.medico.ActualizarMedicoDTO;
 import com.salomon.citasmedbackend.domain.medico.Medico;
 import com.salomon.citasmedbackend.domain.medico.MedicoResponseDTO;
 import com.salomon.citasmedbackend.domain.medico.RegistrarMedicoDTO;
@@ -176,7 +177,7 @@ public class AdminController {
     @PatchMapping("/medicos/editar/{id}")
     @Transactional
     public ResponseEntity<?> updateMedico(@PathVariable Long id,
-                                          @RequestBody RegistrarMedicoDTO medicoResponseDTO,
+                                          @RequestBody ActualizarMedicoDTO medicoResponseDTO,
                                           UriComponentsBuilder uriBuilder) {
         Medico medico = medicoService.actualizarMedico(id, medicoResponseDTO);
 
