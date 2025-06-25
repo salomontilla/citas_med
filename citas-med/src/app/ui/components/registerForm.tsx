@@ -1,8 +1,9 @@
 'use client';
 import { Button, DatePicker, Input } from "@heroui/react";
 import React, { BaseSyntheticEvent, useState } from "react";
-import { CalendarDate } from "@internationalized/date";
+import { CalendarDate, today, getLocalTimeZone } from "@internationalized/date";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "./passwordEyes";
+import axios from 'axios';
 
 export default function RegisterForm() {
   const [isVisible, setIsVisible] = React.useState(false);
@@ -15,23 +16,45 @@ export default function RegisterForm() {
   const [fecha, setFecha] = useState<CalendarDate | null>(null);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
+  const errors = []
+
+  const fechaFormateada = `${fecha?.day.toString().padStart(2, '0')}-${fecha?.month.toString().padStart(2, '0')}-${fecha?.year}`;
+  
+  if (contra !== confirm) {
+    errors.push("las contraseñas no coinciden");
+  }
 
   const handleSubmit = (e:BaseSyntheticEvent) => {
     e.preventDefault();
-    console.log(name, id, correo, telefono, contra, confirm, fecha?.toString(), e);
-    // Aquí iría la lógica para enviar datos al backend
+    console.log(name, id, correo, telefono, contra, confirm, fechaFormateada);
+
+    axios.post('http://localhost:8080/api/citasmed/pacientes/register', {
+      nombreCompleto: name,
+      email: correo,
+      contrasena: contra,
+      telefono: telefono,
+      documento: id,
+      fechaNacimiento: fechaFormateada?.toString(),
+    })
+    .then(response => {
+      console.log('Registro exitoso:', response.data);
+      // Aquí puedes manejar la respuesta del servidor, como redirigir al usuario o mostrar un mensaje de éxito
+    }).catch(error => {
+      console.error('Error al registrar:', error);
+      // Aquí puedes manejar el error, como mostrar un mensaje de error al usuario
+    })
+
+    
   };
 
-  const passwordValidation = () =>{
-    if (contra.length === 0 ) {
-      return "Campo requerido";
-    }else
-    if (contra.match(confirm)) {
-      return "Las contraseñas no coinciden";
-    }else if (confirm.length === 0){
-      return "Campo requerido";
-    }
+ const passwordValidation = () => {
+  if (contra.length === 0) {
+    return "Campo requerido";
   }
+  return "";
+};
+
+
 
   return (
     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 3xl:grid-cols-3 gap-4 items-end ">
@@ -97,50 +120,49 @@ export default function RegisterForm() {
         />
       </div>
       <div>
-        <Input
-          size="lg"
-          color="primary"
-          onValueChange={setContra}
-          required
-          errorMessage={passwordValidation()}
-          endContent={
-            <button
-              aria-label="toggle password visibility"
-              className="focus:outline-hidden"
-              type="button"
-              onClick={toggleVisibility}
-            >
-              {isVisible ? (
-                <EyeSlashFilledIcon  />
-              ) : (
-                <EyeFilledIcon  />
-              )}
-            </button>
-          }
+  <Input
+    size="lg"
+    color="primary"
+    onValueChange={setContra}
+    required
+    errorMessage={passwordValidation()}
+    endContent={
+      <button
+        aria-label="toggle password visibility"
+        className="focus:outline-none"
+        type="button"
+        onClick={toggleVisibility}
+      >
+        {isVisible ? <EyeSlashFilledIcon /> : <EyeFilledIcon />}
+      </button>
+    }
+    label="Contraseña"
+    labelPlacement="outside"
+    type={isVisible ? "text" : "password"}
+  />
+</div>
 
-          label="Contraseña"
-          labelPlacement="outside"
-          type={isVisible ? "text" : "password"}
+<div>
+  <Input
+    onValueChange={setConfirm}
+    label="Confirmar contraseña"
+    labelPlacement="outside"
+    color="primary"
+    size="lg"
+    type="password"
+    required
+    isInvalid={contra !== confirm}
+    errorMessage={
+      errors.map((error, index) => (
+        <li key={index} >{error}</li>
+      ))
+    }
+  />
+</div>
 
-        />
-      </div>
-
-      <div>
-        <Input
-          onValueChange={setConfirm}
-
-          label="Confirmar contraseña"
-          labelPlacement="outside"
-          color="primary"
-          size="lg"
-          type="password"
-          
-          errorMessage={passwordValidation()}
-          required
-        />
-      </div>
       <div>
         <DatePicker
+          showMonthAndYearPickers
           color="primary"
           value={fecha}
           onChange={(value) => setFecha(value)}
@@ -149,7 +171,8 @@ export default function RegisterForm() {
           labelPlacement="inside"
           isRequired
           className="rounded-2xl" 
-          errorMessage="Campo requerido"/>
+          errorMessage="Campo requerido"
+          maxValue={today(getLocalTimeZone())}/>
           
           
       </div>

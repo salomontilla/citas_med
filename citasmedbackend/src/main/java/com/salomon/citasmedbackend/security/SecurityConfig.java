@@ -31,6 +31,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/citasmed/pacientes/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/citasmed/auth/login").permitAll()
                         .requestMatchers("/login.html", "/css/**", "/js/**").permitAll()
                         .requestMatchers("/api/citasmed/pacientes/**").hasRole("PACIENTE")

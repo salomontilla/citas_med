@@ -1,3 +1,4 @@
+'use client'
 import Navbar from '../ui/components/navbar';
 export default function LoginPage() {
     return (
@@ -46,6 +47,7 @@ export default function LoginPage() {
                             <a href="#" className="text-sm text-blue-600 hover:underline">¿Olvidaste tu contraseña?</a>
                         </div>
                         <button
+                            onSubmit={() => console.log("Iniciar sesión")}
                             type="submit"
                             className="w-full px-4 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300"
                         >

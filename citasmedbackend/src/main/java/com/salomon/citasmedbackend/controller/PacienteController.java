@@ -1,6 +1,5 @@
 package com.salomon.citasmedbackend.controller;
 
-import com.salomon.citasmedbackend.domain.cita.Cita;
 import com.salomon.citasmedbackend.domain.paciente.Paciente;
 import com.salomon.citasmedbackend.domain.paciente.PacienteUpdateDTO;
 import com.salomon.citasmedbackend.domain.paciente.PacientesResponseDTO;
@@ -10,18 +9,15 @@ import com.salomon.citasmedbackend.services.PacienteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("api/citasmed/pacientes")
-@PreAuthorize("hasRole('PACIENTE')")
 
 @RequiredArgsConstructor
 public class PacienteController {

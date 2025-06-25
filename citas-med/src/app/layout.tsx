@@ -27,13 +27,12 @@ export default function RootLayout({
         className={`${raleway.className} antialiased`}
       >
         
-        
           {children}
         
-      </body>
       <footer>
         <Footer />
       </footer>
+      </body>
     </html>
   );
 }
