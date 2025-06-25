@@ -1,6 +1,19 @@
 'use client'
 import Navbar from '../ui/components/navbar';
+import { Button, Input } from "@heroui/react";
+import React, { useState } from "react";
+import axios from 'axios';
+
 export default function LoginPage() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const handleLogin = (e: React.FormEvent) => {
+        e.preventDefault();
+        console.log("Iniciar sesión:", email
+        , password);
+        // Aquí puedes agregar la lógica para manejar el inicio de sesión
+    }
+
     return (
         <div className="relative w-full h-screen flex flex-col items-center justify-center">
             <header className="bg-blue-50 absolute top-0 left-0 w-full z-20">
@@ -21,38 +34,45 @@ export default function LoginPage() {
                 />
                 ))}
             </div>
-            <div className="relative z-10 flex items-center justify-center min-h-fit">
-                <div className="w-[80%] md:w-full max-w-md p-8 bg-white rounded-2xl shadow-md">
+            <div className="relative z-10 flex items-center justify-center min-h-fit w-full">
+                <div className="w-[80%] md:w-full max-w-sm p-8 bg-white rounded-2xl shadow-md">
                     <h2 className="mb-6 text-2xl font-bold text-center">Iniciar Sesión</h2>
-                    <form>
-                        <div className="mb-4">
-                            <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="email">Correo Electrónico</label>
-                            <input
-                                type="email"
-                                id="email"
-                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Ingrese su correo electrónico"
-                                required
-                            />
+                    <form onSubmit={handleLogin}>
+                        <div className="mb-4 w-full">
+                            <Input
+                                      value={email}
+                                      onValueChange={setEmail}
+                                      label="Ingresa tu correo electrónico"
+                                      labelPlacement="inside"
+                                      color="primary"
+                                      size="md"
+                                      type="text"
+                                      errorMessage="Campo requerido"
+                                      required
+                                    />
                         </div>
-                        <div className="mb-6">
-                            <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="password">Contraseña</label>
-                            <input
-                                type="password"
-                                id="password"
-                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Ingrese su contraseña"
-                                required
-                            />
+                        <div className="mb-4">
+                            <Input
+                                      value={password}
+                                      onValueChange={setPassword}
+                                      label="Ingresa tu contraseña"
+                                      labelPlacement="inside"
+                                      color="primary"
+                                      size="md"
+                                      type="password"
+                                      errorMessage="Campo requerido"
+                                      required
+                                    />
                             <a href="#" className="text-sm text-blue-600 hover:underline">¿Olvidaste tu contraseña?</a>
                         </div>
-                        <button
-                            onSubmit={() => console.log("Iniciar sesión")}
-                            type="submit"
-                            className="w-full px-4 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300"
-                        >
-                            Iniciar Sesión
-                        </button>
+                        <Button
+                                type="submit"
+                                className="p-6 w-full"
+                                radius="lg"
+                                color="primary"
+                              >
+                                Iniciar Sesión
+                              </Button>
                     </form>
                 </div>
             </div>
