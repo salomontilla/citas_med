@@ -14,30 +14,32 @@ export default function LoginPage() {
 
 
     const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
 
-      const res = await api.post("/auth/login", {
-        email: email,
-        contrasena: password,
-      });
+  e.preventDefault();
+  setErrorMsg("");
+  try {
+    await api.post("/auth/login", {
+      email: email,
+      contrasena: password,
+    });
 
-      const rol = res.data.rol;
+    const res = await api.get("/auth/me"); 
+    const rol = res.data.rol;
 
-    // Redirige según el rol
+    console.log("Rol:", rol);
+
     if (rol === "ADMIN") {
-      router.push("dashboard/admin");
+      router.push("/dashboard/admin");
     } else if (rol === "PACIENTE") {
-      router.push("dashboard/pacientes");
+      router.push("/dashboard/pacientes");
     } else if (rol === "MEDICO") {
-      router.push("dashboard/medicos");
+      router.push("/dashboard/medicos");
     }
-
-    } catch (err: any) {
-      const msg = err.response.data || "Error al iniciar sesión";
-      setErrorMsg(msg);
-    }
-  };
+  } catch (err: any) {
+    const msg = err.response?.data || "Error al iniciar sesión";
+    setErrorMsg(msg);
+  }
+};
 
     return (
         <div className="relative w-full h-screen flex flex-col items-center justify-center">
