@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/citasmed/pacientes/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/citasmed/auth/login").permitAll()
                         .requestMatchers("/login.html", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/api/citasmed/auth/**").authenticated()
                         .requestMatchers("/api/citasmed/pacientes/**").hasRole("PACIENTE")
                         .requestMatchers("/api/citasmed/medicos/**").hasRole("MEDICO")
                         .requestMatchers("/api/citasmed/**").hasRole("ADMIN")
