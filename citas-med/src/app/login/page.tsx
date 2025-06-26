@@ -1,6 +1,6 @@
 'use client'
 import Navbar from '../ui/components/navbar';
-import { Button, Input } from "@heroui/react";
+import { Button, Input, Alert } from "@heroui/react";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import api from '../lib/axios';
@@ -8,36 +8,51 @@ import api from '../lib/axios';
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
+  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState("");
+  const [isInvalid, setIsInvalid] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const router = useRouter();
 
 
-  const handleLogin = async (e: React.FormEvent) => {
-
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg("");
-    try {
-      await api.post("/auth/login", {
-        email: email,
-        contrasena: password,
+    setIsInvalid(false);
+    setDescription("");
+    setTitle("");
+    setIsLoading(true);
+    setIsVisible(false)
+
+    api.post("/auth/login", {
+      email: email,
+      contrasena: password,
+    }).then(() => {
+      api.get("/auth/me").then((res) => {
+
+        const rol = res.data.rol;
+        setDescription("Inicio de sesión exitoso");
+        setTitle("Éxito");
+        setIsVisible(true);
+
+        if (rol === "ADMIN") {
+          router.push("/dashboard/admin");
+        } else if (rol === "PACIENTE") {
+          router.push("/dashboard/pacientes");
+        } else if (rol === "MEDICO") {
+          router.push("/dashboard/medicos");
+        }
       });
 
-      const res = await api.get("/auth/me");
-      const rol = res.data.rol;
+    }).catch((error: any) => {
+      const msg:string = error.response.data || "Error al iniciar sesión";
+      setDescription(msg);
+      setTitle("Error");
+      setIsInvalid(true);
+      setIsLoading(false);
+      setIsVisible(true);
+    });
 
-      console.log("Rol:", rol);
-
-      if (rol === "ADMIN") {
-        router.push("/dashboard/admin");
-      } else if (rol === "PACIENTE") {
-        router.push("/dashboard/pacientes");
-      } else if (rol === "MEDICO") {
-        router.push("/dashboard/medicos");
-      }
-    } catch (err: any) {
-      const msg = err.response?.data || "Error al iniciar sesión";
-      setErrorMsg(msg);
-    }
   };
 
   return (
@@ -86,17 +101,28 @@ export default function LoginPage() {
                 color="primary"
                 size="md"
                 type="password"
-                isInvalid={!!errorMsg}
-                errorMessage={errorMsg || "Campo requerido"}
+                errorMessage={"Campo requerido"}
                 required
               />
               <a href="#" className="text-sm text-blue-600 hover:underline">¿Olvidaste tu contraseña?</a>
+              
+              <Alert
+                color={isInvalid ? "danger" : "success"}
+                className="w-full mt-3"
+                description={description}
+                title={title}
+                isVisible={isVisible}
+                variant="faded"
+                onClose={() => setIsVisible(false)}
+              />
+              
             </div>
             <Button
               type="submit"
               className="p-6 w-full"
               radius="lg"
               color="primary"
+              isLoading={isLoading}
             >
               Iniciar Sesión
             </Button>
