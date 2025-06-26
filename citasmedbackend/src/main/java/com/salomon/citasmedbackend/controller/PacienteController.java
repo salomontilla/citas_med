@@ -44,16 +44,16 @@ public class PacienteController {
 
     //READ
     @GetMapping("/mis-datos")
-    public ResponseEntity<PacientesResponseRolDTO> getPacienteById(@AuthenticationPrincipal DetallesUsuario user) {
+    public ResponseEntity<PacientesResponseDTO> getPacienteById(@AuthenticationPrincipal DetallesUsuario user) {
         Paciente paciente = pacienteService.obtenerPacientePorEmail(user.getUsername());
         System.out.println(user.getAuthorities().toString());
-        PacientesResponseRolDTO pacienteResponse = new PacientesResponseRolDTO(
+        PacientesResponseDTO pacienteResponse = new PacientesResponseDTO(
+                paciente.getId(),
                 paciente.getUsuario().getNombreCompleto(),
                 paciente.getUsuario().getDocumento(),
                 paciente.getUsuario().getEmail(),
                 paciente.getUsuario().getTelefono(),
-                paciente.getFechaNacimiento().toString(),
-                String.valueOf(paciente.getUsuario().getRol())
+                paciente.getFechaNacimiento()
         );
         return ResponseEntity.ok(pacienteResponse);
     }
