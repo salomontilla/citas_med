@@ -2,17 +2,42 @@
 import Navbar from '../ui/components/navbar';
 import { Button, Input } from "@heroui/react";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import axios from 'axios';
+import api from '../lib/axios'; 
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const handleLogin = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log("Iniciar sesión:", email
-        , password);
-        // Aquí puedes agregar la lógica para manejar el inicio de sesión
+    const [errorMsg, setErrorMsg] = useState("");
+    const router = useRouter();
+
+
+    const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+
+      const res = await api.post("/auth/login", {
+        email: email,
+        contrasena: password,
+      });
+
+      const rol = res.data.rol;
+
+    // Redirige según el rol
+    if (rol === "ADMIN") {
+      router.push("dashboard/admin");
+    } else if (rol === "PACIENTE") {
+      router.push("dashboard/pacientes");
+    } else if (rol === "MEDICO") {
+      router.push("dashboard/medicos");
     }
+
+    } catch (err: any) {
+      const msg = err.response.data || "Error al iniciar sesión";
+      setErrorMsg(msg);
+    }
+  };
 
     return (
         <div className="relative w-full h-screen flex flex-col items-center justify-center">
@@ -60,7 +85,8 @@ export default function LoginPage() {
                                       color="primary"
                                       size="md"
                                       type="password"
-                                      errorMessage="Campo requerido"
+                                      isInvalid={!!errorMsg}
+                                      errorMessage={errorMsg || "Campo requerido"}
                                       required
                                     />
                             <a href="#" className="text-sm text-blue-600 hover:underline">¿Olvidaste tu contraseña?</a>
