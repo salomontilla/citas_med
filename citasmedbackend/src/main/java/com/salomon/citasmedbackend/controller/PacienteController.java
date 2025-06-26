@@ -1,9 +1,6 @@
 package com.salomon.citasmedbackend.controller;
 
-import com.salomon.citasmedbackend.domain.paciente.Paciente;
-import com.salomon.citasmedbackend.domain.paciente.PacienteUpdateDTO;
-import com.salomon.citasmedbackend.domain.paciente.PacientesResponseDTO;
-import com.salomon.citasmedbackend.domain.paciente.PacienteRegisterDTO;
+import com.salomon.citasmedbackend.domain.paciente.*;
 import com.salomon.citasmedbackend.domain.usuario.DetallesUsuario;
 import com.salomon.citasmedbackend.services.PacienteService;
 import jakarta.validation.Valid;
@@ -15,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/citasmed/pacientes")
@@ -46,15 +44,16 @@ public class PacienteController {
 
     //READ
     @GetMapping("/mis-datos")
-    public ResponseEntity<PacientesResponseDTO> getPacienteById(@AuthenticationPrincipal DetallesUsuario user) {
+    public ResponseEntity<PacientesResponseRolDTO> getPacienteById(@AuthenticationPrincipal DetallesUsuario user) {
         Paciente paciente = pacienteService.obtenerPacientePorEmail(user.getUsername());
-        PacientesResponseDTO pacienteResponse = new PacientesResponseDTO(
-                paciente.getId(),
+        System.out.println(user.getAuthorities().toString());
+        PacientesResponseRolDTO pacienteResponse = new PacientesResponseRolDTO(
                 paciente.getUsuario().getNombreCompleto(),
                 paciente.getUsuario().getDocumento(),
                 paciente.getUsuario().getEmail(),
                 paciente.getUsuario().getTelefono(),
-                paciente.getFechaNacimiento()
+                paciente.getFechaNacimiento().toString(),
+                String.valueOf(paciente.getUsuario().getRol())
         );
         return ResponseEntity.ok(pacienteResponse);
     }
