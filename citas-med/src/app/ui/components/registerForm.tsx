@@ -1,9 +1,10 @@
 'use client';
-import { Button, DatePicker, Input } from "@heroui/react";
+import { Button, DatePicker, Input, Alert } from "@heroui/react";
 import React, { BaseSyntheticEvent, useState } from "react";
 import { CalendarDate, today, getLocalTimeZone } from "@internationalized/date";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "./passwordEyes";
 import axios from 'axios';
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
   const [isVisible, setIsVisible] = React.useState(false);
@@ -14,11 +15,18 @@ export default function RegisterForm() {
   const [contra, setContra] = useState("");
   const [confirm, setConfirm] = useState("");
   const [fecha, setFecha] = useState<CalendarDate | null>(null);
+  const [isVisibleAlert, setIsVisibleAlert] = React.useState(false);
+  const [isBadRequest, setIsBadRequest] = React.useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState("");
 
   const toggleVisibility = () => setIsVisible(!isVisible);
   const errors = []
+  const router = useRouter();
+  
 
-  const fechaFormateada = `${fecha?.day.toString().padStart(2, '0')}-${fecha?.month.toString().padStart(2, '0')}-${fecha?.year}`;
+  
   
   if (contra !== confirm) {
     errors.push("las contraseñas no coinciden");
@@ -26,6 +34,14 @@ export default function RegisterForm() {
 
   const handleSubmit = (e:BaseSyntheticEvent) => {
     e.preventDefault();
+    setIsLoading(false);
+    setIsBadRequest(false);
+    setIsVisibleAlert(false);
+    setDescription("");
+    setTitle("");
+    
+
+    const fechaFormateada = `${fecha?.day.toString().padStart(2, '0')}-${fecha?.month.toString().padStart(2, '0')}-${fecha?.year}`;
     console.log(name, id, correo, telefono, contra, confirm, fechaFormateada);
 
     axios.post('http://localhost:8080/api/citasmed/pacientes/register', {
@@ -34,14 +50,26 @@ export default function RegisterForm() {
       contrasena: contra,
       telefono: telefono,
       documento: id,
-      fechaNacimiento: fechaFormateada?.toString(),
+      fechaNacimiento: fechaFormateada,
     })
-    .then(response => {
-      console.log('Registro exitoso:', response.data);
-      // Aquí puedes manejar la respuesta del servidor, como redirigir al usuario o mostrar un mensaje de éxito
+    .then(() => {
+
+      setTitle("Registro exitoso");
+      setDescription("Cuenta creada exitosamente!");
+      setIsVisibleAlert(true);
+      setIsLoading(true);
+
+      setTimeout(()=>{
+        router.push("/login");
+      }, 200)
+      
+
     }).catch(error => {
-      console.error('Error al registrar:', error);
-      // Aquí puedes manejar el error, como mostrar un mensaje de error al usuario
+      setIsBadRequest(true);
+      setIsVisibleAlert(true);
+      setIsLoading(false);
+      setTitle("Error al crear cuenta");
+      setDescription(error.response.data);
     })
 
     
@@ -179,13 +207,22 @@ export default function RegisterForm() {
 
       <Button
         type="submit"
-
+        isLoading={isLoading}
         className="p-6"
         radius="lg"
         color="primary"
       >
         Crear cuenta
       </Button>
+      <Alert
+          color={isBadRequest ? "danger" : "success"}
+          className="w-full col-span-1 md:col-span-2"
+          description={description}
+          title={title}
+          isVisible={isVisibleAlert}
+          variant="faded"
+          onClose={() => setIsVisibleAlert(false)}
+        />
       <style>
         {
           `input{
