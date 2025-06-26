@@ -3,9 +3,11 @@ package com.salomon.citasmedbackend.domain.jwt;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,21 +28,37 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        String token = null;
+
+        // Buscar en el header Authorization
         String header = request.getHeader("Authorization");
-
         if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
+            token = header.substring(7);
+        } else if (request.getCookies() != null) {
+            // Si no hay header, buscar en cookies
+            for (Cookie cookie : request.getCookies()) {
+                if ("token".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
 
+        if (token != null) {
             try {
                 String username = jwtUtil.extractUsername(token);
 
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
                     jwtUtil.validateToken(token);
 
                     SecurityContextHolder.getContext().setAuthentication(
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            )
+                    );
                 }
 
             } catch (TokenExpiredException e) {
@@ -52,11 +70,13 @@ public class JwtFilter extends OncePerRequestFilter {
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
-                response.getWriter().write("{\"error\": \"Token invalido.\"}");
+                response.getWriter().write("{\"error\": \"Token inválido.\"}");
                 return;
             }
         }
 
+        // Continuar con la cadena de filtros
         filterChain.doFilter(request, response);
     }
+
 }
