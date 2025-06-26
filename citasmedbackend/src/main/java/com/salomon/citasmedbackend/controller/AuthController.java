@@ -40,7 +40,7 @@ public class AuthController {
             // Crea cookie segura
             ResponseCookie cookie = ResponseCookie.from("token", token)
                     .httpOnly(true)
-                    .secure(true) // solo en HTTPS en producción
+                    .secure(false) // solo en HTTPS en producción
                     .path("/")
                     .maxAge(Duration.ofHours(1))
                     .sameSite("Strict")
