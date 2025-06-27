@@ -9,11 +9,11 @@ import java.time.format.DateTimeParseException;
 public class FechaUtils {
     public static Date convertirFecha(String fechaString) {
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate localDate = LocalDate.parse(fechaString, formatter);
             return Date.valueOf(localDate);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Formato de fecha inválido. Usa dd-MM-yyyy");
+            throw new IllegalArgumentException("Formato de fecha inválido. Usa yyyy-MM-dd");
         }
     }
 
