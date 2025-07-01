@@ -1,6 +1,6 @@
-import Footer from "../ui/components/footer";
-import Navbar from "../ui/components/navbar";
-import RegisterForm from "../ui/components/registerForm";
+import Footer from "../../ui/components/footer";
+import Navbar from "../../ui/components/navbar";
+import RegisterForm from "../../ui/components/registerForm";
 import Image from "next/image";
 
 export default function RegisterPage() {

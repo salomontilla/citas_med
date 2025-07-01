@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import CtaCard from './components/ctaCard';
-import Button from './components/button';
+import CtaCard from '../components/ctaCard';
+import Button from '../components/button';
 export default function Cta() {
     return (
         <div>

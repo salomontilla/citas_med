@@ -1,9 +1,9 @@
 'use client'
-import Navbar from '../ui/components/navbar';
+import Navbar from '../../ui/components/navbar';
 import { Button, Input, Alert } from "@heroui/react";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import api from '../lib/axios';
+import api from '../../lib/axios';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -38,7 +38,7 @@ export default function LoginPage() {
         if (rol === "ADMIN") {
           router.push("/dashboard/admin");
         } else if (rol === "PACIENTE") {
-          router.push("/dashboard/pacientes");
+          router.push("/pacientes/agendar-cita");
         } else if (rol === "MEDICO") {
           router.push("/dashboard/medicos");
         }

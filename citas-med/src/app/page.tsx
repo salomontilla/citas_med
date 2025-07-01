@@ -1,6 +1,6 @@
 import Navbar from './ui/components/navbar';
-import MainHero from './ui/mainHero';
-import Cta from './ui/cta';
+import MainHero from './ui/(sections)/mainHero';
+import Cta from './ui/(sections)/cta';
 
 export default function Home() {
   return (
