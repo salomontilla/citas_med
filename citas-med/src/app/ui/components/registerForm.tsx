@@ -41,8 +41,7 @@ export default function RegisterForm() {
     setTitle("");
     
 
-    const fechaFormateada = `${fecha?.day.toString().padStart(2, '0')}-${fecha?.month.toString().padStart(2, '0')}-${fecha?.year}`;
-    console.log(name, id, correo, telefono, contra, confirm, fechaFormateada);
+    console.log(name, id, correo, telefono, contra, confirm, fecha);
 
     axios.post('http://localhost:8080/api/citasmed/pacientes/register', {
       nombreCompleto: name,
@@ -50,7 +49,7 @@ export default function RegisterForm() {
       contrasena: contra,
       telefono: telefono,
       documento: id,
-      fechaNacimiento: fechaFormateada,
+      fechaNacimiento: fecha,
     })
     .then(() => {
 
@@ -81,8 +80,6 @@ export default function RegisterForm() {
   }
   return "";
 };
-
-
 
   return (
     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 3xl:grid-cols-3 gap-4 items-end ">
@@ -180,11 +177,7 @@ export default function RegisterForm() {
     type="password"
     required
     isInvalid={contra !== confirm}
-    errorMessage={
-      errors.map((error, index) => (
-        <li key={index} >{error}</li>
-      ))
-    }
+    errorMessage={errors[0]}
   />
 </div>
 
