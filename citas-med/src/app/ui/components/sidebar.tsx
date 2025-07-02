@@ -2,6 +2,16 @@
 import React, { useState } from "react";
 import { CalendarDays, ClipboardList, UserCog, LogOut, Menu, X } from 'lucide-react';
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  useDisclosure,
+} from "@heroui/react";
 
 
 
@@ -26,14 +36,17 @@ export const Sidebar = () => {
           selected={selected}
           setSelected={setSelected}
           open={open}
+          href="/pacientes/agendar-cita"
         />
-        
+
         <Option
           Icon={ClipboardList}
           title="Mis citas"
           selected={selected}
           setSelected={setSelected}
           open={open}
+          href="/pacientes/mis-citas"
+
         />
         <Option
           Icon={UserCog}
@@ -41,20 +54,75 @@ export const Sidebar = () => {
           selected={selected}
           setSelected={setSelected}
           open={open}
+          href="/pacientes/mis-datos"
         />
-        <Option
-          Icon={LogOut}
-          title="Cerrar sesión"
-          selected={selected}
-          setSelected={setSelected}
-          open={open}
-        />
+        <OptionLogout open={open} />
       </div>
 
       <ToggleClose open={open} setOpen={setOpen} />
     </motion.nav>
   );
 };
+type OptionLogoutProps = {
+  open: boolean;
+};
+const OptionLogout = ({ open }: OptionLogoutProps) => {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  return (
+    <>
+    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Cerrar Sesion</ModalHeader>
+              <ModalBody>
+                <p>
+                  Deseas cerrar sesión? Esto te llevará a la página de inicio de sesión y perderás tu sesión actual.
+                </p>
+                
+              </ModalBody>
+              <ModalFooter>
+                <Button color="default" variant="light" onPress={onClose}>
+                  Cancelar
+                </Button>
+                <Button color="danger" onPress={onClose}>
+                  Cerrar sesión
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      <motion.button
+        layout
+        whileTap={{ scale: 0.95 }}
+        onClick={() => onOpen()}
+        className="relative flex h-10 w-full items-center rounded-md transition-colors text-slate-500 hover:bg-red-200 "
+      >
+        <motion.div
+          layout
+          className="grid h-full w-10 place-content-center text-lg"
+        >
+
+          <X />
+        </motion.div>
+        {open && (
+          <motion.span
+            layout
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.125 }}
+            className="text-xs font-medium"
+          >
+            Cerrar sesión
+          </motion.span>
+        )}
+
+
+      </motion.button>
+    </>
+  )
+}
 
 type OptionProps = {
   Icon: React.ElementType;
@@ -62,19 +130,30 @@ type OptionProps = {
   selected: string;
   setSelected: (title: string) => void;
   open: boolean;
+  href?: string;
 };
 
-const Option = ({ Icon, title, selected, setSelected, open }: OptionProps) => {
+const Option = ({ Icon, title, selected, setSelected, open, href }: OptionProps) => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    setSelected(title);
+    if (href) {
+      router.push(href);
+    }
+  };
+
   return (
     <motion.button
       layout
-      onClick={() => setSelected(title)}
+      onClick={() => handleClick()}
       className={`relative flex h-10 w-full items-center rounded-md transition-colors ${selected === title ? "bg-indigo-100 text-indigo-800" : "text-slate-500 hover:bg-slate-100"}`}
     >
       <motion.div
         layout
         className="grid h-full w-10 place-content-center text-lg"
       >
+
         <Icon />
       </motion.div>
       {open && (
@@ -89,18 +168,18 @@ const Option = ({ Icon, title, selected, setSelected, open }: OptionProps) => {
         </motion.span>
       )}
 
-    
+
     </motion.button>
   );
 };
 
 type TitleSectionProps = {
-    open: boolean;
-    };  
-const TitleSection = ({open}:TitleSectionProps) => {
+  open: boolean;
+};
+const TitleSection = ({ open }: TitleSectionProps) => {
   return (
     <div className="mb-3 border-b border-slate-300 pb-3">
-      <div className="flex cursor-pointer items-center justify-between rounded-md transition-colors hover:bg-slate-100">
+      <div className="flex cursor-auto items-center justify-between rounded-md transition-colors">
         <div className="flex items-center gap-2">
           <Logo />
           {open && (
@@ -115,7 +194,7 @@ const TitleSection = ({open}:TitleSectionProps) => {
             </motion.div>
           )}
         </div>
-        
+
       </div>
     </div>
   );
@@ -129,7 +208,7 @@ const Logo = () => {
     >
       <svg
         width="24"
-        height="auto"
+        height="24"
         viewBox="0 0 50 39"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -150,10 +229,11 @@ const Logo = () => {
 
 type ToggleCloseProps = {
   open: boolean;
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const ToggleClose = ({ open, setOpen }: ToggleCloseProps) => {
+
   return (
     <motion.button
       layout
@@ -182,7 +262,7 @@ const ToggleClose = ({ open, setOpen }: ToggleCloseProps) => {
             transition={{ delay: 0.125 }}
             className="text-xs font-medium"
           >
-            Hide
+            Esconder
           </motion.span>
         )}
       </div>
