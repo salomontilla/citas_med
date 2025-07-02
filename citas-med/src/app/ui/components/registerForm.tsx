@@ -31,7 +31,9 @@ export default function RegisterForm() {
   if (contra !== confirm) {
     errors.push("las contraseñas no coinciden");
   }
-
+  //esta función se encarga de manejar el evento de envío del formulario
+  //previene el comportamiento por defecto del formulario, que es recargar la página
+  //y luego envía los datos del formulario a la API para crear una nueva cuenta de paciente
   const handleSubmit = (e:BaseSyntheticEvent) => {
     e.preventDefault();
     setIsLoading(false);
@@ -42,6 +44,9 @@ export default function RegisterForm() {
     
 
     console.log(name, id, correo, telefono, contra, confirm, fecha);
+    //Formato de fecha: YYYY-MM-DD
+    const fechaFormateada = `${fecha?.year}-${String(fecha?.month).padStart(2, '0')}-${String(fecha?.day).padStart(2, '0')}`;
+
 
     axios.post('http://localhost:8080/api/citasmed/pacientes/register', {
       nombreCompleto: name,
@@ -49,7 +54,7 @@ export default function RegisterForm() {
       contrasena: contra,
       telefono: telefono,
       documento: id,
-      fechaNacimiento: fecha,
+      fechaNacimiento: fechaFormateada
     })
     .then(() => {
 
@@ -65,10 +70,11 @@ export default function RegisterForm() {
 
     }).catch(error => {
       setIsBadRequest(true);
-      setIsVisibleAlert(true);
+      setIsVisibleAlert(true);  
       setIsLoading(false);
       setTitle("Error al crear cuenta");
       setDescription(error.response.data);
+      console.log(error.response.data);
     })
 
     

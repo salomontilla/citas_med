@@ -1,8 +1,12 @@
+import { Sidebar } from "../../ui/components/sidebar";
+import Link from "next/link";
+
  
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-      <main className="w-full ">
+      <section className="w-full flex h-screen">
+        <Sidebar/>
         {children}
-      </main>
+      </section>
   )
 }

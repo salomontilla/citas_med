@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link';
-import Button from './components/button';
-import HeroCard from './components/heroCard';
+import Button from '../components/button';
+import HeroCard from '../components/heroCard';
 
 export default function MainHero() {
     return (
