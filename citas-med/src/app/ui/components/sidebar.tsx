@@ -89,20 +89,7 @@ const Option = ({ Icon, title, selected, setSelected, open }: OptionProps) => {
         </motion.span>
       )}
 
-      { open && (
-        <motion.span
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{
-            opacity: 1,
-            scale: 1,
-          }}
-          style={{ y: "-50%" }}
-          transition={{ delay: 0.5 }}
-          className="absolute right-2 top-1/2 size-4 rounded bg-indigo-500 text-xs text-white"
-        >
-         
-        </motion.span>
-      )}
+    
     </motion.button>
   );
 };
@@ -128,7 +115,7 @@ const TitleSection = ({open}:TitleSectionProps) => {
             </motion.div>
           )}
         </div>
-        {open && <X className="mr-2" />}
+        
       </div>
     </div>
   );
@@ -160,10 +147,12 @@ const Logo = () => {
     </motion.div>
   );
 };
+
 type ToggleCloseProps = {
   open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
+
 const ToggleClose = ({ open, setOpen }:ToggleCloseProps) => {
   return (
     <motion.button
@@ -178,7 +167,7 @@ const ToggleClose = ({ open, setOpen }:ToggleCloseProps) => {
         >
           <Menu
             className={`transition-transform ${open && "rotate-180"}`}
-          />
+          />  
         </motion.div>
         {open && (
           <motion.span
@@ -195,3 +184,5 @@ const ToggleClose = ({ open, setOpen }:ToggleCloseProps) => {
     </motion.button>
   );
 };
+
+
