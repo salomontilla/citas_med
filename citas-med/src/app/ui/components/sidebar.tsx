@@ -153,7 +153,7 @@ type ToggleCloseProps = {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const ToggleClose = ({ open, setOpen }:ToggleCloseProps) => {
+const ToggleClose = ({ open, setOpen }: ToggleCloseProps) => {
   return (
     <motion.button
       layout
@@ -164,11 +164,16 @@ const ToggleClose = ({ open, setOpen }:ToggleCloseProps) => {
         <motion.div
           layout
           className="grid size-10 place-content-center text-lg"
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.3 }}
         >
-          <Menu
-            className={`transition-transform ${open && "rotate-180"}`}
-          />  
+          {open ? (
+            <X className="w-6 h-6" />
+          ) : (
+            <Menu className="w-6 h-6" />
+          )}
         </motion.div>
+
         {open && (
           <motion.span
             layout
