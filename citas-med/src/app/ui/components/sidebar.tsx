@@ -11,7 +11,9 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
+  Alert,
 } from "@heroui/react";
+import api from '../../lib/axios';
 
 
 
@@ -66,33 +68,71 @@ export const Sidebar = () => {
 type OptionLogoutProps = {
   open: boolean;
 };
+
+//Este componente maneja la opción de cerrar sesión en la barra lateral
 const OptionLogout = ({ open }: OptionLogoutProps) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [isVisibleAlert, setIsVisibleAlert] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+
+  const router = useRouter();
+
+  const handleLogout = () => {
+    setIsLoading(true);
+    setIsVisibleAlert(false);
+    setError("");
+
+    api.post("/auth/logout")
+      .then(() => {
+        setIsLoading(false);
+        router.push("/auth/login")
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        setIsVisibleAlert(true);
+        setError(error.message || "Error al cerrar sesión");
+      })
+  }
   return (
     <>
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
+
           {(onClose) => (
             <>
+
               <ModalHeader className="flex flex-col gap-1">Cerrar Sesion</ModalHeader>
               <ModalBody>
                 <p>
                   Deseas cerrar sesión? Esto te llevará a la página de inicio de sesión y perderás tu sesión actual.
                 </p>
-                
+
               </ModalBody>
-              <ModalFooter>
-                <Button color="default" variant="light" onPress={onClose}>
-                  Cancelar
-                </Button>
-                <Button color="danger" onPress={onClose}>
-                  Cerrar sesión
-                </Button>
+              <ModalFooter className="flex flex-col">
+                <div className="flex w-full justify-center gap-3">
+                  <Button color="default" variant="light" onPress={onClose}>
+                    Cancelar
+                  </Button>
+                  <Button isLoading={isLoading} color="danger" onPress={handleLogout}>
+                    Cerrar sesión
+                  </Button>
+                </div>
+                <Alert
+                  color="danger"
+                  description={error}
+                  title="Error"
+                  isVisible={isVisibleAlert}
+                  variant="faded"
+                  onClose={() => setIsVisibleAlert(false)}
+                />
               </ModalFooter>
             </>
           )}
         </ModalContent>
       </Modal>
+
       <motion.button
         layout
         whileTap={{ scale: 0.95 }}
@@ -104,7 +144,7 @@ const OptionLogout = ({ open }: OptionLogoutProps) => {
           className="grid h-full w-10 place-content-center text-lg"
         >
 
-          <X />
+          <LogOut />
         </motion.div>
         {open && (
           <motion.span
