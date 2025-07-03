@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import api from '../../../lib/axios';
 import { useState } from 'react'
 import MedicoGrid from './medicoGrid';
+import AgendarCita from './agendarCita';
 
 export default function PacienteDashboard() {
 
@@ -31,21 +32,24 @@ export default function PacienteDashboard() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-4 text-blue-900">Agendar Cita Médica</h1>
+      <h1 className="text-3xl font-bold my-4 md:my-0 text-blue-900">Agendar Cita Médica</h1>
       <p className="text-gray-600 mb-4">
         En esta sección puedes seleccionar al médico de tu preferencia, consultar su disponibilidad y agendar una cita de forma rápida y sencilla.
       </p>
 
-      <div className=" p-8 rounded-2xl shadow-xl border border-blue-200 bg-gray-50">
+      <section className="p-8 rounded-2xl shadow-xl border border-blue-200 bg-gray-50">
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-blue-800">Selecciona un médico disponible</h2>
-          <p className="text-blue-600 text-sm">
+          <p className="text-blue-600 text-sm mt-2">
             Revisa los médicos activos, haz clic sobre uno para consultar horarios disponibles y continuar con el proceso de agendamiento.
           </p>
         </div>
 
         <MedicoGrid />
-      </div>
+      </section>
+      <section className='p-8 rounded-2xl shadow-xl border border-blue-200 bg-gray-50 mt-6'>
+        <AgendarCita />
+      </section>
     </div>
 
   );
