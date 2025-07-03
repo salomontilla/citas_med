@@ -58,6 +58,7 @@ export default function GridMedicos() {
     <section className="flex flex-col gap-4">
       {/* FILTRO */}
       <Select
+        color='primary'
         label="Busca por especialidad"
         labelPlacement='outside'
         className="max-w-xs z-0"
