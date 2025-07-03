@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '../../../lib/axios';
 import { useState } from 'react'
+import  MedicoGrid  from './medicoGrid';
 
 export default function PacienteDashboard() {
 
@@ -32,7 +33,9 @@ export default function PacienteDashboard() {
     <div className="">
       <h1 className="text-2xl font-bold mb-4">Bienvenido al Dashboard del Paciente</h1>
       <p className="text-gray-600">Aquí podrás gestionar tus citas médicas y acceder a tu información personal.</p>
-      {/* Aquí puedes agregar más componentes o funcionalidades específicas del dashboard */}
+      <div>
+        <MedicoGrid/>
+      </div>
     </div>
   );
 }
