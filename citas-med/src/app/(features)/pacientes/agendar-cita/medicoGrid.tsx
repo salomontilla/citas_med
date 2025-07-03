@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Card, Pagination } from '@heroui/react';
+import { Card, Pagination, Select, SelectItem } from '@heroui/react';
 
 type Medico = {
   id: number;
@@ -57,17 +57,19 @@ export default function GridMedicos() {
   return (
     <section className="flex flex-col gap-6">
       {/* GRID RESPONSIVE */}
-      <select
-        className="mb-6 p-2 rounded-md border border-blue-300 text-blue-800"
+      <Select
+        label="Busca por especialidad"
+        labelPlacement='outside'
+        className="max-w-xs"
         value={especialidadSeleccionada}
         onChange={(e) => setEspecialidadSeleccionada(e.target.value)}
       >
         {especialidades.map((esp) => (
-          <option key={esp} value={esp}>
+          <SelectItem key={esp}>
             {esp}
-          </option>
+          </SelectItem>
         ))}
-      </select>
+      </Select>
       {paginatedMedicos.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
           {paginatedMedicos.map((medico) => (
