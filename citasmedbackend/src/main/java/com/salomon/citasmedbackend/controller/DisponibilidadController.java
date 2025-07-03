@@ -1,9 +1,6 @@
 package com.salomon.citasmedbackend.controller;
 
-import com.salomon.citasmedbackend.domain.disponibilidad.DisponibilidadDTO;
-import com.salomon.citasmedbackend.domain.disponibilidad.DisponibilidadResponseDTO;
-import com.salomon.citasmedbackend.domain.disponibilidad.Disponibilidad;
-import com.salomon.citasmedbackend.domain.disponibilidad.UpdateDisponibilidadDTO;
+import com.salomon.citasmedbackend.domain.disponibilidad.*;
 import com.salomon.citasmedbackend.domain.medico.Medico;
 import com.salomon.citasmedbackend.domain.usuario.DetallesUsuario;
 import com.salomon.citasmedbackend.services.DisponibilidadService;
@@ -17,6 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+import static com.salomon.citasmedbackend.infra.utils.FechaUtils.dividirEnBloques;
 
 @RestController
 @RequiredArgsConstructor
@@ -83,19 +84,23 @@ public class DisponibilidadController {
                 )));
     }
 
-@GetMapping("/pacientes/{medicoId}/disponibilidades")
+    @GetMapping("/pacientes/{medicoId}/disponibilidades")
     public ResponseEntity<?> obtenerDisponibilidadesMedicoId(
             @PathVariable Long medicoId,
-            @PageableDefault(size = 8) Pageable pageable) {
+            @PageableDefault Pageable pageable) {
         return ResponseEntity.ok(disponibilidadService.obtenerDisponibilidadesPorMedico(medicoId, pageable)
-                .map(disponibilidad -> new DisponibilidadResponseDTO(
-                        disponibilidad.getId(),
-                        disponibilidad.getMedico().getId(),
-                        disponibilidad.getDiaSemana().toString(),
-                        disponibilidad.getHoraInicio().toLocalTime().toString(),
-                        disponibilidad.getHoraFin().toLocalTime().toString()
-                )));
+                .map(disponibilidad -> {
+                    List<String> bloques = dividirEnBloques(
+                            disponibilidad.getHoraInicio().toLocalTime(),
+                            disponibilidad.getHoraFin().toLocalTime()
+                    );
+                    return new BloqueDisponibilidadDTO(
+                            disponibilidad.getId(),
+                            disponibilidad.getMedico().getId(),
+                            disponibilidad.getDiaSemana().toString(),
+                            bloques
+                    );
+                })
+        );
     }
-
-
 }
