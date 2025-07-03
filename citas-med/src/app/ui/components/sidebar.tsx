@@ -187,7 +187,7 @@ const Option = ({ Icon, title, selected, setSelected, open, href }: OptionProps)
     <motion.button
       layout
       onClick={() => handleClick()}
-      className={`relative flex h-10 w-full items-center rounded-md transition-colors ${selected === title ? "bg-indigo-100 text-indigo-800" : "text-slate-500 hover:bg-slate-100"}`}
+      className={`relative flex h-10 w-full items-center rounded-md transition-colors ${selected === title ? "bg-blue-100 text-blue-800" : "text-slate-500 hover:bg-slate-100"}`}
     >
       <motion.div
         layout
