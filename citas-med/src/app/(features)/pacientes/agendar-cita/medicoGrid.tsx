@@ -55,12 +55,12 @@ export default function GridMedicos() {
 
 
   return (
-    <section className="flex flex-col gap-6">
-      {/* GRID RESPONSIVE */}
+    <section className="flex flex-col gap-4">
+      {/* FILTRO */}
       <Select
         label="Busca por especialidad"
         labelPlacement='outside'
-        className="max-w-xs"
+        className="max-w-xs z-0"
         value={especialidadSeleccionada}
         onChange={(e) => setEspecialidadSeleccionada(e.target.value)}
       >
@@ -70,6 +70,8 @@ export default function GridMedicos() {
           </SelectItem>
         ))}
       </Select>
+
+      {/* Muestra los médicos filtrados y paginados */}
       {paginatedMedicos.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
           {paginatedMedicos.map((medico) => (
@@ -97,9 +99,10 @@ export default function GridMedicos() {
 
       {/* PAGINADOR */}
       {totalPages > 1 && (
-        <div className="flex justify-center">
+        <div className="flex justify-center z-0">
           <Pagination
             loop
+            isCompact 
             showControls
             total={totalPages}
             initialPage={1}
