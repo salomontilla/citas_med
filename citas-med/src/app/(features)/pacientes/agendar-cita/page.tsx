@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '../../../lib/axios';
 import { useState } from 'react'
-import  MedicoGrid  from './medicoGrid';
+import MedicoGrid from './medicoGrid';
 
 export default function PacienteDashboard() {
 
@@ -31,11 +31,22 @@ export default function PacienteDashboard() {
 
   return (
     <div className="">
-      <h1 className="text-2xl font-bold mb-4">Bienvenido al Dashboard del Paciente</h1>
-      <p className="text-gray-600">Aquí podrás gestionar tus citas médicas y acceder a tu información personal.</p>
-      <div>
-        <MedicoGrid/>
-      </div>
+  <h1 className="text-2xl font-bold mb-4 text-blue-900">Agendar Cita Médica</h1>
+  <p className="text-gray-600 mb-6">
+    En esta sección puedes seleccionar al médico de tu preferencia, consultar su disponibilidad y agendar una cita de forma rápida y sencilla.
+  </p>
+
+  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-2xl shadow-xl border border-blue-200">
+    <div className="mb-6">
+      <h2 className="text-xl font-semibold text-blue-800">Selecciona un médico disponible</h2>
+      <p className="text-blue-600 text-sm">
+        Revisa los médicos activos, haz clic sobre uno para consultar horarios disponibles y continuar con el proceso de agendamiento.
+      </p>
     </div>
+
+    <MedicoGrid />
+  </div>
+</div>
+
   );
 }

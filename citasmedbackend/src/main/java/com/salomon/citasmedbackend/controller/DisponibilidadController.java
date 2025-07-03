@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/citasmed")
 public class DisponibilidadController {
     private final DisponibilidadService disponibilidadService;
+
+
     private final MedicoService medicoService;
 
     @PostMapping("/medicos/registrar-disponibilidad")
