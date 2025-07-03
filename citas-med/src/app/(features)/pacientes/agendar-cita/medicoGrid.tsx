@@ -32,7 +32,7 @@ export default function GridMedicos() {
   const [selectedMedico, setSelectedMedico] = useState<number | null>(null);
   const [especialidadSeleccionada, setEspecialidadSeleccionada] = useState("Todas");
 
-  const pageSize = 4; 
+  const pageSize = 4;
   const especialidades = ["Todas", "Cardiología", "Pediatría", "Dermatología", "Neurología"];
 
   // 1. Filtras primero
@@ -69,43 +69,45 @@ export default function GridMedicos() {
         ))}
       </select>
       {paginatedMedicos.length > 0 ? (
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
-    {paginatedMedicos.map((medico) => (
-      <Card
-        isPressable
-        key={medico.id}
-        onPress={() => setSelectedMedico(medico.id)}
-        className={`p-4 shadow-md max-w-72 transition-colors duration-300 ${
-          selectedMedico === medico.id ? "bg-blue-500 text-white" : "bg-white hover:bg-blue-50"
-        }`}
-      >
-        <img
-          src={medico.imagen}
-          alt={medico.nombre}
-          className="w-full h-40 object-cover rounded-md mb-4"
-        />
-        <h3 className="text-lg font-semibold">{medico.nombre}</h3>
-        <p className="text-sm">{medico.especialidad}</p>
-      </Card>
-    ))}
-  </div>
-) : (
-  <div className="text-center text-blue-700 font-medium">No hay médicos disponibles para esta especialidad.</div>
-)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
+          {paginatedMedicos.map((medico) => (
+            <Card
+              isPressable
+              key={medico.id}
+              onPress={() => setSelectedMedico(medico.id)}
+              className={`p-4 shadow-md max-w-72 transition-colors duration-300 ${selectedMedico === medico.id ? "bg-blue-500 text-white" : "bg-white hover:bg-blue-50"
+                }`}
+            >
+              <img
+                src={medico.imagen}
+                alt={medico.nombre}
+                className="w-full h-40 object-cover rounded-md mb-4"
+              />
+              <h3 className="text-lg font-semibold">{medico.nombre}</h3>
+              <p className="text-sm">{medico.especialidad}</p>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center text-blue-700 font-medium">No hay médicos disponibles para esta especialidad.</div>
+      )}
 
 
       {/* PAGINADOR */}
-      <div className="flex justify-center">
-        <Pagination
-          loop
-          showControls
-          total={totalPages}
-          initialPage={1}
-          page={currentPage}
-          onChange={setCurrentPage}
-          color="primary"
-        />
-      </div>
+      {totalPages > 1 && (
+        <div className="flex justify-center">
+          <Pagination
+            loop
+            showControls
+            total={totalPages}
+            initialPage={1}
+            page={currentPage}
+            onChange={setCurrentPage}
+            color="primary"
+          />
+        </div>
+      )}
+
     </section>
   );
 }
