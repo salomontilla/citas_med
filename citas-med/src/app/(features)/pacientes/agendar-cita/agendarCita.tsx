@@ -2,16 +2,37 @@
 
 import { useState } from "react";
 import { CalendarDays, Clock4 } from "lucide-react";
-import { CalendarDate, DateValue, getLocalTimeZone, today } from "@internationalized/date";
-import { DatePicker } from "@heroui/react";
+import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
+import { Button, DatePicker } from "@heroui/react";
 
 // Simulamos la disponibilidad por día de la semana
 const DISPONIBILIDADES = [
-    { id: 1, diaSemana: "LUNES", horaInicio: "08:00", horaFin: "10:00" },
-    { id: 2, diaSemana: "LUNES", horaInicio: "14:00", horaFin: "16:00" },
-    { id: 3, diaSemana: "MARTES", horaInicio: "10:00", horaFin: "11:00" },
-    { id: 4, diaSemana: "MIÉRCOLES", horaInicio: "12:00", horaFin: "13:00" },
+    {
+        id: 1,
+        medicoId: 1,
+        diaSemana: "LUNES",
+        bloques: ["08:00", "08:30", "09:00", "09:30"]
+    },
+    {
+        id: 2,
+        medicoId: 1,
+        diaSemana: "LUNES",
+        bloques: ["14:00", "14:30", "15:00", "15:30"]
+    },
+    {
+        id: 3,
+        medicoId: 1,
+        diaSemana: "MARTES",
+        bloques: ["10:00", "10:30"]
+    },
+    {
+        id: 4,
+        medicoId: 1,
+        diaSemana: "MIÉRCOLES",
+        bloques: ["12:00", "12:30"]
+    }
 ];
+
 
 const diasSemanaMap = [
     "DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"
@@ -24,7 +45,8 @@ const mesesMap = [
 
 export default function SeleccionHorarioConFecha() {
     const [fechaSeleccionada, setFechaSeleccionada] = useState<CalendarDate | null>(null);
-    const [bloqueSeleccionado, setBloqueSeleccionado] = useState<number | null>(null);
+    const [bloqueSeleccionado, setBloqueSeleccionado] = useState<string | null>(null);
+    const [horaSeleccionada, setHoraSeleccionada] = useState<string | null>(null);
 
     // Función auxiliar para obtener el nombre del día
     const obtenerDiaSemana = (fecha: CalendarDate | null): string | null => {
@@ -75,22 +97,33 @@ export default function SeleccionHorarioConFecha() {
                     </h3>
 
                     <div className="flex flex-wrap gap-3">
-                        {horariosFiltrados.length > 0 ? horariosFiltrados.map((bloque) => (
-                            <button
-                                key={bloque.id}
-                                onClick={() => setBloqueSeleccionado(bloque.id)}
-                                className={`px-4 py-2 rounded-lg border text-sm flex items-center gap-2 transition-all duration-200 ${bloqueSeleccionado === bloque.id
-                                    ? "bg-blue-600 text-white border-blue-700"
-                                    : "bg-white text-blue-700 border-blue-300 hover:bg-blue-100"
-                                    }`}
-                            >
-                                <Clock4 className="w-4 h-4" />
-                                {bloque.horaInicio} - {bloque.horaFin}
-                            </button>
-                        )) : (
-                            <p className="text-sm text-gray-500">No hay horarios disponibles para este día.</p>
+                        {horariosFiltrados.length > 0 ? (
+                            horariosFiltrados.flatMap((disponibilidad) =>
+                                disponibilidad.bloques.map((hora, index) => {
+                                    const bloqueId = `${disponibilidad.id}-${hora}`; // ID único combinando disponibilidad e índice
+
+                                    return (
+                                        <Button
+                                            key={bloqueId}
+                                            onPress={() => setBloqueSeleccionado(bloqueId)}
+                                            className={`px-4 py-2 rounded-lg border text-sm flex items-center gap-2 transition-all duration-200 ${bloqueSeleccionado === bloqueId
+                                                    ? "bg-blue-600 text-white border-blue-700"
+                                                    : "bg-white text-blue-700 border-blue-300 hover:bg-blue-100"
+                                                }`}
+                                        >
+                                            <Clock4 className="w-4 h-4" />
+                                            {hora}
+                                        </Button>
+                                    );
+                                })
+                            )
+                        ) : (
+                            <p className="text-sm text-gray-500">
+                                No hay horarios disponibles para este día.
+                            </p>
                         )}
                     </div>
+
                 </div>
             )}
         </div>
