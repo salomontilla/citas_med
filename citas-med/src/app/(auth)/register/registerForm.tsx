@@ -2,9 +2,10 @@
 import { Button, DatePicker, Input, Alert } from "@heroui/react";
 import React, { BaseSyntheticEvent, useState } from "react";
 import { CalendarDate, today, getLocalTimeZone } from "@internationalized/date";
-import { EyeFilledIcon, EyeSlashFilledIcon } from "./passwordEyes";
+import { EyeFilledIcon, EyeSlashFilledIcon } from "../../ui/components/passwordEyes";
 import axios from 'axios';
 import { useRouter } from "next/navigation";
+import { formatearFecha } from "@/app/lib/utils";
 
 export default function RegisterForm() {
   const [isVisible, setIsVisible] = React.useState(false);
@@ -45,7 +46,7 @@ export default function RegisterForm() {
 
     console.log(name, id, correo, telefono, contra, confirm, fecha);
     //Formato de fecha: YYYY-MM-DD
-    const fechaFormateada = `${fecha?.year}-${String(fecha?.month).padStart(2, '0')}-${String(fecha?.day).padStart(2, '0')}`;
+    const fechaFormateada = formatearFecha(fecha)
 
 
     axios.post('http://localhost:8080/api/citasmed/pacientes/register', {

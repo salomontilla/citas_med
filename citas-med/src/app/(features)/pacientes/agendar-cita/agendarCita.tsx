@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CalendarDays, Clock4 } from "lucide-react";
 import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
 import { Button, DatePicker } from "@heroui/react";
+import { formatearFecha } from "@/app/lib/utils";
 
 // Simulamos la disponibilidad por día de la semana
 const DISPONIBILIDADES = [
@@ -46,7 +47,6 @@ const mesesMap = [
 export default function SeleccionHorarioConFecha() {
     const [fechaSeleccionada, setFechaSeleccionada] = useState<CalendarDate | null>(null);
     const [bloqueSeleccionado, setBloqueSeleccionado] = useState<string | null>(null);
-    const [horaSeleccionada, setHoraSeleccionada] = useState<string | null>(null);
 
     // Función auxiliar para obtener el nombre del día
     const obtenerDiaSemana = (fecha: CalendarDate | null): string | null => {
@@ -54,6 +54,9 @@ export default function SeleccionHorarioConFecha() {
         const jsDate = new Date(fecha.year, fecha.month - 1, fecha.day);
         return diasSemanaMap[jsDate.getDay()];
     };
+    
+    console.log("Fecha seleccionada:", formatearFecha(fechaSeleccionada));
+    console.log("Bloque seleccionado:", bloqueSeleccionado?.substring(bloqueSeleccionado.indexOf('-') + 1)+":00");
 
     // Función auxiliar para obtener el mes
     const obtenerMes = (fecha: CalendarDate | null): string | null => {
@@ -106,7 +109,7 @@ export default function SeleccionHorarioConFecha() {
                                         <Button
                                             key={bloqueId}
                                             onPress={() => setBloqueSeleccionado(bloqueId)}
-                                            className={`px-4 py-2 rounded-lg border text-sm flex items-center gap-2 transition-all duration-200 ${bloqueSeleccionado === bloqueId
+                                            className={`px-4 py-2 rounded-lg border text-sm flex items-center gap-2 ${bloqueSeleccionado === bloqueId
                                                     ? "bg-blue-600 text-white border-blue-700"
                                                     : "bg-white text-blue-700 border-blue-300 hover:bg-blue-100"
                                                 }`}
