@@ -1,10 +1,15 @@
 package com.salomon.citasmedbackend.controller;
 
+import com.salomon.citasmedbackend.domain.medico.MedicoResponseDTO;
 import com.salomon.citasmedbackend.domain.paciente.*;
 import com.salomon.citasmedbackend.domain.usuario.DetallesUsuario;
+import com.salomon.citasmedbackend.services.MedicoService;
 import com.salomon.citasmedbackend.services.PacienteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Map;
 
 @RestController
 @RequestMapping("api/citasmed/pacientes")
@@ -20,6 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PacienteController {
     private final PacienteService pacienteService;
+    private final MedicoService medicoService;
 
     //CREATE
     @PostMapping("/register")
@@ -73,6 +78,21 @@ public class PacienteController {
                 pacienteActualizado.getUsuario().getEmail(),
                 pacienteActualizado.getUsuario().getTelefono(),
                 pacienteActualizado.getFechaNacimiento()
+        ));
+    }
+
+    @GetMapping("/ver-medicos")
+    public ResponseEntity<Page<MedicoResponseDTO>> getAllMedicos (@PageableDefault(size = 4) Pageable paginacion) {
+
+        return ResponseEntity.ok(medicoService.obtenerMedicos(paginacion).map(
+                medico -> new MedicoResponseDTO(
+                        medico.getId(),
+                        medico.getUsuario().getNombreCompleto(),
+                        medico.getUsuario().getEmail(),
+                        medico.getUsuario().getDocumento(),
+                        medico.getUsuario().getTelefono(),
+                        medico.getEspecialidad().toString()
+                )
         ));
     }
 
