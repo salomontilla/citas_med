@@ -5,6 +5,7 @@ import { CalendarDays, Clock4 } from "lucide-react";
 import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
 import { Button, DatePicker } from "@heroui/react";
 import { formatearFecha } from "@/app/lib/utils";
+import { useMedicoStore } from "@/app/store/medicoStore";
 
 // Simulamos la disponibilidad por día de la semana
 const DISPONIBILIDADES = [
@@ -47,6 +48,8 @@ const mesesMap = [
 export default function SeleccionHorarioConFecha() {
     const [fechaSeleccionada, setFechaSeleccionada] = useState<CalendarDate | null>(null);
     const [bloqueSeleccionado, setBloqueSeleccionado] = useState<string | null>(null);
+    const { medicoSeleccionado } = useMedicoStore();
+    console.log("Médico seleccionado:", medicoSeleccionado);
 
     // Función auxiliar para obtener el nombre del día
     const obtenerDiaSemana = (fecha: CalendarDate | null): string | null => {
@@ -54,7 +57,7 @@ export default function SeleccionHorarioConFecha() {
         const jsDate = new Date(fecha.year, fecha.month - 1, fecha.day);
         return diasSemanaMap[jsDate.getDay()];
     };
-    
+
     console.log("Fecha seleccionada:", formatearFecha(fechaSeleccionada));
     console.log("Bloque seleccionado:", bloqueSeleccionado?.substring(bloqueSeleccionado.indexOf('-') + 1)+":00");
 
@@ -99,7 +102,7 @@ export default function SeleccionHorarioConFecha() {
                         </span>
                     </h3>
 
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-wrap items-center justify-center gap-3">
                         {horariosFiltrados.length > 0 ? (
                             horariosFiltrados.flatMap((disponibilidad) =>
                                 disponibilidad.bloques.map((hora, index) => {

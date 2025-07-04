@@ -1,44 +1,49 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Card, Pagination, Select, SelectItem } from '@heroui/react';
+import { Card, CircularProgress, Pagination, Select, SelectItem, Spinner } from '@heroui/react';
+import { useMedicoStore } from '@/app/store/medicoStore';
+import api from '@/app/lib/axios';
+import { Loader2 } from 'lucide-react';
 
-type Medico = {
+interface Medico {
   id: number;
   nombre: string;
+  email: string;
+  documento: string;
+  telefono: string;
   especialidad: string;
-  imagen: string;
-};
+}
 
-const TODOS_LOS_MEDICOS: Medico[] = [
-  // Simulación de médicos (reemplaza con datos reales o de API)
-  { id: 1, nombre: "Dr. Carlos", especialidad: "Cardiología", imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi9pkWsBdG5b1shPiwNzUx517y1-V57tuQ1Q&s" },
-  { id: 2, nombre: "Dra. Ana", especialidad: "Pediatría", imagen: "/medico.jpg" },
-  { id: 3, nombre: "Dr. Juan", especialidad: "Neurología", imagen: "/medico.jpg" },
-  { id: 4, nombre: "Dr. Juan", especialidad: "Neurología", imagen: "/medico.jpg" },
-  { id: 5, nombre: "Dr. Juan", especialidad: "Neurología", imagen: "/medico.jpg" },
-  { id: 6, nombre: "Dr. Juan", especialidad: "Neurología", imagen: "/medico.jpg" },
-  { id: 7, nombre: "Dr. Juan", especialidad: "Neurología", imagen: "/medico.jpg" },
-  { id: 8, nombre: "Dr. Juan", especialidad: "Neurología", imagen: "/medico.jpg" },
-  { id: 9, nombre: "Dr. Juan", especialidad: "Neurología", imagen: "/medico.jpg" },
-  { id: 10, nombre: "Dr. Juan", especialidad: "Neurología", imagen: "/medico.jpg" },
-  { id: 11, nombre: "Dr. Juan", especialidad: "Neurología", imagen: "/medico.jpg" },
-  { id: 12, nombre: "Dr. Juan", especialidad: "Neurología", imagen: "/medico.jpg" },
-  // agrega más médicos...
-];
+
 
 
 export default function GridMedicos() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedMedico, setSelectedMedico] = useState<number | null>(null);
+  const { medicoSeleccionado, setMedicoSeleccionado } = useMedicoStore();
   const [especialidadSeleccionada, setEspecialidadSeleccionada] = useState("Todas");
+  const [medicos, setMedicos] = useState<Medico[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    api.get("/pacientes/ver-medicos")
+      .then((response) => {
+        setMedicos(response.data.content); // 🔥 Aquí extraes los médicos
+      })
+      .catch((error) => {
+        console.error("Error al obtener médicos:", error);
+        setError("No se pudieron cargar los médicos.");
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   const pageSize = 4;
-  const especialidades = ["Todas", "Cardiología", "Pediatría", "Dermatología", "Neurología"];
+  const especialidades = ["Todas", "GENERAL", "CARDIOLOGIA"];
 
   // 1. Filtras primero
   const medicosFiltrados = especialidadSeleccionada === "Todas"
-    ? TODOS_LOS_MEDICOS
-    : TODOS_LOS_MEDICOS.filter((medico) => medico.especialidad === especialidadSeleccionada);
+    ? medicos
+    : medicos.filter((medico) => medico.especialidad === especialidadSeleccionada);
 
   // 2. Luego haces paginación sobre los filtrados
   const totalPages = Math.ceil(medicosFiltrados.length / pageSize);
@@ -53,7 +58,8 @@ export default function GridMedicos() {
     setCurrentPage(1);
   }, [especialidadSeleccionada]);
 
-
+  if (loading) return <Spinner />
+  if (error) return <div className="text-red-500 text-center">{error}</div>;
   return (
     <section className="flex flex-col gap-4">
       {/* FILTRO */}
@@ -79,8 +85,8 @@ export default function GridMedicos() {
             <Card
               isPressable
               key={medico.id}
-              onPress={() => setSelectedMedico(medico.id)}
-              className={`p-4 shadow-md max-w-72 transition-colors duration-300 ${selectedMedico === medico.id ? "bg-blue-500 text-white" : "bg-white hover:bg-blue-50"
+              onPress={() => setMedicoSeleccionado(medico.id)}
+              className={`p-4 shadow-md max-w-72 transition-colors duration-300 ${medicoSeleccionado === medico.id ? "bg-blue-500 text-white" : "bg-white hover:bg-blue-50"
                 }`}
             >
               <img
@@ -103,7 +109,7 @@ export default function GridMedicos() {
         <div className="flex justify-center z-0">
           <Pagination
             loop
-            isCompact 
+            isCompact
             showControls
             total={totalPages}
             initialPage={1}
