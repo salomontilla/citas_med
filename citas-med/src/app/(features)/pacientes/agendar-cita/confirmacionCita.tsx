@@ -71,8 +71,7 @@ export default function ConfirmacionCita({
                 setTimeout(() => {
                     setIsVisibleAlert(false);
                     onOpenChange();
-
-                }, 3000);
+                }, 1000);
 
             })
             .catch((error) => {
