@@ -24,14 +24,13 @@ export default function ConfirmacionCita({
     horaInicio,
 }: Props) {
     const { medicoSeleccionado } = useMedicoStore();
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
     const [isAgendadaExitosamente, setIsAgendadaExitosamente] = useState(false);
     const [description, setDescription] = useState("");
     const [title, setTitle] = useState("");
     const [isVisibleAlert, setIsVisibleAlert] = useState(false);
     const [loading, setLoading] = useState(false);
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
-
 
     const puedeAgendar =
         fechaSeleccionada !== null &&
@@ -44,7 +43,7 @@ export default function ConfirmacionCita({
         api.post('/pacientes/citas/agendar', {
             medicoId: medicoSeleccionado?.id,
             fecha: fechaSeleccionada,
-            hora: horaInicio,
+            hora: horaInicio?.substring(horaInicio.indexOf('-') + 1)+":00",
         })
             .then((response) => {
                 setIsAgendadaExitosamente(true);
@@ -87,7 +86,7 @@ export default function ConfirmacionCita({
                 <p className="text-sm">
                     <strong>Hora:</strong>{' '}
                     {horaInicio
-                        ? `${horaInicio}`
+                        ? `${horaInicio.substring(horaInicio.indexOf('-') + 1)}`
                         : 'No seleccionada'}
                 </p>
             </div>
@@ -104,7 +103,7 @@ export default function ConfirmacionCita({
                 </Button>
 
             )}
-
+            {/* MODAL DE CONFIRMACION */}
             <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
                 <ModalContent>
                     {(onClose) => (

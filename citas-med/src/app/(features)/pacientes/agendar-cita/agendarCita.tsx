@@ -139,7 +139,7 @@ export default function SeleccionHorarioConFecha() {
             )}
             <ConfirmacionCita
                 fechaSeleccionada={formatearFecha(fechaSeleccionada)}
-                horaInicio={bloqueSeleccionado?.substring(bloqueSeleccionado.indexOf('-') + 1) + ":00"}
+                horaInicio={bloqueSeleccionado}
 
             />
         </div>
