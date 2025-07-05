@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CalendarDays, ClipboardList, UserCog, LogOut, Menu, X } from 'lucide-react';
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -217,6 +217,18 @@ type TitleSectionProps = {
   open: boolean;
 };
 const TitleSection = ({ open }: TitleSectionProps) => {
+  const [nombre, setNombre] = useState("");
+  const [rol, setRol] = useState("");
+
+  useEffect(() =>{
+    api.get("/auth/me")
+    .then((r) =>{
+      setNombre(r.data.nombre);
+      setRol(r.data.rol);
+    }).catch((error) => {
+      console.error("Error al obtener los datos del usuario:", error);
+    })
+  },[]);
   return (
     <div className="mb-3 border-b border-slate-300 pb-3">
       <div className="flex cursor-auto items-center justify-between rounded-md transition-colors">
@@ -229,8 +241,8 @@ const TitleSection = ({ open }: TitleSectionProps) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.125 }}
             >
-              <span className="block text-xs font-semibold">TomIsLoading</span>
-              <span className="block text-xs text-slate-500">Pro Plan</span>
+              <span className="block text-xs font-semibold">{nombre}</span>
+              <span className="block text-xs text-slate-500">{rol}</span>
             </motion.div>
           )}
         </div>
