@@ -7,7 +7,8 @@ import {
     ModalContent,
     ModalHeader,
     ModalBody,
-    ModalFooter
+    ModalFooter,
+    addToast
 } from '@heroui/react';
 import api from '@/app/lib/axios';
 import { useState } from 'react';
@@ -39,31 +40,37 @@ export default function ConfirmacionCita({
 
     const agendarCita = () => {
         setLoading(true);
-        api.post('/pacientes/citas/agendar', {
-            medicoId: medicoSeleccionado?.id,
-            fecha: fechaSeleccionada,
-            hora: horaInicio?.substring(horaInicio.indexOf('-') + 1)+":00",
-        })
-            .then((response) => {
+        api
+            .post("/pacientes/citas/agendar", {
+                medicoId: medicoSeleccionado?.id,
+                fecha: fechaSeleccionada,
+                hora: horaInicio?.substring(horaInicio.indexOf("-") + 1) + ":00",
+            })
+            .then(() => {
                 setIsAgendadaExitosamente(true);
                 setIsVisibleAlert(true);
                 setDescription("Cita agendada exitosamente");
                 setTitle("Éxito");
-                
-                setTimeout(() => {
-                    router.push('/pacientes/mis-citas'); 
-                }, 600);
 
-            }
-            )
+                addToast({
+                    color: "success",
+                    title: "Cita Agendada Exitosamente",
+                    description: "Tu cita ha sido agendada correctamente.",
+                    timeout: 3000,
+                    shouldShowTimeoutProgress: true,
+                });
+                
+
+            })
             .catch((error) => {
                 setIsAgendadaExitosamente(false);
                 setIsVisibleAlert(true);
                 setTitle("Error");
                 setDescription(error.response?.data || "Error al agendar la cita");
-            }).finally(() => setLoading(false));
+            })
+            .finally(() => setLoading(false));
+    };
 
-    }
 
     return (
         <div className="mt-8 bg-white p-6 rounded-2xl shadow-lg border border-blue-200 flex flex-col gap-4">
@@ -111,34 +118,34 @@ export default function ConfirmacionCita({
             <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
                 <ModalContent>
                     {(onClose) => (
-                    <>
-                        <ModalHeader className="flex flex-col gap-1">Deseas agendar la cita?</ModalHeader>
-                        <ModalBody>
-                            <p>
-                                Al confirmar, se agendará la cita con el médico seleccionado para la fecha y hora indicadas.
-                            </p>
+                        <>
+                            <ModalHeader className="flex flex-col gap-1">Deseas agendar la cita?</ModalHeader>
+                            <ModalBody>
+                                <p>
+                                    Al confirmar, se agendará la cita con el médico seleccionado para la fecha y hora indicadas.
+                                </p>
 
-                        </ModalBody>
-                        <ModalFooter className="flex flex-col">
-                            <div className="flex w-full justify-center gap-3">
-                                <Button color="default" onPress={onClose}>
-                                    Cancelar
-                                </Button>
-                                <Button isLoading={loading} color="primary" onPress={agendarCita}>
-                                    Agendar cita
-                                </Button>
-                            </div>
-                            <Alert
-                                color={isAgendadaExitosamente ? "success" : "danger"}
-                                className="w-full mt-3"
-                                description={description}
-                                title={title}
-                                isVisible={isVisibleAlert}
-                                variant="faded"
-                                onClose={() => setIsVisibleAlert(false)}
-                            />
-                        </ModalFooter>
-                    </>
+                            </ModalBody>
+                            <ModalFooter className="flex flex-col">
+                                <div className="flex w-full justify-center gap-3">
+                                    <Button color="default" onPress={onClose}>
+                                        Cancelar
+                                    </Button>
+                                    <Button isLoading={loading} color="primary" onPress={agendarCita}>
+                                        Agendar cita
+                                    </Button>
+                                </div>
+                                <Alert
+                                    color={isAgendadaExitosamente ? "success" : "danger"}
+                                    className="w-full mt-3"
+                                    description={description}
+                                    title={title}
+                                    isVisible={isVisibleAlert}
+                                    variant="faded"
+                                    onClose={() => setIsVisibleAlert(false)}
+                                />
+                            </ModalFooter>
+                        </>
                     )}
                 </ModalContent>
             </Modal>

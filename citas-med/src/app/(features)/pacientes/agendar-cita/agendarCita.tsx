@@ -47,22 +47,15 @@ const mesesMap = [
     "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"
 ];
 
-interface Disponibilidad {
-    id: number;
-    medicoId: number;
-    diaSemana: string;
-    bloques: string[];
-}
-
 export default function SeleccionHorarioConFecha() {
     const [fechaSeleccionada, setFechaSeleccionada] = useState<CalendarDate | null>(null);
     const [bloqueSeleccionado, setBloqueSeleccionado] = useState<string | null>(null);
     const {medicoSeleccionado } = useMedicoStore();
-    const [disponibilidades, setDisponibilidades] = useState<Disponibilidad[]>([]);
+    const [disponibilidades, setDisponibilidades] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() =>{
+    const cargarDisponibilidades = () => {
         if (fechaSeleccionada && medicoSeleccionado) {
             setLoading(true);
             api.get(`/pacientes/${medicoSeleccionado?.id}/disponibilidades?fecha=${fechaSeleccionada?.toString()}`)
@@ -75,6 +68,10 @@ export default function SeleccionHorarioConFecha() {
                 })
                 .finally(() => setLoading(false));
         }
+    }
+
+    useEffect(() =>{
+        cargarDisponibilidades();
     },[fechaSeleccionada, medicoSeleccionado]);
 
 
@@ -135,7 +132,7 @@ export default function SeleccionHorarioConFecha() {
 
                     <div className="flex flex-wrap items-center justify-center gap-3">
                         {disponibilidades.length > 0 ? (
-                                disponibilidades.map((hora, index) => {
+                                disponibilidades.map((hora, index ) => {
                                     const bloqueId = `${index}-${hora}`; 
 
                                     return (
@@ -151,11 +148,11 @@ export default function SeleccionHorarioConFecha() {
                                             {hora}
                                         </Button>
                                     );
-                                })
+                          })
                             
                         ) : (
                             <p className="text-sm text-gray-500">
-                                No hay horarios disponibles para este día.
+                               No hay horarios disponibles para este día.
                             </p>
                         )}
                     </div>
