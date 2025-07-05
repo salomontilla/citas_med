@@ -50,7 +50,7 @@ const mesesMap = [
 export default function SeleccionHorarioConFecha() {
     const [fechaSeleccionada, setFechaSeleccionada] = useState<CalendarDate | null>(null);
     const [bloqueSeleccionado, setBloqueSeleccionado] = useState<string | null>(null);
-    const {medicoSeleccionado } = useMedicoStore();
+    const { medicoSeleccionado, limpiarMedico } = useMedicoStore();
     const [disponibilidades, setDisponibilidades] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -70,9 +70,9 @@ export default function SeleccionHorarioConFecha() {
         }
     }
 
-    useEffect(() =>{
+    useEffect(() => {
         cargarDisponibilidades();
-    },[fechaSeleccionada, medicoSeleccionado]);
+    }, [fechaSeleccionada, medicoSeleccionado]);
 
 
     // Función auxiliar para obtener el nombre del día
@@ -95,7 +95,7 @@ export default function SeleccionHorarioConFecha() {
     const diaSemana = obtenerDiaSemana(fechaSeleccionada);
     const mes = obtenerMes(fechaSeleccionada);
 
-    
+
 
     return (
         <div className="space-y-6">
@@ -132,27 +132,27 @@ export default function SeleccionHorarioConFecha() {
 
                     <div className="flex flex-wrap items-center justify-center gap-3">
                         {disponibilidades.length > 0 ? (
-                                disponibilidades.map((hora, index ) => {
-                                    const bloqueId = `${index}-${hora}`; 
+                            disponibilidades.map((hora, index) => {
+                                const bloqueId = `${index}-${hora}`;
 
-                                    return (
-                                        <Button
-                                            key={bloqueId}
-                                            onPress={() => setBloqueSeleccionado(bloqueId)}
-                                            className={`px-4 py-2 rounded-lg border text-sm flex items-center gap-2 ${bloqueSeleccionado === bloqueId
-                                                ? "bg-blue-600 text-white border-blue-700"
-                                                : "bg-white text-blue-700 border-blue-300 hover:bg-blue-100"
-                                                }`}
-                                        >
-                                            <Clock4 className="w-4 h-4" />
-                                            {hora}
-                                        </Button>
-                                    );
-                          })
-                            
+                                return (
+                                    <Button
+                                        key={bloqueId}
+                                        onPress={() => setBloqueSeleccionado(bloqueId)}
+                                        className={`px-4 py-2 rounded-lg border text-sm flex items-center gap-2 ${bloqueSeleccionado === bloqueId
+                                            ? "bg-blue-600 text-white border-blue-700"
+                                            : "bg-white text-blue-700 border-blue-300 hover:bg-blue-100"
+                                            }`}
+                                    >
+                                        <Clock4 className="w-4 h-4" />
+                                        {hora}
+                                    </Button>
+                                );
+                            })
+
                         ) : (
                             <p className="text-sm text-gray-500">
-                               No hay horarios disponibles para este día.
+                                No hay horarios disponibles para este día.
                             </p>
                         )}
                     </div>
@@ -162,6 +162,13 @@ export default function SeleccionHorarioConFecha() {
             <ConfirmacionCita
                 fechaSeleccionada={formatearFecha(fechaSeleccionada)}
                 horaInicio={bloqueSeleccionado}
+                onCitaAgendada={() => {
+                    setFechaSeleccionada(null);
+                    setBloqueSeleccionado(null);
+                    limpiarMedico();
+                    cargarDisponibilidades();
+                }
+                }
 
             />
         </div>

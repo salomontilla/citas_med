@@ -13,15 +13,18 @@ import {
 import api from '@/app/lib/axios';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { set } from 'date-fns';
 
 interface Props {
     fechaSeleccionada: string | null;
     horaInicio: string | null;
+    onCitaAgendada?: () => void;
 }
 
 export default function ConfirmacionCita({
     fechaSeleccionada,
     horaInicio,
+    onCitaAgendada
 }: Props) {
     const { medicoSeleccionado } = useMedicoStore();
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -40,6 +43,10 @@ export default function ConfirmacionCita({
 
     const agendarCita = () => {
         setLoading(true);
+        setIsVisibleAlert(false);
+        setDescription("");
+        setTitle("");
+
         api
             .post("/pacientes/citas/agendar", {
                 medicoId: medicoSeleccionado?.id,
@@ -56,10 +63,16 @@ export default function ConfirmacionCita({
                     color: "success",
                     title: "Cita Agendada Exitosamente",
                     description: "Tu cita ha sido agendada correctamente.",
-                    timeout: 3000,
+                    timeout: 5000,
                     shouldShowTimeoutProgress: true,
                 });
-                
+                onCitaAgendada?.();
+
+                setTimeout(() => {
+                    setIsVisibleAlert(false);
+                    onOpenChange();
+
+                }, 3000);
 
             })
             .catch((error) => {
