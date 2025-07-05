@@ -27,7 +27,7 @@ export default function GridMedicos() {
         setMedicos(response.data.content);
       })
       .catch((error) => {
-        setError(error.response.message ||"No se pudieron cargar los médicos.");
+        setError(error.message ||"No se pudieron cargar los médicos.");
       })
       .finally(() => setLoading(false));
   }, []);
@@ -85,7 +85,7 @@ export default function GridMedicos() {
                 }`}
             >
               <img
-                src={medico.imagen}
+                src={"/medico.jpg"}
                 alt={medico.nombre}
                 className="w-full h-40 object-cover rounded-md mb-4"
               />

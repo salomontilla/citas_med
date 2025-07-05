@@ -38,7 +38,6 @@ export default function ConfirmacionCita({
         medicoSeleccionado !== null;
 
     const agendarCita = () => {
-        console.log(fechaSeleccionada, horaInicio, medicoSeleccionado);
         setLoading(true);
         api.post('/pacientes/citas/agendar', {
             medicoId: medicoSeleccionado?.id,

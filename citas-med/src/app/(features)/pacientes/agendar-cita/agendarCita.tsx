@@ -63,7 +63,7 @@ export default function SeleccionHorarioConFecha() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() =>{
-        if (fechaSeleccionada) {
+        if (fechaSeleccionada && medicoSeleccionado) {
             setLoading(true);
             api.get(`/pacientes/${medicoSeleccionado?.id}/disponibilidades?fecha=${fechaSeleccionada?.toString()}`)
                 .then((response) => {
@@ -75,7 +75,7 @@ export default function SeleccionHorarioConFecha() {
                 })
                 .finally(() => setLoading(false));
         }
-    },[ fechaSeleccionada])
+    },[fechaSeleccionada, medicoSeleccionado]);
 
 
     // Función auxiliar para obtener el nombre del día
