@@ -42,7 +42,7 @@ public class CitaController {
 
     @GetMapping("/pacientes/mis-citas")
     public ResponseEntity<?> getCitasPacienteAuth(@AuthenticationPrincipal DetallesUsuario user,
-                                                  @PageableDefault(size = 10) Pageable pageable) {
+                                                  @PageableDefault(size = 5) Pageable pageable) {
         Paciente paciente = pacienteService.obtenerPacientePorEmail(user.getUsername());
         Page<Cita> citas = citaService.obtenerCitasPorPacienteId(paciente.getId(), pageable);
 
