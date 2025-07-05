@@ -1,9 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Card, CircularProgress, Pagination, Select, SelectItem, Spinner } from '@heroui/react';
+import { Card, Pagination, Select, SelectItem, Spinner } from '@heroui/react';
 import { useMedicoStore } from '@/app/store/medicoStore';
 import api from '@/app/lib/axios';
-import { Loader2 } from 'lucide-react';
 
 interface Medico {
   id: number;
@@ -13,9 +12,6 @@ interface Medico {
   telefono: string;
   especialidad: string;
 }
-
-
-
 
 export default function GridMedicos() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,11 +24,10 @@ export default function GridMedicos() {
   useEffect(() => {
     api.get("/pacientes/ver-medicos")
       .then((response) => {
-        setMedicos(response.data.content); // 🔥 Aquí extraes los médicos
+        setMedicos(response.data.content);
       })
       .catch((error) => {
-        console.error("Error al obtener médicos:", error);
-        setError("No se pudieron cargar los médicos.");
+        setError(error.response.message ||"No se pudieron cargar los médicos.");
       })
       .finally(() => setLoading(false));
   }, []);
@@ -40,12 +35,12 @@ export default function GridMedicos() {
   const pageSize = 4;
   const especialidades = ["Todas", "GENERAL", "CARDIOLOGIA"];
 
-  // 1. Filtras primero
+  // 1. Filtra primero
   const medicosFiltrados = especialidadSeleccionada === "Todas"
     ? medicos
     : medicos.filter((medico) => medico.especialidad === especialidadSeleccionada);
 
-  // 2. Luego haces paginación sobre los filtrados
+  // 2. Luego hace paginación sobre los filtrados
   const totalPages = Math.ceil(medicosFiltrados.length / pageSize);
 
   const paginatedMedicos = medicosFiltrados.slice(
@@ -53,7 +48,7 @@ export default function GridMedicos() {
     currentPage * pageSize
   );
 
-  // 3. Reiniciar página al cambiar filtro
+  // 3. Reinicia página al cambiar filtro
   useEffect(() => {
     setCurrentPage(1);
   }, [especialidadSeleccionada]);
@@ -85,8 +80,8 @@ export default function GridMedicos() {
             <Card
               isPressable
               key={medico.id}
-              onPress={() => setMedicoSeleccionado(medico.id)}
-              className={`p-4 shadow-md max-w-72 transition-colors duration-300 ${medicoSeleccionado === medico.id ? "bg-blue-500 text-white" : "bg-white hover:bg-blue-50"
+              onPress={() => setMedicoSeleccionado(medico)}
+              className={`p-4 shadow-md max-w-72 transition-colors duration-300 ${medicoSeleccionado?.id === medico.id ? "bg-blue-500 text-white" : "bg-white hover:bg-blue-50"
                 }`}
             >
               <img

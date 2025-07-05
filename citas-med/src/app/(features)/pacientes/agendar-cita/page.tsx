@@ -1,11 +1,11 @@
 
 'use client';
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '../../../lib/axios';
 import { useState } from 'react'
 import MedicoGrid from './medicoGrid';
 import AgendarCita from './agendarCita';
+import ConfirmacionCita from './confirmacionCita';
 
 export default function PacienteDashboard() {
 

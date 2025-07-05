@@ -6,6 +6,8 @@ import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
 import { Button, DatePicker } from "@heroui/react";
 import { formatearFecha } from "@/app/lib/utils";
 import { useMedicoStore } from "@/app/store/medicoStore";
+import ConfirmacionCita from "./confirmacionCita";
+import api from "@/app/lib/axios";
 
 // Simulamos la disponibilidad por día de la semana
 const DISPONIBILIDADES = [
@@ -48,7 +50,8 @@ const mesesMap = [
 export default function SeleccionHorarioConFecha() {
     const [fechaSeleccionada, setFechaSeleccionada] = useState<CalendarDate | null>(null);
     const [bloqueSeleccionado, setBloqueSeleccionado] = useState<string | null>(null);
-    const { medicoSeleccionado } = useMedicoStore();
+    const {medicoSeleccionado } = useMedicoStore();
+
     console.log("Médico seleccionado:", medicoSeleccionado);
 
     // Función auxiliar para obtener el nombre del día
@@ -59,7 +62,7 @@ export default function SeleccionHorarioConFecha() {
     };
 
     console.log("Fecha seleccionada:", formatearFecha(fechaSeleccionada));
-    console.log("Bloque seleccionado:", bloqueSeleccionado?.substring(bloqueSeleccionado.indexOf('-') + 1)+":00");
+    console.log("Bloque seleccionado:",);
 
     // Función auxiliar para obtener el mes
     const obtenerMes = (fecha: CalendarDate | null): string | null => {
@@ -71,6 +74,8 @@ export default function SeleccionHorarioConFecha() {
     const diaSemana = obtenerDiaSemana(fechaSeleccionada);
     const mes = obtenerMes(fechaSeleccionada);
     const horariosFiltrados = DISPONIBILIDADES.filter((d) => d.diaSemana === diaSemana);
+
+    
 
     return (
         <div className="space-y-6">
@@ -113,8 +118,8 @@ export default function SeleccionHorarioConFecha() {
                                             key={bloqueId}
                                             onPress={() => setBloqueSeleccionado(bloqueId)}
                                             className={`px-4 py-2 rounded-lg border text-sm flex items-center gap-2 ${bloqueSeleccionado === bloqueId
-                                                    ? "bg-blue-600 text-white border-blue-700"
-                                                    : "bg-white text-blue-700 border-blue-300 hover:bg-blue-100"
+                                                ? "bg-blue-600 text-white border-blue-700"
+                                                : "bg-white text-blue-700 border-blue-300 hover:bg-blue-100"
                                                 }`}
                                         >
                                             <Clock4 className="w-4 h-4" />
@@ -132,6 +137,11 @@ export default function SeleccionHorarioConFecha() {
 
                 </div>
             )}
+            <ConfirmacionCita
+                fechaSeleccionada={formatearFecha(fechaSeleccionada)}
+                horaInicio={bloqueSeleccionado?.substring(bloqueSeleccionado.indexOf('-') + 1) + ":00"}
+
+            />
         </div>
     );
 }

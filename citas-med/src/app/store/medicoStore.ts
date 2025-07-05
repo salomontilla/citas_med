@@ -1,11 +1,23 @@
+// store/medicoStore.ts
 import { create } from 'zustand';
 
-type MedicoState = {
-  medicoSeleccionado: number | null;
-  setMedicoSeleccionado: (id: number) => void;
-};
+interface Medico {
+  id: number;
+  nombre: string;
+  email: string;
+  documento: string;
+  telefono: string;
+  especialidad: string;
+}
 
-export const useMedicoStore = create<MedicoState>((set) => ({
+interface MedicoStore {
+  medicoSeleccionado: Medico | null;
+  setMedicoSeleccionado: (medico: Medico) => void;
+  limpiarMedico: () => void;
+}
+
+export const useMedicoStore = create<MedicoStore>((set) => ({
   medicoSeleccionado: null,
-  setMedicoSeleccionado: (id) => set({ medicoSeleccionado: id }),
+  setMedicoSeleccionado: (medico) => set({ medicoSeleccionado: medico }),
+  limpiarMedico: () => set({ medicoSeleccionado: null }),
 }));
