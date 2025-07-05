@@ -2,7 +2,13 @@
 
 import { useMedicoStore } from '@/app/store/medicoStore';
 import { CalendarCheck, Clock4, UserCircle2 } from 'lucide-react';
-import { Alert, Button } from '@heroui/react';
+import {
+    Alert, Button, useDisclosure, Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter
+} from '@heroui/react';
 import api from '@/app/lib/axios';
 import { formatearFecha } from '@/app/lib/utils';
 import { useState } from 'react';
@@ -23,6 +29,8 @@ export default function ConfirmacionCita({
     const [title, setTitle] = useState("");
     const [isVisibleAlert, setIsVisibleAlert] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
 
 
     const puedeAgendar =
@@ -50,7 +58,7 @@ export default function ConfirmacionCita({
                 setIsVisibleAlert(true);
                 setTitle("Error");
                 setDescription(error.response?.data || "Error al agendar la cita");
-                  }).finally(() => setLoading(false));
+            }).finally(() => setLoading(false));
 
     }
 
@@ -90,21 +98,47 @@ export default function ConfirmacionCita({
                     color="primary"
                     radius="lg"
                     className="mt-4 self-start"
-                    onPress={() => agendarCita()}
+                    onPress={() => onOpen()}
                 >
                     Agendar cita
                 </Button>
 
             )}
-            <Alert
-                color={isAgendadaExitosamente ? "success" : "danger"}
-                className="w-full mt-3"
-                description={description}
-                title={title}
-                isVisible={isVisibleAlert}
-                variant="faded"
-                onClose={() => setIsVisibleAlert(false)}
-            />
+
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+                <ModalContent>
+                    {(onClose) => (
+                    <>
+                        <ModalHeader className="flex flex-col gap-1">Deseas agendar la cita?</ModalHeader>
+                        <ModalBody>
+                            <p>
+                                Al confirmar, se agendará la cita con el médico seleccionado para la fecha y hora indicadas.
+                            </p>
+
+                        </ModalBody>
+                        <ModalFooter className="flex flex-col">
+                            <div className="flex w-full justify-center gap-3">
+                                <Button color="default" onPress={onClose}>
+                                    Cancelar
+                                </Button>
+                                <Button isLoading={loading} color="primary" onPress={agendarCita}>
+                                    Agendar cita
+                                </Button>
+                            </div>
+                            <Alert
+                                color={isAgendadaExitosamente ? "success" : "danger"}
+                                className="w-full mt-3"
+                                description={description}
+                                title={title}
+                                isVisible={isVisibleAlert}
+                                variant="faded"
+                                onClose={() => setIsVisibleAlert(false)}
+                            />
+                        </ModalFooter>
+                    </>
+                    )}
+                </ModalContent>
+            </Modal>
         </div>
     );
 }

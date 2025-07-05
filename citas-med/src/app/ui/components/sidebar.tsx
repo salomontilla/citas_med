@@ -18,7 +18,7 @@ import api from '../../lib/axios';
 
 
 export const Sidebar = () => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState("Agendar Cita");
 
   return (
