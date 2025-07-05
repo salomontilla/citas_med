@@ -1,10 +1,13 @@
 package com.salomon.citasmedbackend.services;
 
+import com.salomon.citasmedbackend.domain.cita.Cita;
+import com.salomon.citasmedbackend.domain.cita.EstadoCita;
 import com.salomon.citasmedbackend.domain.disponibilidad.DiaSemana;
 import com.salomon.citasmedbackend.domain.disponibilidad.DisponibilidadDTO;
 import com.salomon.citasmedbackend.domain.disponibilidad.Disponibilidad;
 import com.salomon.citasmedbackend.domain.disponibilidad.UpdateDisponibilidadDTO;
 import com.salomon.citasmedbackend.domain.medico.Medico;
+import com.salomon.citasmedbackend.repository.CitaRepository;
 import com.salomon.citasmedbackend.repository.DisponibilidadRepository;
 import com.salomon.citasmedbackend.repository.MedicoRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +17,13 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import static com.salomon.citasmedbackend.infra.utils.FechaUtils.convertirADiaSemana;
 import static com.salomon.citasmedbackend.infra.utils.FechaUtils.convertirHora;
 
 @Service
@@ -24,6 +31,7 @@ import static com.salomon.citasmedbackend.infra.utils.FechaUtils.convertirHora;
 public class DisponibilidadService {
     private final MedicoRepository medicoRepository;
     private final DisponibilidadRepository disponibilidadRepository;
+    private final CitaRepository citasRepository;
 
     public Disponibilidad agregarDisponibilidad(DisponibilidadDTO dto, Long medicoId) {
         Medico medico = medicoRepository.findByIdAndUsuarioActivo(medicoId)
@@ -49,6 +57,44 @@ public class DisponibilidadService {
                 .orElseThrow(() -> new RuntimeException("Médico no encontrado o inactivo"));
         return disponibilidadRepository.findByMedicoId(medico.getId(), pageable);
     }
+
+    public List<String> obtenerBloquesDisponibles(Long medicoId, LocalDate fecha) {
+        DiaSemana diaSemana = convertirADiaSemana(fecha.getDayOfWeek());
+
+        List<Disponibilidad> disponibilidades = disponibilidadRepository
+                .findByMedicoIdAndDiaSemana(medicoId, diaSemana);
+
+        // Obtener citas ya agendadas ese día
+        List<Cita> citasEseDia = citasRepository.findActivasByMedicoAndFecha(medicoId, fecha);
+
+        List<String> bloquesLibres = new ArrayList<>();
+
+        for (Disponibilidad disponibilidad : disponibilidades) {
+            LocalTime inicio = disponibilidad.getHoraInicio().toLocalTime();
+            LocalTime fin = disponibilidad.getHoraFin().toLocalTime();
+
+            // Dividir el bloque en segmentos de 30 minutos
+            while (inicio.isBefore(fin)) {
+                LocalTime siguiente = inicio.plusMinutes(30);
+                LocalTime bloqueInicio = inicio;
+
+                boolean ocupado = citasEseDia.stream().anyMatch(cita -> {
+                    LocalTime citaHora = cita.getHora().toLocalTime();
+                    return !citaHora.isBefore(bloqueInicio) && citaHora.isBefore(siguiente);
+                });
+
+                if (!ocupado) {
+                    bloquesLibres.add(bloqueInicio.toString());
+                }
+
+                inicio = siguiente;
+            }
+
+        }
+
+        return bloquesLibres;
+    }
+
 
     public Disponibilidad modificarDisponibilidad(UpdateDisponibilidadDTO dto, Long id) {
         Disponibilidad disponibilidad = disponibilidadRepository.findById(id)
@@ -109,4 +155,6 @@ public class DisponibilidadService {
         return disponibilidadRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Disponibilidad no encontrada"));
     }
+
+
 }

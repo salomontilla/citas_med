@@ -1,7 +1,7 @@
 'use client';
 
 import { useMedicoStore } from '@/app/store/medicoStore';
-import { CalendarCheck, Clock4, UserCircle2 } from 'lucide-react';
+import { CalendarCheck, Clock4, Router, UserCircle2 } from 'lucide-react';
 import {
     Alert, Button, useDisclosure, Modal,
     ModalContent,
@@ -10,9 +10,8 @@ import {
     ModalFooter
 } from '@heroui/react';
 import api from '@/app/lib/axios';
-import { formatearFecha } from '@/app/lib/utils';
 import { useState } from 'react';
-import { set } from 'date-fns';
+import { useRouter } from 'next/navigation';
 
 interface Props {
     fechaSeleccionada: string | null;
@@ -31,6 +30,7 @@ export default function ConfirmacionCita({
     const [title, setTitle] = useState("");
     const [isVisibleAlert, setIsVisibleAlert] = useState(false);
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     const puedeAgendar =
         fechaSeleccionada !== null &&
@@ -50,6 +50,11 @@ export default function ConfirmacionCita({
                 setIsVisibleAlert(true);
                 setDescription("Cita agendada exitosamente");
                 setTitle("Éxito");
+                
+                setTimeout(() => {
+                    router.push('/pacientes/mis-citas'); 
+                }, 600);
+
             }
             )
             .catch((error) => {

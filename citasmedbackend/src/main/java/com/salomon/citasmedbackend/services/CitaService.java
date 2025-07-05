@@ -55,7 +55,7 @@ public class CitaService {
 
         Date formattedDate = convertirFecha(citaDto.fecha());
         Time formattedTime = convertirHora(citaDto.hora());
-        validarDisponibilidad(medico.getId(), formattedDate, formattedTime, null);
+        validarDisponibilidad(medico.getId(), formattedDate.toLocalDate(), formattedTime, null);
         Cita nuevaCita = new Cita(
                 paciente,
                 medico,
@@ -92,6 +92,12 @@ public class CitaService {
         Medico medico = medicoRepository.findByIdAndUsuarioActivo(medicoId)
                 .orElseThrow(() -> new RuntimeException("Médico no encontrado o inactivo"));
         return citasRepository.findByMedicoId(medico.getId(), pageable);
+    }
+
+    public List<Cita> obtenerCitasPorMedicoIdYFecha(Long medicoId, LocalDate fecha) {
+        Medico medico = medicoRepository.findByIdAndUsuarioActivo(medicoId)
+                .orElseThrow(() -> new RuntimeException("Médico no encontrado o inactivo"));
+        return citasRepository.findActivasByMedicoAndFecha(medico.getId(), fecha);
     }
 
    public Cita actualizarCitaAdmin(Long id, CitaActualizarDTO citaDto) {
@@ -189,7 +195,7 @@ public class CitaService {
         Date nuevaFecha = dto.fecha() != null ? convertirFecha(dto.fecha()) : cita.getFecha();
         Time nuevaHora = dto.hora() != null ? convertirHora(dto.hora()) : cita.getHora();
 
-        validarDisponibilidad(cita.getMedico().getId(), nuevaFecha, nuevaHora, cita.getId());
+        validarDisponibilidad(cita.getMedico().getId(), nuevaFecha.toLocalDate(), nuevaHora, cita.getId());
 
         if (dto.fecha() != null) cita.setFecha(nuevaFecha);
         if (dto.hora() != null) cita.setHora(nuevaHora);
@@ -201,7 +207,7 @@ public class CitaService {
         Date nuevaFecha = citaDto.fecha() != null ? convertirFecha(citaDto.fecha()) : cita.getFecha();
         Time nuevaHora = citaDto.hora() != null ? convertirHora(citaDto.hora()) : cita.getHora();
 
-        validarDisponibilidad(cita.getMedico().getId(), nuevaFecha, nuevaHora, cita.getId());
+        validarDisponibilidad(cita.getMedico().getId(), nuevaFecha.toLocalDate(), nuevaHora, cita.getId());
 
         if (citaDto.fecha() != null) {
             cita.setFecha(nuevaFecha);
@@ -216,10 +222,10 @@ public class CitaService {
         return citasRepository.save(cita);
     }
 
-    private void validarDisponibilidad(Long medicoId, Date fechaAgendada, Time horaInicio, Long citaIdAExcluir) {
-        DiaSemana dia = DIA_SEMANA_MAP.get(fechaAgendada.toLocalDate().getDayOfWeek());
+    private void validarDisponibilidad(Long medicoId, LocalDate fechaAgendada, Time horaInicio, Long citaIdAExcluir) {
+        DiaSemana dia = DIA_SEMANA_MAP.get(fechaAgendada.getDayOfWeek());
 
-        LocalDate fecha = fechaAgendada.toLocalDate();
+        LocalDate fecha = fechaAgendada;
         if (!fecha.isAfter(LocalDate.now()) && !fecha.isEqual(LocalDate.now())) {
             throw new RuntimeException("No se pueden agendar citas en fechas pasadas");
         }
@@ -242,20 +248,6 @@ public class CitaService {
             throw new RuntimeException("La hora está fuera del horario de atención del médico");
         }
 
-        List<Cita> citasEseDia = citasRepository.findByMedicoIdAndFecha(medicoId, fechaAgendada)
-                .stream()
-                .filter(c -> c.getEstado() != EstadoCita.CANCELADA)
-                .filter(c -> citaIdAExcluir == null || !c.getId().equals(citaIdAExcluir)) // excluir esta cita
-                .toList();
-
-        for (Cita cita : citasEseDia) {
-            LocalTime citaInicio = cita.getHora().toLocalTime();
-            LocalTime citaFin = citaInicio.plusMinutes(30);
-
-            if (!(horaFin.isBefore(citaInicio) || horaInicioDeseada.isAfter(citaFin.minusNanos(1)))) {
-                throw new RuntimeException("Ya hay una cita agendada en ese horario");
-            }
-        }
     }
 
 

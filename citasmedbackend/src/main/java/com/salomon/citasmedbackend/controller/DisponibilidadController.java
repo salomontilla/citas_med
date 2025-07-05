@@ -1,23 +1,30 @@
 package com.salomon.citasmedbackend.controller;
 
+import com.salomon.citasmedbackend.domain.cita.Cita;
 import com.salomon.citasmedbackend.domain.disponibilidad.*;
 import com.salomon.citasmedbackend.domain.medico.Medico;
 import com.salomon.citasmedbackend.domain.usuario.DetallesUsuario;
+import com.salomon.citasmedbackend.services.CitaService;
 import com.salomon.citasmedbackend.services.DisponibilidadService;
 import com.salomon.citasmedbackend.services.MedicoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
-import static com.salomon.citasmedbackend.infra.utils.FechaUtils.dividirEnBloques;
+import static com.salomon.citasmedbackend.infra.utils.FechaUtils.dividirEnBloquesDisponibles;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,6 +34,7 @@ public class DisponibilidadController {
 
 
     private final MedicoService medicoService;
+    private final CitaService citaService;
 
     @PostMapping("/medicos/registrar-disponibilidad")
     public ResponseEntity<?> registrarDisponibilidadAuth(@RequestBody @Valid DisponibilidadDTO dto,
@@ -72,7 +80,7 @@ public class DisponibilidadController {
 
     @GetMapping("/medicos/mis-disponibilidades")
     public ResponseEntity<?> obtenerMisDisponibilidadeso(@AuthenticationPrincipal DetallesUsuario user,
-                                                         @PageableDefault(size = 10) Pageable pageable) {
+                                                         @PageableDefault Pageable pageable) {
         Medico medico = medicoService.obtenerMedicoPorEmail(user.getUsername());
         return ResponseEntity.ok(disponibilidadService.obtenerDisponibilidadesPorMedico(medico.getId(), pageable)
                 .map(disponibilidad -> new DisponibilidadResponseDTO(
@@ -85,22 +93,11 @@ public class DisponibilidadController {
     }
 
     @GetMapping("/pacientes/{medicoId}/disponibilidades")
-    public ResponseEntity<?> obtenerDisponibilidadesMedicoId(
+    public ResponseEntity<?> obtenerDisponibilidadesMedicoPorFecha(
             @PathVariable Long medicoId,
-            @PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(disponibilidadService.obtenerDisponibilidadesPorMedico(medicoId, pageable)
-                .map(disponibilidad -> {
-                    List<String> bloques = dividirEnBloques(
-                            disponibilidad.getHoraInicio().toLocalTime(),
-                            disponibilidad.getHoraFin().toLocalTime()
-                    );
-                    return new BloqueDisponibilidadDTO(
-                            disponibilidad.getId(),
-                            disponibilidad.getMedico().getId(),
-                            disponibilidad.getDiaSemana().toString(),
-                            bloques
-                    );
-                })
-        );
+            @RequestParam("fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+
+        List<String> bloquesDisponibles = disponibilidadService.obtenerBloquesDisponibles(medicoId, fecha);
+        return ResponseEntity.ok(bloquesDisponibles);
     }
 }

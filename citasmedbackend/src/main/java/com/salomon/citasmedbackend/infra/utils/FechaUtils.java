@@ -1,7 +1,10 @@
 package com.salomon.citasmedbackend.infra.utils;
 
+import com.salomon.citasmedbackend.domain.disponibilidad.DiaSemana;
+
 import java.sql.Date;
 import java.sql.Time;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -28,7 +31,7 @@ public class FechaUtils {
         }
     }
 
-    public static List<String> dividirEnBloques(LocalTime inicio, LocalTime fin) {
+    public static List<String> dividirEnBloquesDisponibles(LocalTime inicio, LocalTime fin) {
         List<String> bloques = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -39,4 +42,16 @@ public class FechaUtils {
 
         return bloques;
     }
+
+    public static DiaSemana convertirADiaSemana(DayOfWeek dayOfWeek) {
+        return switch (dayOfWeek) {
+            case MONDAY -> DiaSemana.LUNES;
+            case TUESDAY -> DiaSemana.MARTES;
+            case WEDNESDAY -> DiaSemana.MIERCOLES;
+            case THURSDAY -> DiaSemana.JUEVES;
+            case FRIDAY -> DiaSemana.VIERNES;
+            case SATURDAY -> DiaSemana.SABADO;
+            case SUNDAY -> DiaSemana.DOMINGO;
+        };
+            }
 }

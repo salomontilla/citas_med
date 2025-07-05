@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { CalendarDays, Clock4 } from "lucide-react";
 import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
 import { Button, DatePicker } from "@heroui/react";
@@ -47,12 +47,36 @@ const mesesMap = [
     "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"
 ];
 
+interface Disponibilidad {
+    id: number;
+    medicoId: number;
+    diaSemana: string;
+    bloques: string[];
+}
+
 export default function SeleccionHorarioConFecha() {
     const [fechaSeleccionada, setFechaSeleccionada] = useState<CalendarDate | null>(null);
     const [bloqueSeleccionado, setBloqueSeleccionado] = useState<string | null>(null);
     const {medicoSeleccionado } = useMedicoStore();
+    const [disponibilidades, setDisponibilidades] = useState<Disponibilidad[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    console.log("Médico seleccionado:", medicoSeleccionado);
+    useEffect(() =>{
+        if (fechaSeleccionada) {
+            setLoading(true);
+            api.get(`/pacientes/${medicoSeleccionado?.id}/disponibilidades?fecha=${fechaSeleccionada?.toString()}`)
+                .then((response) => {
+                    setDisponibilidades(response.data || []);
+                })
+                .catch((error) => {
+                    console.error("Error al cargar las disponibilidades:", error);
+                    setError(error.response?.data || "Error al cargar las disponibilidades");
+                })
+                .finally(() => setLoading(false));
+        }
+    },[ fechaSeleccionada])
+
 
     // Función auxiliar para obtener el nombre del día
     const obtenerDiaSemana = (fecha: CalendarDate | null): string | null => {
@@ -62,7 +86,7 @@ export default function SeleccionHorarioConFecha() {
     };
 
     console.log("Fecha seleccionada:", formatearFecha(fechaSeleccionada));
-    console.log("Bloque seleccionado:",);
+    console.log("Bloque seleccionado:", disponibilidades);
 
     // Función auxiliar para obtener el mes
     const obtenerMes = (fecha: CalendarDate | null): string | null => {
@@ -73,7 +97,6 @@ export default function SeleccionHorarioConFecha() {
 
     const diaSemana = obtenerDiaSemana(fechaSeleccionada);
     const mes = obtenerMes(fechaSeleccionada);
-    const horariosFiltrados = DISPONIBILIDADES.filter((d) => d.diaSemana === diaSemana);
 
     
 
@@ -84,18 +107,21 @@ export default function SeleccionHorarioConFecha() {
                 <CalendarDays className="w-6 h-6" />
                 <h2 className="text-xl font-bold">Selecciona una fecha para agendar</h2>
             </div>
-
-            <DatePicker
-                color="primary"
-                label="Fecha"
-                value={fechaSeleccionada}
-                onChange={setFechaSeleccionada}
-                labelPlacement="outside"
-                className="w-fit"
-                minValue={today(getLocalTimeZone())}
-                showMonthAndYearPickers
-                isRequired
-            />
+            {
+                medicoSeleccionado && (
+                    <DatePicker
+                        color="primary"
+                        label="Fecha"
+                        value={fechaSeleccionada}
+                        onChange={setFechaSeleccionada}
+                        labelPlacement="outside"
+                        className="w-fit"
+                        minValue={today(getLocalTimeZone())}
+                        showMonthAndYearPickers
+                        isRequired
+                    />
+                )
+            }
 
             {/* HORARIOS DISPONIBLES */}
             {fechaSeleccionada && (
@@ -108,10 +134,9 @@ export default function SeleccionHorarioConFecha() {
                     </h3>
 
                     <div className="flex flex-wrap items-center justify-center gap-3">
-                        {horariosFiltrados.length > 0 ? (
-                            horariosFiltrados.flatMap((disponibilidad) =>
-                                disponibilidad.bloques.map((hora, index) => {
-                                    const bloqueId = `${disponibilidad.id}-${hora}`; // ID único combinando disponibilidad e índice
+                        {disponibilidades.length > 0 ? (
+                                disponibilidades.map((hora, index) => {
+                                    const bloqueId = `${index}-${hora}`; 
 
                                     return (
                                         <Button
@@ -127,7 +152,7 @@ export default function SeleccionHorarioConFecha() {
                                         </Button>
                                     );
                                 })
-                            )
+                            
                         ) : (
                             <p className="text-sm text-gray-500">
                                 No hay horarios disponibles para este día.
