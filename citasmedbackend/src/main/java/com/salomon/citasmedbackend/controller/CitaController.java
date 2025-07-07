@@ -33,7 +33,8 @@ public class CitaController {
         Cita cita = citaService.agendarCita(citaDto, user.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(new CitaResponseDTO(cita.getId(),
                 cita.getPaciente().getId(),
-                cita.getMedico().getId(),
+                cita.getMedico().getUsuario().getNombreCompleto(),
+                cita.getMedico().getEspecialidad(),
                 cita.getFecha().toString(),
                 cita.getHora().toString(),
                 cita.getEstado().toString()));
@@ -50,7 +51,8 @@ public class CitaController {
                 .map(cita -> new CitaResponseDTO(
                         cita.getId(),
                         cita.getPaciente().getId(),
-                        cita.getMedico().getId(),
+                        cita.getMedico().getUsuario().getNombreCompleto(),
+                        cita.getMedico().getEspecialidad(),
                         cita.getFecha().toString(),
                         cita.getHora().toString(),
                         cita.getEstado().toString()
@@ -71,7 +73,8 @@ public class CitaController {
                 .map(cita -> new CitaResponseDTO(
                         cita.getId(),
                         cita.getPaciente().getId(),
-                        cita.getMedico().getId(),
+                        cita.getMedico().getUsuario().getNombreCompleto(),
+                        cita.getMedico().getEspecialidad(),
                         cita.getFecha().toString(),
                         cita.getHora().toString(),
                         cita.getEstado().toString()
@@ -93,7 +96,8 @@ public class CitaController {
         CitaResponseDTO response = new CitaResponseDTO(
                 updatedCita.getId(),
                 updatedCita.getPaciente().getId(),
-                updatedCita.getMedico().getId(),
+                updatedCita.getMedico().getUsuario().getNombreCompleto(),
+                updatedCita.getMedico().getEspecialidad(),
                 updatedCita.getFecha().toString(),
                 updatedCita.getHora().toString(),
                 updatedCita.getEstado().toString()
@@ -112,7 +116,8 @@ public class CitaController {
         CitaResponseDTO response = new CitaResponseDTO(
                 updatedCita.getId(),
                 updatedCita.getPaciente().getId(),
-                updatedCita.getMedico().getId(),
+                updatedCita.getMedico().getUsuario().getNombreCompleto(),
+                updatedCita.getMedico().getEspecialidad(),
                 updatedCita.getFecha().toString(),
                 updatedCita.getHora().toString(),
                 updatedCita.getEstado().toString()

@@ -252,7 +252,8 @@ public class AdminController {
                 .map(cita -> new CitaResponseDTO(
                         cita.getId(),
                         cita.getPaciente().getId(),
-                        cita.getMedico().getId(),
+                        cita.getMedico().getUsuario().getNombreCompleto(),
+                        cita.getMedico().getEspecialidad(),
                         cita.getFecha().toString(),
                         cita.getHora().toString(),
                         cita.getEstado().toString()
@@ -266,7 +267,8 @@ public class AdminController {
         CitaResponseDTO response = new CitaResponseDTO(
                 cita.getId(),
                 cita.getPaciente().getId(),
-                cita.getMedico().getId(),
+                cita.getMedico().getUsuario().getNombreCompleto(),
+                cita.getMedico().getEspecialidad(),
                 cita.getFecha().toString(),
                 cita.getHora().toString(),
                 cita.getEstado().toString()
@@ -282,7 +284,8 @@ public class AdminController {
                 .map(cita -> new CitaResponseDTO(
                         cita.getId(),
                         cita.getPaciente().getId(),
-                        cita.getMedico().getId(),
+                        cita.getMedico().getUsuario().getNombreCompleto(),
+                        cita.getMedico().getEspecialidad(),
                         cita.getFecha().toString(),
                         cita.getHora().toString(),
                         cita.getEstado().toString()
@@ -298,7 +301,8 @@ public class AdminController {
                 .map(cita -> new CitaResponseDTO(
                         cita.getId(),
                         cita.getPaciente().getId(),
-                        cita.getMedico().getId(),
+                        cita.getMedico().getUsuario().getNombreCompleto(),
+                        cita.getMedico().getEspecialidad(),
                         cita.getFecha().toString(),
                         cita.getHora().toString(),
                         cita.getEstado().toString()
@@ -316,7 +320,8 @@ public class AdminController {
         CitaResponseDTO response = new CitaResponseDTO(
                 updatedCita.getId(),
                 updatedCita.getPaciente().getId(),
-                updatedCita.getMedico().getId(),
+                updatedCita.getMedico().getUsuario().getNombreCompleto(),
+                updatedCita.getMedico().getEspecialidad(),
                 updatedCita.getFecha().toString(),
                 updatedCita.getHora().toString(),
                 updatedCita.getEstado().toString()

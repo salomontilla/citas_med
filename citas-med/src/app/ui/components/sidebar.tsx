@@ -87,7 +87,7 @@ const OptionLogout = ({ open }: OptionLogoutProps) => {
     api.post("/auth/logout")
       .then(() => {
         setIsLoading(false);
-        router.push("/auth/login")
+        router.push("/login")
       })
       .catch((error) => {
         setIsLoading(false);
