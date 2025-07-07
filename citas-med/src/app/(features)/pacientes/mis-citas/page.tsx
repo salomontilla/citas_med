@@ -12,7 +12,7 @@ type Cita = {
   especialidad: string;
   fecha: string;
   hora: string;
-  estado: "AGENDADA" | "CANCELADA" | "FINALIZADA";
+  estado: "PENDIENTE" | "CANCELADA" | "CONFIRMADA" | "ATENDIDA";
 };
 
 
@@ -25,10 +25,12 @@ export default function MisCitasSection() {
   const rowsPerPage = 5;
 
   const obtenerCitas = () => {
-    api.get(`/pacientes/mis-citas?page=${page-1}`)
+    api.get(`/pacientes/mis-citas?page=${page - 1}`)
       .then((response) => {
         setCitas(response.data.content);
         setTotalPages(response.data.totalElements);
+        console.log(`ENDPOINT /pacientes/mis-citas?page=:${page - 1}`);
+
       })
       .catch((error) => {
         console.error("Error al cargar las citas:", error);
@@ -40,6 +42,7 @@ export default function MisCitasSection() {
   // Cargar citas al montar el componente y al cambiar de página
   useEffect(() => {
     obtenerCitas();
+    console.log("Pagina actual: ", page);
   }, [page]);
 
   const pages = Math.ceil(totalPages / rowsPerPage);
@@ -96,14 +99,21 @@ export default function MisCitasSection() {
         );
       case "estado":
         return (
-          <span className={`text-xs font-semibold px-2 py-1 rounded-lg ${item.estado === "AGENDADA"
-            ? "bg-green-100 text-green-700"
-            : item.estado === "CANCELADA"
-              ? "bg-red-100 text-red-700"
-              : "bg-gray-100 text-gray-700"
-            }`}>
+          <span
+            className={`text-xs font-semibold px-2 py-1 rounded-lg ${item.estado === "PENDIENTE"
+                ? "bg-yellow-100 text-yellow-700"
+                : item.estado === "CONFIRMADA"
+                ? "bg-blue-100 text-blue-700"
+                : item.estado === "ATENDIDA"
+                ? "bg-green-100 text-green-700"
+                : item.estado === "CANCELADA"
+                ? "bg-red-100 text-red-700"
+                : "bg-gray-100 text-gray-700"
+              }`}
+          >
             {item.estado}
           </span>
+
         );
       case "acciones":
         return (
@@ -146,11 +156,9 @@ export default function MisCitasSection() {
         Consulta el historial y estado de tus próximas citas médicas.
       </p>
 
-
       <Table
         isStriped
-
-        aria-label="Tabla editable de citas médicas"
+        aria-label="Tabla de citas médicas"
         bottomContent={
           pages > 0 ? (
             <div className="flex w-full justify-center">
@@ -177,7 +185,7 @@ export default function MisCitasSection() {
         </TableHeader>
         <TableBody
           emptyContent="No tienes citas registradas."
-          items={items}
+          items={citas}
           loadingContent={<Spinner />}
           loadingState={loadingState}
         >
