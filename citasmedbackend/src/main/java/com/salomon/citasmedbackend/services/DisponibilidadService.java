@@ -132,9 +132,9 @@ public class DisponibilidadService {
         LocalTime horaInicio = convertirHora(hora).toLocalTime();
         LocalTime horaFin = convertirHora(horaFinal).toLocalTime();
 
-        // 1. Validar que la hora de inicio sea antes que la hora fin
+        // 1. Validar que la horaHora de inicio sea antes que la horaHora fin
         if (!horaInicio.isBefore(horaFin)) {
-            throw new IllegalArgumentException("La hora de inicio debe ser anterior a la hora de fin.");
+            throw new IllegalArgumentException("La horaHora de inicio debe ser anterior a la horaHora de fin.");
         }
 
         // 2. Validar que no se cruce con una disponibilidad ya existente

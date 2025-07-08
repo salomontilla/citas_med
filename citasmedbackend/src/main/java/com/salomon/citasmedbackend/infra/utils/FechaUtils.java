@@ -27,7 +27,7 @@ public class FechaUtils {
         try {
             return Time.valueOf(horaString);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Formato de hora inválido. Usa HH:mm:ss");
+            throw new IllegalArgumentException("Formato de horaHora inválido. Usa HH:mm:ss");
         }
     }
 

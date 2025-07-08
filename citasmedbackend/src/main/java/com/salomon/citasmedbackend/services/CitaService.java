@@ -55,7 +55,7 @@ public class CitaService {
 
         Date formattedDate = convertirFecha(citaDto.fecha());
         Time formattedTime = convertirHora(citaDto.hora());
-        validarDisponibilidad(medico.getId(), formattedDate.toLocalDate(), formattedTime, null);
+        validarDisponibilidad(medico.getId(), formattedDate.toLocalDate(), formattedTime);
         Cita nuevaCita = new Cita(
                 paciente,
                 medico,
@@ -192,13 +192,13 @@ public class CitaService {
 
 
     private Cita validatedCitaPaciente(CitaPacienteActualizarDTO dto, Cita cita) {
-        Date nuevaFecha = dto.fecha() != null ? convertirFecha(dto.fecha()) : cita.getFecha();
-        Time nuevaHora = dto.hora() != null ? convertirHora(dto.hora()) : cita.getHora();
+        Date nuevaFecha = dto.fechaNueva() != null ? convertirFecha(dto.fechaNueva()) : cita.getFecha();
+        Time nuevaHora = dto.horaNueva() != null ? convertirHora(dto.horaNueva()) : cita.getHora();
 
-        validarDisponibilidad(cita.getMedico().getId(), nuevaFecha.toLocalDate(), nuevaHora, cita.getId());
+        validarDisponibilidad(cita.getMedico().getId(), nuevaFecha.toLocalDate(), nuevaHora);
 
-        if (dto.fecha() != null) cita.setFecha(nuevaFecha);
-        if (dto.hora() != null) cita.setHora(nuevaHora);
+        if (dto.fechaNueva() != null) cita.setFecha(nuevaFecha);
+        if (dto.horaNueva() != null) cita.setHora(nuevaHora);
 
         return citasRepository.save(cita);
     }
@@ -207,7 +207,7 @@ public class CitaService {
         Date nuevaFecha = citaDto.fecha() != null ? convertirFecha(citaDto.fecha()) : cita.getFecha();
         Time nuevaHora = citaDto.hora() != null ? convertirHora(citaDto.hora()) : cita.getHora();
 
-        validarDisponibilidad(cita.getMedico().getId(), nuevaFecha.toLocalDate(), nuevaHora, cita.getId());
+        validarDisponibilidad(cita.getMedico().getId(), nuevaFecha.toLocalDate(), nuevaHora);
 
         if (citaDto.fecha() != null) {
             cita.setFecha(nuevaFecha);
@@ -222,7 +222,7 @@ public class CitaService {
         return citasRepository.save(cita);
     }
 
-    private void validarDisponibilidad(Long medicoId, LocalDate fechaAgendada, Time horaInicio, Long citaIdAExcluir) {
+    private void validarDisponibilidad(Long medicoId, LocalDate fechaAgendada, Time horaInicio) {
         DiaSemana dia = DIA_SEMANA_MAP.get(fechaAgendada.getDayOfWeek());
 
         LocalDate fecha = fechaAgendada;
@@ -245,7 +245,7 @@ public class CitaService {
         );
 
         if (!dentroDeHorario) {
-            throw new RuntimeException("La hora está fuera del horario de atención del médico");
+            throw new RuntimeException("La horaHora está fuera del horario de atención del médico");
         }
 
     }
