@@ -68,10 +68,9 @@ export default function ConfirmacionCita({
                 });
                 onCitaAgendada?.();
 
-                setTimeout(() => {
                     setIsVisibleAlert(false);
                     onOpenChange();
-                }, 1000);
+                
 
             })
             .catch((error) => {

@@ -9,12 +9,14 @@ import {
   ModalFooter,
   useDisclosure,
   Calendar,
-  CalendarDate
+  CalendarDate,
+  Alert
 } from "@heroui/react";
 import { CalendarDays, Clock4, UserCircle2, Stethoscope, Pencil, XCircle, CalendarIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Key } from "@react-types/shared";
 import api from "@/app/lib/axios";
+import { formatearFecha } from "@/app/lib/utils";
 
 type Cita = {
   id: string;
@@ -25,6 +27,18 @@ type Cita = {
   estado: "PENDIENTE" | "CANCELADA" | "CONFIRMADA" | "ATENDIDA";
 };
 
+const editarCita = (idCita: number, fecha: string | null, hora: string | null) => {
+  api.patch(`/pacientes/citas/editar-cita/${idCita}`, {
+    fechaNueva: fecha,
+    horaNueva: hora
+  })
+    .then(() => {
+
+    })
+    .catch((error) => {
+      console.error("Error al editar la cita:", error);
+    });
+}
 
 export default function MisCitasSection() {
 
@@ -32,6 +46,7 @@ export default function MisCitasSection() {
   const [loading, setIsLoading] = useState(true);
   const [citas, setCitas] = useState<Cita[]>([]);
   const [totalPages, setTotalPages] = useState(0);
+  const [idCitaSeleccionada, setIdCitaSeleccionada] = useState<number | null>(null);
   const rowsPerPage = 5;
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -54,17 +69,16 @@ export default function MisCitasSection() {
   // Cargar citas al montar el componente y al cambiar de página
   useEffect(() => {
     obtenerCitas();
-    console.log("Pagina actual: ", page);
   }, [page]);
 
   const pages = Math.ceil(totalPages / rowsPerPage);
 
-  const editarCita = (id: number, fecha?: string, hora?: string) => {
-
-    api.patch(`/pacientes/citas/${id}`, {
-
-    })
+  const handleEditarCita = (idCita: number) => {
+    onOpen();
+    setIdCitaSeleccionada(idCita);
   };
+
+
 
   const cancelarCita = (id: number) => {
     console.log("Cancelar cita ID:", id);
@@ -129,7 +143,7 @@ export default function MisCitasSection() {
                 isIconOnly
                 color="primary"
                 variant="light"
-                onPress={() => onOpen()}
+                onPress={() => handleEditarCita(parseInt(item.id))}
               >
                 <Pencil className="w-4 h-4" />
               </Button>
@@ -195,100 +209,152 @@ export default function MisCitasSection() {
           loadingContent={<Spinner />}
           loadingState={loadingState}
         >
-          {(item: Cita
-          ) => (
-            <TableRow key={item?.id}>
-              {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-            </TableRow>
-          )}
+          {
+            (item: Cita) => {
+              console.log("Cita actual:", item.id);
+
+              return (
+                <TableRow key={item?.id}>
+                  {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                </TableRow>
+              )
+            }
+          }
         </TableBody>
       </Table>
 
       {/* Modal de edición de cita */}
-      <ModalEdicionCita
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        cita={citas.find(cita => cita.id === "1")} // Aquí deberías pasar la cita seleccionada
-        />
+      {
+        idCitaSeleccionada !== null && (
+          <ModalEdicionCita
+            isOpen={isOpen}
+            onOpenChange={onOpenChange}
+            idCita={idCitaSeleccionada}
+          />
+        )
+      }
 
-
-    </section>                                  
+    </section>
   );
 }
 interface ModalEdicionCitaProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  cita?: Cita;
-  onConfirm?: (fecha: string, hora: string) => void;
+  idCita: number;
+
 }
-const ModalEdicionCita = ({ isOpen, onOpenChange, cita, onConfirm }: ModalEdicionCitaProps) => {
+const ModalEdicionCita = ({ isOpen, onOpenChange, idCita }: ModalEdicionCitaProps) => {
   const [fechaSeleccionada, setFechaSeleccionada] = useState<CalendarDate | null>(null);
   const [horaSeleccionada, setHoraSeleccionada] = useState(null);
   const [horariosDisponibles, setHorariosDisponibles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const { isOpen: isModalOpen, onOpen, onOpenChange: onModalOpenChange } = useDisclosure();
 
-  return(
+  const puedeAgendar =
+    fechaSeleccionada !== null &&
+    horaSeleccionada !== null;
 
-  <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="xl">
-    <ModalContent>
-      {(onClose) => (
-        <>
-          <ModalHeader className="flex flex-col gap-1">
-            Seleccionar cita
-          </ModalHeader>
-          <ModalBody>
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <label className="text-sm font-semibold text-blue-700 flex items-center gap-2 mb-2">
-                  <CalendarIcon className="w-4 h-4" />
-                  Selecciona una fecha:
-                </label>
-                <Calendar
-                  aria-label="Calendario de citas"
-                  value={fechaSeleccionada}
-                  onChange={setFechaSeleccionada}
-                  className="rounded-xl border border-blue-300 p-2"
-                />
-              </div>
+  return (
+    <>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="xl">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Seleccionar cita
+              </ModalHeader>
+              <ModalBody>
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="flex-1">
+                    <label className="text-sm font-semibold text-blue-700 flex items-center gap-2 mb-2">
+                      <CalendarIcon className="w-4 h-4" />
+                      Selecciona una fecha:
+                    </label>
+                    <Calendar
+                      aria-label="Calendario de citas"
+                      value={fechaSeleccionada}
+                      onChange={setFechaSeleccionada}
+                    />
+                  </div>
 
-              <div className="flex-1">
-                <label className="text-sm font-semibold text-blue-700 flex items-center gap-2 mb-2">
-                  <Clock4 className="w-4 h-4" />
-                  Horarios disponibles:
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {horariosDisponibles.length > 0 ? (
-                    horariosDisponibles.map((hora, idx) => (
-                      <Button
-                        key={idx}
-                        size="sm"
-                        variant={hora === horaSeleccionada ? "solid" : "light"}
-                        color={horaSeleccionada === hora ? "primary" : "default"}
-                        onPress={() => setHoraSeleccionada(hora)}
-                      >
-                        {hora}
-                      </Button>
-                    ))
-                  ) : (
-                    <p className="text-gray-500 text-sm">No hay horarios para esta fecha.</p>
-                  )}
+                  <div className="flex-1">
+                    <label className="text-sm font-semibold text-blue-700 flex items-center gap-2 mb-2">
+                      <Clock4 className="w-4 h-4" />
+                      Horarios disponibles:
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {/* ESTA PARTE SE REEMPLAZA CON EL COMPONENTE */}
+                      {horariosDisponibles.length > 0 ? (
+                        horariosDisponibles.map((hora, idx) => (
+                          <Button
+                            key={idx}
+                            size="sm"
+                            variant={hora === horaSeleccionada ? "solid" : "light"}
+                            color={horaSeleccionada === hora ? "primary" : "default"}
+                            onPress={() => setHoraSeleccionada(hora)}
+                          >
+                            {hora}
+                          </Button>
+                        ))
+                      ) : (
+                        <p className="text-gray-500 text-sm">No hay horarios para esta fecha.</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </ModalBody>
-          <ModalFooter>
-            <Button color="default" onPress={onClose}>
-              Cancelar
-            </Button>
-            <Button
-              color="primary"
-              isDisabled={!fechaSeleccionada || !horaSeleccionada}
-              
-            >
-              Confirmar cita
-            </Button>
-          </ModalFooter>
-        </>
-      )}
-    </ModalContent>
-  </Modal>);
+              </ModalBody>
+              <ModalFooter>
+                <Button color="default" onPress={onClose}>
+                  Cancelar
+                </Button>
+                {puedeAgendar && (
+                  <Button
+                    isLoading={loading}
+                    color="primary"
+                    radius="lg"
+                    className="mt-4 self-start"
+                    onPress={() => onOpen()}
+                  >
+                    Agendar cita
+                  </Button>
+
+                )}
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      {/* MODAL DE CONFIRMACIÓN DE CITA */}
+      <Modal isOpen={isModalOpen} onOpenChange={onModalOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Deseas agendar la cita?</ModalHeader>
+              <ModalBody>
+                <p>
+                  Al confirmar, se editará la cita con el médico previamente seleccionado para la fecha y hora indicadas.
+                </p>
+
+              </ModalBody>
+              <ModalFooter className="flex flex-col">
+                <div className="flex w-full justify-center gap-3">
+                  <Button color="default" onPress={onClose}>
+                    Cancelar
+                  </Button>
+                  <Button
+                    isLoading={loading}
+                    color="primary"
+                    onPress={() => {
+                      editarCita(idCita, formatearFecha(fechaSeleccionada), horaSeleccionada);
+                    }}>
+                    Agendar cita
+                  </Button>
+                </div>
+                
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    </>);
 }
