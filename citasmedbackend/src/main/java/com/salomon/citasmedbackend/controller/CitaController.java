@@ -50,7 +50,7 @@ public class CitaController {
         Page<CitaResponseDTO> citasResponse = citas
                 .map(cita -> new CitaResponseDTO(
                         cita.getId(),
-                        cita.getPaciente().getId(),
+                        cita.getMedico().getId(),
                         cita.getMedico().getUsuario().getNombreCompleto(),
                         cita.getMedico().getEspecialidad(),
                         cita.getFecha().toString(),

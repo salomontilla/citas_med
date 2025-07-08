@@ -13,13 +13,17 @@ import {
   Alert
 } from "@heroui/react";
 import { CalendarDays, Clock4, UserCircle2, Stethoscope, Pencil, XCircle, CalendarIcon } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import { Key } from "@react-types/shared";
 import api from "@/app/lib/axios";
 import { formatearFecha } from "@/app/lib/utils";
+import { cargarDisponibilidades } from "../agendar-cita/seleccionDisponibilidad";
+import { TabItem } from "flowbite-react";
+import { getLocalTimeZone, today } from "@internationalized/date";
 
 type Cita = {
   id: string;
+  idMedico: number;
   nombreMedico: string;
   especialidad: string;
   fecha: string;
@@ -28,12 +32,13 @@ type Cita = {
 };
 
 const editarCita = (idCita: number, fecha: string | null, hora: string | null) => {
-  api.patch(`/pacientes/citas/editar-cita/${idCita}`, {
+  console.log("Editar cita con ID:", idCita, "Fecha:", fecha, "Hora:", hora);
+  api.patch(`/pacientes/editar-cita/${idCita}`, {
     fechaNueva: fecha,
-    horaNueva: hora
+    horaNueva: hora?.substring(hora?.indexOf('-') + 1) + ":00"
   })
     .then(() => {
-
+        
     })
     .catch((error) => {
       console.error("Error al editar la cita:", error);
@@ -47,6 +52,7 @@ export default function MisCitasSection() {
   const [citas, setCitas] = useState<Cita[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [idCitaSeleccionada, setIdCitaSeleccionada] = useState<number | null>(null);
+  const [idMedicoSeleccionada, setIdMedicoSeleccionada] = useState<number | null>(null);
   const rowsPerPage = 5;
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -73,9 +79,13 @@ export default function MisCitasSection() {
 
   const pages = Math.ceil(totalPages / rowsPerPage);
 
-  const handleEditarCita = (idCita: number) => {
+  const handleEditarCita = (idCita: number, idMedico:number) => {
+    setIdCitaSeleccionada(null);
+    setIdMedicoSeleccionada(null);
     onOpen();
     setIdCitaSeleccionada(idCita);
+    setIdMedicoSeleccionada(idMedico);
+    console.log("Editar cita ID:", idCita, "ID Médico:", idMedico);
   };
 
 
@@ -143,7 +153,7 @@ export default function MisCitasSection() {
                 isIconOnly
                 color="primary"
                 variant="light"
-                onPress={() => handleEditarCita(parseInt(item.id))}
+                onPress={() => handleEditarCita(parseInt(item.id), item.idMedico)}
               >
                 <Pencil className="w-4 h-4" />
               </Button>
@@ -225,11 +235,12 @@ export default function MisCitasSection() {
 
       {/* Modal de edición de cita */}
       {
-        idCitaSeleccionada !== null && (
+        idCitaSeleccionada !== null && idMedicoSeleccionada && (
           <ModalEdicionCita
             isOpen={isOpen}
             onOpenChange={onOpenChange}
             idCita={idCitaSeleccionada}
+            idMedico={idMedicoSeleccionada}
           />
         )
       }
@@ -241,18 +252,34 @@ interface ModalEdicionCitaProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   idCita: number;
+  idMedico: number | null;
 
 }
-const ModalEdicionCita = ({ isOpen, onOpenChange, idCita }: ModalEdicionCitaProps) => {
+const ModalEdicionCita = ({ isOpen, onOpenChange, idCita, idMedico}: ModalEdicionCitaProps) => {
   const [fechaSeleccionada, setFechaSeleccionada] = useState<CalendarDate | null>(null);
-  const [horaSeleccionada, setHoraSeleccionada] = useState(null);
   const [horariosDisponibles, setHorariosDisponibles] = useState([]);
   const [loading, setLoading] = useState(false);
   const { isOpen: isModalOpen, onOpen, onOpenChange: onModalOpenChange } = useDisclosure();
+  const [disponibilidades, setDisponibilidades] = useState<string[]>([]);
+  const [bloqueSeleccionado, setBloqueSeleccionado] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (fechaSeleccionada) {
+      cargarDisponibilidades(
+        fechaSeleccionada,
+        idMedico,
+        setDisponibilidades,
+        setLoading,
+        (error) => console.error("Error al cargar disponibilidades:", error)
+      );
+    } else {
+      setDisponibilidades([]);
+    }
+  },[fechaSeleccionada, idMedico]);
 
   const puedeAgendar =
     fechaSeleccionada !== null &&
-    horaSeleccionada !== null;
+    bloqueSeleccionado !== null;
 
   return (
     <>
@@ -274,6 +301,7 @@ const ModalEdicionCita = ({ isOpen, onOpenChange, idCita }: ModalEdicionCitaProp
                       aria-label="Calendario de citas"
                       value={fechaSeleccionada}
                       onChange={setFechaSeleccionada}
+                      minValue={today(getLocalTimeZone())}
                     />
                   </div>
 
@@ -282,28 +310,35 @@ const ModalEdicionCita = ({ isOpen, onOpenChange, idCita }: ModalEdicionCitaProp
                       <Clock4 className="w-4 h-4" />
                       Horarios disponibles:
                     </label>
-                    <div className="flex flex-wrap gap-2">
-                      {/* ESTA PARTE SE REEMPLAZA CON EL COMPONENTE */}
-                      {horariosDisponibles.length > 0 ? (
-                        horariosDisponibles.map((hora, idx) => (
-                          <Button
-                            key={idx}
-                            size="sm"
-                            variant={hora === horaSeleccionada ? "solid" : "light"}
-                            color={horaSeleccionada === hora ? "primary" : "default"}
-                            onPress={() => setHoraSeleccionada(hora)}
-                          >
-                            {hora}
-                          </Button>
-                        ))
+                    <div className="flex flex-wrap items-center justify-center gap-3">
+                      {disponibilidades.length > 0 ? (
+                        disponibilidades.map((hora, index) => {
+                          const bloqueId = `${index}-${hora}`;
+                          return (
+                            <Button
+                              key={bloqueId}
+                              onPress={() => setBloqueSeleccionado(bloqueId)}
+                              className={`px-4 py-2 rounded-lg border text-sm flex items-center gap-2 ${bloqueSeleccionado === bloqueId
+                                ? "bg-blue-600 text-white border-blue-700"
+                                : "bg-white text-blue-700 border-blue-300 hover:bg-blue-100"
+                                }`}
+                            >
+                              <Clock4 className="w-4 h-4" />
+                              {hora}
+                            </Button>
+                          );
+                        })
+
                       ) : (
-                        <p className="text-gray-500 text-sm">No hay horarios para esta fecha.</p>
+                        <p className="text-sm text-gray-500">
+                          No hay horarios disponibles para este día.
+                        </p>
                       )}
                     </div>
                   </div>
                 </div>
               </ModalBody>
-              <ModalFooter>
+              <ModalFooter className="flex gap-4">
                 <Button color="default" onPress={onClose}>
                   Cancelar
                 </Button>
@@ -312,7 +347,6 @@ const ModalEdicionCita = ({ isOpen, onOpenChange, idCita }: ModalEdicionCitaProp
                     isLoading={loading}
                     color="primary"
                     radius="lg"
-                    className="mt-4 self-start"
                     onPress={() => onOpen()}
                   >
                     Agendar cita
@@ -324,12 +358,13 @@ const ModalEdicionCita = ({ isOpen, onOpenChange, idCita }: ModalEdicionCitaProp
           )}
         </ModalContent>
       </Modal>
+
       {/* MODAL DE CONFIRMACIÓN DE CITA */}
       <Modal isOpen={isModalOpen} onOpenChange={onModalOpenChange}>
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Deseas agendar la cita?</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">Deseas modificar la cita?</ModalHeader>
               <ModalBody>
                 <p>
                   Al confirmar, se editará la cita con el médico previamente seleccionado para la fecha y hora indicadas.
@@ -345,12 +380,12 @@ const ModalEdicionCita = ({ isOpen, onOpenChange, idCita }: ModalEdicionCitaProp
                     isLoading={loading}
                     color="primary"
                     onPress={() => {
-                      editarCita(idCita, formatearFecha(fechaSeleccionada), horaSeleccionada);
+                      editarCita(idCita, formatearFecha(fechaSeleccionada), bloqueSeleccionado);
                     }}>
-                    Agendar cita
+                    Modificar cita
                   </Button>
                 </div>
-                
+
               </ModalFooter>
             </>
           )}

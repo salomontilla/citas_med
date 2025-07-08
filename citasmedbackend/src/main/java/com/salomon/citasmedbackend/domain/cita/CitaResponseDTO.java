@@ -4,7 +4,7 @@ import com.salomon.citasmedbackend.domain.medico.Especialidad;
 
 public record CitaResponseDTO (
     Long id,
-    Long pacienteId,
+    Long idMedico,
     String nombreMedico,
     Especialidad especialidad,
     String fecha,

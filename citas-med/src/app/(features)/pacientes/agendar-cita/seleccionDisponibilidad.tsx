@@ -48,30 +48,21 @@ const mesesMap = [
 ];
 
 export default function SeleccionHorarioConFecha() {
+    const { medicoSeleccionado, limpiarMedico } = useMedicoStore();
     const [fechaSeleccionada, setFechaSeleccionada] = useState<CalendarDate | null>(null);
     const [bloqueSeleccionado, setBloqueSeleccionado] = useState<string | null>(null);
-    const { medicoSeleccionado, limpiarMedico } = useMedicoStore();
     const [disponibilidades, setDisponibilidades] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const cargarDisponibilidades = () => {
-        if (fechaSeleccionada && medicoSeleccionado) {
-            setLoading(true);
-            api.get(`/pacientes/${medicoSeleccionado?.id}/disponibilidades?fecha=${fechaSeleccionada?.toString()}`)
-                .then((response) => {
-                    setDisponibilidades(response.data || []);
-                })
-                .catch((error) => {
-                    console.error("Error al cargar las disponibilidades:", error);
-                    setError(error.response?.data || "Error al cargar las disponibilidades");
-                })
-                .finally(() => setLoading(false));
-        }
-    }
-
     useEffect(() => {
-        cargarDisponibilidades();
+        cargarDisponibilidades(
+            fechaSeleccionada,
+            medicoSeleccionado?.id ?? null,
+            setDisponibilidades,
+            setLoading,
+            setError
+        );
     }, [fechaSeleccionada, medicoSeleccionado]);
 
 
@@ -166,7 +157,13 @@ export default function SeleccionHorarioConFecha() {
                     setFechaSeleccionada(null);
                     setBloqueSeleccionado(null);
                     limpiarMedico();
-                    cargarDisponibilidades();
+                    cargarDisponibilidades(
+                        null,
+                        null,
+                        setDisponibilidades,
+                        setLoading,
+                        setError
+                    );
                 }
                 }
 
@@ -174,3 +171,23 @@ export default function SeleccionHorarioConFecha() {
         </div>
     );
 }
+export const cargarDisponibilidades = (
+    fechaSeleccionada: CalendarDate | null,
+    medicoSeleccionado: number | null,
+    setDisponibilidades: (disponibilidades: string[]) => void,
+    setLoading: (loading: boolean) => void,
+    setError: (error: string | null) => void
+) => {
+        if (fechaSeleccionada && medicoSeleccionado) {
+            setLoading(true);
+            api.get(`/pacientes/${medicoSeleccionado}/disponibilidades?fecha=${fechaSeleccionada?.toString()}`)
+                .then((response) => {
+                    setDisponibilidades(response.data || []);
+                })
+                .catch((error) => {
+                    console.error("Error al cargar las disponibilidades:", error);
+                    setError(error.response?.data || "Error al cargar las disponibilidades");
+                })
+                .finally(() => setLoading(false));
+        }
+    }
