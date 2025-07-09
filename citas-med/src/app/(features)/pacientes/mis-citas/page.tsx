@@ -42,7 +42,10 @@ export default function MisCitasSection() {
   const [citas, setCitas] = useState<Cita[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [idCitaSeleccionada, setIdCitaSeleccionada] = useState<number | null>(null);
+  const [idCitaSeleccionadaCancelar, setIdCitaSeleccionadaCancelar] = useState<number | null>(null);
   const [idMedicoSeleccionada, setIdMedicoSeleccionada] = useState<number | null>(null);
+  const [errorCargarCitas, setErrorCargarCitas] = useState<string | null>(null);
+  const [isOpenModalCancelar, setIsOpenModalCancelar] = useState(false);
   const rowsPerPage = 5;
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -53,7 +56,7 @@ export default function MisCitasSection() {
         setTotalPages(response.data.totalElements);
       })
       .catch((error) => {
-        console.error("Error al cargar las citas:", error);
+        setErrorCargarCitas(error.response?.data || "Error al cargar las citas");
       })
       .finally(() => {
         setIsLoading(false)
@@ -75,12 +78,14 @@ export default function MisCitasSection() {
     setIdMedicoSeleccionada(idMedico);
   };
 
-
-
-  const cancelarCita = (id: number) => {
-    console.log("Cancelar cita ID:", id);
-    // Aquí llamas a tu endpoint de cancelación
+  const handleCancelarCita = (id: number) => {
+    console.log("ID de cita a cancelar:", id);
+    setIdCitaSeleccionadaCancelar(id);
+    setIsOpenModalCancelar(true);
   };
+
+
+
   const loadingState = loading || citas.length === 0 ? "loading" : "idle";
 
   function renderCell(item: Cita, columnKey: Key): React.ReactNode {
@@ -150,7 +155,7 @@ export default function MisCitasSection() {
                 isIconOnly
                 color="danger"
                 variant="light"
-                onPress={() => cancelarCita(parseInt(item.id))}
+                onPress={() => handleCancelarCita(parseInt(item.id))}
               >
                 <XCircle className="w-4 h-4" />
               </Button>
@@ -232,6 +237,16 @@ export default function MisCitasSection() {
           />
         )
       }
+      {/* Modal de confirmación de cancelación */}
+      <ModalCancelarCita
+        isOpen={isOpenModalCancelar}
+        onOpenChange={setIsOpenModalCancelar}
+        idCita={idCitaSeleccionadaCancelar}
+        onCancelSuccess={() => {
+          obtenerCitas();
+          setIsOpenModalCancelar(false);
+        }}
+      />
 
     </section>
   );
@@ -446,4 +461,95 @@ const ModalEdicionCita = ({ isOpen, onOpenChange, idCita, idMedico, onEditSucces
         </ModalContent>
       </Modal>
     </>);
+}
+
+interface ModalCancelarCitaProps {
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+  idCita: number | null;
+  onCancelSuccess: () => void;
+}
+
+const ModalCancelarCita = ({ isOpen, onOpenChange, idCita, onCancelSuccess }: ModalCancelarCitaProps) => {
+  const [loading, setLoading] = useState(false);
+  const [isVisibleAlert, setIsVisibleAlert] = useState(false);
+  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState("");
+  console.log("ID de cita en ModalCancelarCita:", idCita);
+  const cancelarCita = () => {
+    if (idCita === null) return;
+
+    setLoading(true);
+    api.patch(`/pacientes/cancelar-cita/${idCita}`)
+      .then(() => {
+        onCancelSuccess();
+        addToast({
+          color: "success",
+          title: "Cita cancelada Exitosamente",
+          description: "Tu cita ha sido cancelada correctamente.",
+          timeout: 5000,
+          shouldShowTimeoutProgress: true,
+        });
+        onOpenChange(false);
+      })
+      .catch((error) => {
+        setIsVisibleAlert(true);
+        setDescription(error.response?.data || "Error al cancelar la cita");
+        setTitle("Error");
+        
+      })
+      .finally(() => setLoading(false));
+  };
+
+  return (
+    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className="flex items-center gap-2 text-red-600">
+              <XCircle className="w-5 h-5" />
+              Confirmar cancelación
+            </ModalHeader>
+
+            <div className="border-t border-gray-200" />
+
+            <ModalBody>
+              <p className="text-sm text-gray-700">
+                Estás a punto de cancelar una cita médica. Esta acción no se puede deshacer.
+              </p>
+            </ModalBody>
+
+            <div className="border-t border-gray-200" />
+
+            <ModalFooter className="flex flex-col gap-2">
+              <div className="flex w-full justify-end gap-3">
+                {isVisibleAlert && (
+                  <Alert
+                    color="danger"
+                    className="w-full mb-4"
+                    onClose={() => setIsVisibleAlert(false)}
+                  >
+                    <span className="font-semibold">{title}</span>
+                    <p>{description}</p>
+                  </Alert>
+                )}
+                <Button variant="light" onPress={onClose}>
+                  Cancelar
+                </Button>
+
+                <Button
+                  isLoading={loading}
+                  color="danger"
+                  onPress={cancelarCita}
+                  startContent={<XCircle className="w-4 h-4" />}
+                >
+                  Cancelar cita
+                </Button>
+              </div>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
+  );
 }
