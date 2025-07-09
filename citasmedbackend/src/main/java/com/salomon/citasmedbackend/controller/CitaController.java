@@ -46,6 +46,7 @@ public class CitaController {
                                                   @PageableDefault(size = 5) Pageable pageable) {
         Paciente paciente = pacienteService.obtenerPacientePorEmail(user.getUsername());
         Page<Cita> citas = citaService.obtenerCitasPorPacienteId(paciente.getId(), pageable);
+        citaService.cancelarCitasPendientesPasadas(paciente.getId());
 
         Page<CitaResponseDTO> citasResponse = citas
                 .map(cita -> new CitaResponseDTO(

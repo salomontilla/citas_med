@@ -187,7 +187,6 @@ export default function MisCitasSection() {
       <Table
         isStriped
         aria-label="Tabla de citas médicas"
-        disabledKeys={["11"]}
         bottomContent={
           pages > 0 ? (
             <div className="flex w-full justify-center">

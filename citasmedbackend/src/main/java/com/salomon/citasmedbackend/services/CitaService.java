@@ -7,6 +7,7 @@ import com.salomon.citasmedbackend.domain.medico.Medico;
 import com.salomon.citasmedbackend.domain.paciente.Paciente;
 import com.salomon.citasmedbackend.domain.usuario.Usuario;
 import com.salomon.citasmedbackend.repository.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -202,6 +203,22 @@ public class CitaService {
 
         return citasRepository.save(cita);
     }
+
+    public void cancelarCitasPendientesPasadas(Long pacienteId) {
+
+        Date hoy = Date.valueOf(LocalDate.now());
+
+        List<Cita> citasPendientesPasadas = citasRepository.findByPacienteIdAndFechaBeforeAndEstado(
+                pacienteId, hoy, EstadoCita.PENDIENTE
+        );
+
+        for (Cita cita : citasPendientesPasadas) {
+            cita.setEstado(EstadoCita.CANCELADA);
+        }
+
+        citasRepository.saveAll(citasPendientesPasadas);
+    }
+
 
     private Cita validatedCitaAdmin(CitaActualizarDTO citaDto, Cita cita) {
         Date nuevaFecha = citaDto.fecha() != null ? convertirFecha(citaDto.fecha()) : cita.getFecha();
