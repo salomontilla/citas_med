@@ -35,19 +35,24 @@ type Cita = {
 
 
 export default function MisCitasSection() {
-  
-  const [isEditarCitaExitoso, setIsEditarCitaExitoso] = useState(false);
+  // Estados para manejar la paginación y el estado de carga
   const [page, setPage] = useState(1);
   const [loading, setIsLoading] = useState(true);
   const [citas, setCitas] = useState<Cita[]>([]);
   const [totalPages, setTotalPages] = useState(0);
+  const [errorCargarCitas, setErrorCargarCitas] = useState<string | null>(null);
+
+  // Estados para manejar la edición de citas
   const [idCitaSeleccionada, setIdCitaSeleccionada] = useState<number | null>(null);
   const [idCitaSeleccionadaCancelar, setIdCitaSeleccionadaCancelar] = useState<number | null>(null);
   const [idMedicoSeleccionada, setIdMedicoSeleccionada] = useState<number | null>(null);
-  const [errorCargarCitas, setErrorCargarCitas] = useState<string | null>(null);
+  const [isEditarCitaExitoso, setIsEditarCitaExitoso] = useState(false);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  // Estados para manejar la cancelación de citas
+  const [estadoCitaSeleccionada, setEstadoCitaSeleccionada] = useState<string | null>(null);
   const [isOpenModalCancelar, setIsOpenModalCancelar] = useState(false);
   const rowsPerPage = 5;
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const obtenerCitas = () => {
     api.get(`/pacientes/mis-citas?page=${page - 1}`)
@@ -70,7 +75,8 @@ export default function MisCitasSection() {
 
   const pages = Math.ceil(totalPages / rowsPerPage);
 
-  const handleEditarCita = (idCita: number, idMedico: number) => {
+
+  const handleEditarCita = (idCita: number, idMedico: number, estado: string) => {
     setIdCitaSeleccionada(null);
     setIdMedicoSeleccionada(null);
     onOpen();
@@ -78,13 +84,11 @@ export default function MisCitasSection() {
     setIdMedicoSeleccionada(idMedico);
   };
 
-  const handleCancelarCita = (id: number) => {
-    console.log("ID de cita a cancelar:", id);
+  const handleCancelarCita = (id: number, estado: string) => {
+    setEstadoCitaSeleccionada(estado);
     setIdCitaSeleccionadaCancelar(id);
     setIsOpenModalCancelar(true);
   };
-
-
 
   const loadingState = loading || citas.length === 0 ? "loading" : "idle";
 
@@ -143,9 +147,10 @@ export default function MisCitasSection() {
             <Tooltip content="Editar cita" placement="top">
               <Button
                 isIconOnly
+                isDisabled={item.estado === "CANCELADA" || item.estado === "ATENDIDA"}
                 color="primary"
                 variant="light"
-                onPress={() => handleEditarCita(parseInt(item.id), item.idMedico)}
+                onPress={() => handleEditarCita(parseInt(item.id), item.idMedico, item.estado)}
               >
                 <Pencil className="w-4 h-4" />
               </Button>
@@ -153,9 +158,10 @@ export default function MisCitasSection() {
             <Tooltip content="Cancelar cita" placement="top">
               <Button
                 isIconOnly
+                isDisabled={item.estado === "CANCELADA" || item.estado === "ATENDIDA"}
                 color="danger"
                 variant="light"
-                onPress={() => handleCancelarCita(parseInt(item.id))}
+                onPress={() => handleCancelarCita(parseInt(item.id), item.estado)}
               >
                 <XCircle className="w-4 h-4" />
               </Button>
@@ -181,6 +187,7 @@ export default function MisCitasSection() {
       <Table
         isStriped
         aria-label="Tabla de citas médicas"
+        disabledKeys={["11"]}
         bottomContent={
           pages > 0 ? (
             <div className="flex w-full justify-center">
@@ -213,10 +220,10 @@ export default function MisCitasSection() {
         >
           {
             (item: Cita) => {
-              console.log("Cita actual:", item.id);
-
               return (
-                <TableRow key={item?.id}>
+                <TableRow
+                  key={item?.id}
+                >
                   {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                 </TableRow>
               )
@@ -237,6 +244,7 @@ export default function MisCitasSection() {
           />
         )
       }
+
       {/* Modal de confirmación de cancelación */}
       <ModalCancelarCita
         isOpen={isOpenModalCancelar}
@@ -245,6 +253,7 @@ export default function MisCitasSection() {
         onCancelSuccess={() => {
           obtenerCitas();
           setIsOpenModalCancelar(false);
+
         }}
       />
 
@@ -275,9 +284,9 @@ const ModalEdicionCita = ({ isOpen, onOpenChange, idCita, idMedico, onEditSucces
       fechaNueva: fecha,
       horaNueva: formatearHora(hora)
     })
-    .then(() => {
-      onEditSuccess();
-      addToast({
+      .then(() => {
+        onEditSuccess();
+        addToast({
           color: "success",
           title: "Cita editada Exitosamente",
           description: "Tu cita ha sido editada correctamente.",
@@ -291,14 +300,14 @@ const ModalEdicionCita = ({ isOpen, onOpenChange, idCita, idMedico, onEditSucces
         setDisponibilidades([]);
 
       })
-      
+
       .catch((error) => {
         setIsVisibleAlert(true);
         setDescription(error.response?.data || "Error al editar la cita");
         setTitle("Error");
       })
       .finally(() => (setLoading(false)));
-}
+  }
 
   useEffect(() => {
     if (fechaSeleccionada) {
@@ -476,6 +485,7 @@ const ModalCancelarCita = ({ isOpen, onOpenChange, idCita, onCancelSuccess }: Mo
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
   console.log("ID de cita en ModalCancelarCita:", idCita);
+
   const cancelarCita = () => {
     if (idCita === null) return;
 
@@ -496,7 +506,7 @@ const ModalCancelarCita = ({ isOpen, onOpenChange, idCita, onCancelSuccess }: Mo
         setIsVisibleAlert(true);
         setDescription(error.response?.data || "Error al cancelar la cita");
         setTitle("Error");
-        
+
       })
       .finally(() => setLoading(false));
   };
