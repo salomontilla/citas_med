@@ -14,12 +14,11 @@ import {
   addToast
 } from "@heroui/react";
 import { CalendarDays, Clock4, UserCircle2, Stethoscope, Pencil, XCircle, CalendarIcon, AlertTriangle } from "lucide-react";
-import { use, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Key } from "@react-types/shared";
 import api from "@/app/lib/axios";
 import { formatearFecha, formatearHora } from "@/app/lib/utils";
 import { cargarDisponibilidades } from "../agendar-cita/seleccionDisponibilidad";
-import { TabItem } from "flowbite-react";
 import { getLocalTimeZone, today } from "@internationalized/date";
 
 type Cita = {
@@ -32,8 +31,6 @@ type Cita = {
   estado: "PENDIENTE" | "CANCELADA" | "CONFIRMADA" | "ATENDIDA";
 };
 
-
-
 export default function MisCitasSection() {
   // Estados para manejar la paginación y el estado de carga
   const [page, setPage] = useState(1);
@@ -41,6 +38,9 @@ export default function MisCitasSection() {
   const [citas, setCitas] = useState<Cita[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [errorCargarCitas, setErrorCargarCitas] = useState<string | null>(null);
+  const loadingState = loading || citas.length === 0 ? "loading" : "idle";
+  const rowsPerPage = 5;
+  const pages = Math.ceil(totalPages / rowsPerPage);
 
   // Estados para manejar la edición de citas
   const [idCitaSeleccionada, setIdCitaSeleccionada] = useState<number | null>(null);
@@ -52,8 +52,7 @@ export default function MisCitasSection() {
   // Estados para manejar la cancelación de citas
   const [estadoCitaSeleccionada, setEstadoCitaSeleccionada] = useState<string | null>(null);
   const [isOpenModalCancelar, setIsOpenModalCancelar] = useState(false);
-  const rowsPerPage = 5;
-
+  
   const obtenerCitas = () => {
     api.get(`/pacientes/mis-citas?page=${page - 1}`)
       .then((response) => {
@@ -66,15 +65,12 @@ export default function MisCitasSection() {
       .finally(() => {
         setIsLoading(false)
       });
-  }
-
+    }
+    
   // Cargar citas al montar el componente y al cambiar de página
   useEffect(() => {
     obtenerCitas();
   }, [page, isEditarCitaExitoso]);
-
-  const pages = Math.ceil(totalPages / rowsPerPage);
-
 
   const handleEditarCita = (idCita: number, idMedico: number, estado: string) => {
     setIdCitaSeleccionada(null);
@@ -90,8 +86,7 @@ export default function MisCitasSection() {
     setIsOpenModalCancelar(true);
   };
 
-  const loadingState = loading || citas.length === 0 ? "loading" : "idle";
-
+  // Renderiza el contenido de cada celda según la clave de la columna
   function renderCell(item: Cita, columnKey: Key): React.ReactNode {
     const cellValue = item[columnKey as keyof typeof item];
     switch (columnKey) {
@@ -259,6 +254,8 @@ export default function MisCitasSection() {
     </section>
   );
 }
+
+{/* Modal de edicion de citas medicas */}
 interface ModalEdicionCitaProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
@@ -323,9 +320,8 @@ const ModalEdicionCita = ({ isOpen, onOpenChange, idCita, idMedico, onEditSucces
     }
   }, [fechaSeleccionada, idMedico]);
 
-  const puedeAgendar =
-    fechaSeleccionada !== null &&
-    bloqueSeleccionado !== null;
+  //valida si se ha seleccionado una fecha y un bloque de hora
+  const puedeAgendar = fechaSeleccionada !== null && bloqueSeleccionado !== null;
 
   return (
     <>
@@ -405,7 +401,7 @@ const ModalEdicionCita = ({ isOpen, onOpenChange, idCita, idMedico, onEditSucces
         </ModalContent>
       </Modal>
 
-      {/* MODAL DE CONFIRMACIÓN DE CITA */}
+      {/* MODAL DE CONFIRMACIÓN DE EDICION DE CITA */}
       <Modal isOpen={isModalOpen} onOpenChange={onModalOpenChange}>
         <ModalContent>
           {(onClose) => (
@@ -470,7 +466,7 @@ const ModalEdicionCita = ({ isOpen, onOpenChange, idCita, idMedico, onEditSucces
       </Modal>
     </>);
 }
-
+//MODAL DE CANCELACION DE CITAS MEDICAS
 interface ModalCancelarCitaProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
