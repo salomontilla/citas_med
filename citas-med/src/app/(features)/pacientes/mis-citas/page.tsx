@@ -55,17 +55,18 @@ export default function MisCitasSection() {
   
   const obtenerCitas = () => {
     api.get(`/pacientes/mis-citas?page=${page - 1}`)
-      .then((response) => {
-        setCitas(response.data.content);
-        setTotalPages(response.data.totalElements);
-      })
-      .catch((error) => {
-        setErrorCargarCitas(error.response?.data || "Error al cargar las citas");
-      })
-      .finally(() => {
-        setIsLoading(false)
-      });
-    }
+    .then((response) => {
+      setCitas(response.data.content);
+      setTotalPages(response.data.totalElements);
+    })
+    .catch((error) => {
+      setErrorCargarCitas(error.message || "Error al cargar las citas");
+    })
+    .finally(() => {
+      setIsLoading(false)
+    });
+  }
+  if (errorCargarCitas) return <div className="text-red-500 text-center">{errorCargarCitas}</div>;
     
   // Cargar citas al montar el componente y al cambiar de página
   useEffect(() => {
