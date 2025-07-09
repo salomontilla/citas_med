@@ -10,13 +10,14 @@ import {
   useDisclosure,
   Calendar,
   CalendarDate,
-  Alert
+  Alert,
+  addToast
 } from "@heroui/react";
-import { CalendarDays, Clock4, UserCircle2, Stethoscope, Pencil, XCircle, CalendarIcon } from "lucide-react";
+import { CalendarDays, Clock4, UserCircle2, Stethoscope, Pencil, XCircle, CalendarIcon, AlertTriangle } from "lucide-react";
 import { use, useEffect, useMemo, useState } from "react";
 import { Key } from "@react-types/shared";
 import api from "@/app/lib/axios";
-import { formatearFecha } from "@/app/lib/utils";
+import { formatearFecha, formatearHora } from "@/app/lib/utils";
 import { cargarDisponibilidades } from "../agendar-cita/seleccionDisponibilidad";
 import { TabItem } from "flowbite-react";
 import { getLocalTimeZone, today } from "@internationalized/date";
@@ -31,22 +32,11 @@ type Cita = {
   estado: "PENDIENTE" | "CANCELADA" | "CONFIRMADA" | "ATENDIDA";
 };
 
-const editarCita = (idCita: number, fecha: string | null, hora: string | null) => {
-  console.log("Editar cita con ID:", idCita, "Fecha:", fecha, "Hora:", hora);
-  api.patch(`/pacientes/editar-cita/${idCita}`, {
-    fechaNueva: fecha,
-    horaNueva: hora?.substring(hora?.indexOf('-') + 1) + ":00"
-  })
-    .then(() => {
-        
-    })
-    .catch((error) => {
-      console.error("Error al editar la cita:", error);
-    });
-}
+
 
 export default function MisCitasSection() {
-
+  
+  const [isEditarCitaExitoso, setIsEditarCitaExitoso] = useState(false);
   const [page, setPage] = useState(1);
   const [loading, setIsLoading] = useState(true);
   const [citas, setCitas] = useState<Cita[]>([]);
@@ -61,8 +51,6 @@ export default function MisCitasSection() {
       .then((response) => {
         setCitas(response.data.content);
         setTotalPages(response.data.totalElements);
-        console.log(`ENDPOINT /pacientes/mis-citas?page=:${page - 1}`);
-
       })
       .catch((error) => {
         console.error("Error al cargar las citas:", error);
@@ -75,17 +63,16 @@ export default function MisCitasSection() {
   // Cargar citas al montar el componente y al cambiar de página
   useEffect(() => {
     obtenerCitas();
-  }, [page]);
+  }, [page, isEditarCitaExitoso]);
 
   const pages = Math.ceil(totalPages / rowsPerPage);
 
-  const handleEditarCita = (idCita: number, idMedico:number) => {
+  const handleEditarCita = (idCita: number, idMedico: number) => {
     setIdCitaSeleccionada(null);
     setIdMedicoSeleccionada(null);
     onOpen();
     setIdCitaSeleccionada(idCita);
     setIdMedicoSeleccionada(idMedico);
-    console.log("Editar cita ID:", idCita, "ID Médico:", idMedico);
   };
 
 
@@ -241,6 +228,7 @@ export default function MisCitasSection() {
             onOpenChange={onOpenChange}
             idCita={idCitaSeleccionada}
             idMedico={idMedicoSeleccionada}
+            onEditSuccess={() => (obtenerCitas())}
           />
         )
       }
@@ -253,15 +241,49 @@ interface ModalEdicionCitaProps {
   onOpenChange: (isOpen: boolean) => void;
   idCita: number;
   idMedico: number | null;
+  onEditSuccess: () => void;
 
 }
-const ModalEdicionCita = ({ isOpen, onOpenChange, idCita, idMedico}: ModalEdicionCitaProps) => {
+const ModalEdicionCita = ({ isOpen, onOpenChange, idCita, idMedico, onEditSuccess }: ModalEdicionCitaProps) => {
   const [fechaSeleccionada, setFechaSeleccionada] = useState<CalendarDate | null>(null);
-  const [horariosDisponibles, setHorariosDisponibles] = useState([]);
   const [loading, setLoading] = useState(false);
   const { isOpen: isModalOpen, onOpen, onOpenChange: onModalOpenChange } = useDisclosure();
   const [disponibilidades, setDisponibilidades] = useState<string[]>([]);
   const [bloqueSeleccionado, setBloqueSeleccionado] = useState<string | null>(null);
+  const [isVisibleAlert, setIsVisibleAlert] = useState(false);
+  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState("");
+
+  const editarCita = (idCita: number, fecha: string | null, hora: string | null) => {
+    setLoading(true);
+    api.patch(`/pacientes/editar-cita/${idCita}`, {
+      fechaNueva: fecha,
+      horaNueva: formatearHora(hora)
+    })
+    .then(() => {
+      onEditSuccess();
+      addToast({
+          color: "success",
+          title: "Cita editada Exitosamente",
+          description: "Tu cita ha sido editada correctamente.",
+          timeout: 5000,
+          shouldShowTimeoutProgress: true,
+        });
+        onModalOpenChange();
+        onOpenChange(false);
+        setFechaSeleccionada(null);
+        setBloqueSeleccionado(null);
+        setDisponibilidades([]);
+
+      })
+      
+      .catch((error) => {
+        setIsVisibleAlert(true);
+        setDescription(error.response?.data || "Error al editar la cita");
+        setTitle("Error");
+      })
+      .finally(() => (setLoading(false)));
+}
 
   useEffect(() => {
     if (fechaSeleccionada) {
@@ -272,10 +294,11 @@ const ModalEdicionCita = ({ isOpen, onOpenChange, idCita, idMedico}: ModalEdicio
         setLoading,
         (error) => console.error("Error al cargar disponibilidades:", error)
       );
+      setBloqueSeleccionado(null);
     } else {
       setDisponibilidades([]);
     }
-  },[fechaSeleccionada, idMedico]);
+  }, [fechaSeleccionada, idMedico]);
 
   const puedeAgendar =
     fechaSeleccionada !== null &&
@@ -349,7 +372,7 @@ const ModalEdicionCita = ({ isOpen, onOpenChange, idCita, idMedico}: ModalEdicio
                     radius="lg"
                     onPress={() => onOpen()}
                   >
-                    Agendar cita
+                    Editar cita
                   </Button>
 
                 )}
@@ -364,28 +387,59 @@ const ModalEdicionCita = ({ isOpen, onOpenChange, idCita, idMedico}: ModalEdicio
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Deseas modificar la cita?</ModalHeader>
+              <ModalHeader className="flex items-center gap-2 text-yellow-600">
+                <AlertTriangle className="w-5 h-5" />
+                Confirmar modificación
+              </ModalHeader>
+
+              <div className="border-t border-gray-200" />
+
               <ModalBody>
-                <p>
-                  Al confirmar, se editará la cita con el médico previamente seleccionado para la fecha y hora indicadas.
+                <p className="text-sm text-gray-700">
+                  Estás a punto de modificar una cita médica. Asegúrate de que la nueva fecha y hora sean correctas.
                 </p>
 
+                <div className="mt-4 flex flex-col gap-2 text-blue-800 font-medium">
+                  <div className="flex items-center gap-2">
+                    <CalendarDays className="w-4 h-4" />
+                    <span><strong>Fecha seleccionada:</strong> {fechaSeleccionada?.toString()}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock4 className="w-4 h-4" />
+                    <span><strong>Hora seleccionada:</strong> {formatearHora(bloqueSeleccionado)}</span>
+                  </div>
+                </div>
               </ModalBody>
-              <ModalFooter className="flex flex-col">
-                <div className="flex w-full justify-center gap-3">
-                  <Button color="default" onPress={onClose}>
+
+              <div className="border-t border-gray-200" />
+
+              <ModalFooter className="flex flex-col gap-2">
+                <div className="flex w-full justify-end gap-3">
+                  {isVisibleAlert && (
+                    <Alert
+                      color="danger"
+                      className="w-full mb-4"
+                      onClose={() => setIsVisibleAlert(false)}
+                    >
+                      <span className="font-semibold">{title}</span>
+                      <p>{description}</p>
+                    </Alert>
+                  )}
+                  <Button variant="light" onPress={onClose}>
                     Cancelar
                   </Button>
+
                   <Button
                     isLoading={loading}
-                    color="primary"
+                    color="warning"
                     onPress={() => {
                       editarCita(idCita, formatearFecha(fechaSeleccionada), bloqueSeleccionado);
-                    }}>
+                    }}
+                    startContent={<AlertTriangle className="w-4 h-4" />}
+                  >
                     Modificar cita
                   </Button>
                 </div>
-
               </ModalFooter>
             </>
           )}

@@ -9,3 +9,7 @@ export function formatearFecha(fecha: CalendarDate | null): string | null {
 
   return `${year}-${month}-${day}`;
 }
+export function formatearHora(hora: string | null): string | null {
+  if (!hora) return null;
+  return hora?.substring(hora?.indexOf('-') + 1) + ":00";
+}
