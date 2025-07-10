@@ -4,6 +4,7 @@ import { Button, Input, Alert } from "@heroui/react";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import api from '../../lib/axios';
+import { useTokenStore } from '@/app/store/tokenStore';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,6 +15,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const router = useRouter();
+  const { setSessionExpiredModalOpen } = useTokenStore();
 
 
   const handleLogin = (e: React.FormEvent) => {
@@ -29,7 +31,7 @@ export default function LoginPage() {
       contrasena: password,
     }).then(() => {
       api.get("/auth/me").then((res) => {
-
+        setSessionExpiredModalOpen(false);
         const rol = res.data.rol;
         setDescription("Inicio de sesión exitoso");
         setTitle("Éxito");

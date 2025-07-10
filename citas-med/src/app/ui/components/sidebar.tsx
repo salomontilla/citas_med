@@ -226,7 +226,7 @@ const TitleSection = ({ open }: TitleSectionProps) => {
       setNombre(r.data.nombre);
       setRol(r.data.rol);
     }).catch((error) => {
-      console.error("Error al obtener los datos del usuario:", error);
+      console.log("Error al obtener los datos del usuario:", error.response.status);
     })
   },[]);
   return (

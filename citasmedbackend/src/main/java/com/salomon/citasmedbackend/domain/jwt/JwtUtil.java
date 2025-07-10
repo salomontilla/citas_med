@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.salomon.citasmedbackend.domain.usuario.DetallesUsuario;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,7 +47,7 @@ public class JwtUtil {
         return true;
     }
 
-    public String extractUsername(String token){
+    public String extractUsername(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
             DecodedJWT decodedJWT = JWT.require(algorithm)
@@ -56,9 +57,10 @@ public class JwtUtil {
 
             return decodedJWT.getSubject();
 
-        } catch (JWTVerificationException e) {
-            throw new RuntimeException("Token inválido o expirado", e);
+        } catch (TokenExpiredException e) {
+            throw new TokenExpiredException(e.getMessage(), e.getExpiredOn());
         }
+
     }
 }
 

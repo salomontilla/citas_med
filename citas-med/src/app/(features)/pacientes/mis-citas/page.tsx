@@ -66,12 +66,12 @@ export default function MisCitasSection() {
       setIsLoading(false)
     });
   }
-  if (errorCargarCitas) return <div className="text-red-500 text-center">{errorCargarCitas}</div>;
-    
+  
   // Cargar citas al montar el componente y al cambiar de página
   useEffect(() => {
     obtenerCitas();
   }, [page, isEditarCitaExitoso]);
+  if (errorCargarCitas) return <div className="text-red-500 text-center">{errorCargarCitas}</div>;
 
   const handleEditarCita = (idCita: number, idMedico: number, estado: string) => {
     setIdCitaSeleccionada(null);
