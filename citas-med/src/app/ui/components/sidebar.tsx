@@ -19,7 +19,23 @@ import api from '../../lib/axios';
 
 export const Sidebar = () => {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState("Agendar Cita");
+  const [selected, setSelected] = useState(localStorage.getItem("sidebar-selected") || "Agendar Cita");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("sidebar-selected");
+    if (saved) {
+      setSelected(saved);
+    }
+  }, []);
+
+  // Guardar valor cuando cambia
+  useEffect(() => {
+    localStorage.setItem("sidebar-selected", selected);
+  }, [selected]);
+
+  const handleSelect = (item: string) => {
+    setSelected(item);
+  };
 
   return (
     <motion.nav
@@ -36,7 +52,7 @@ export const Sidebar = () => {
           Icon={CalendarDays}
           title="Agendar Cita"
           selected={selected}
-          setSelected={setSelected}
+          setSelected={handleSelect}
           open={open}
           href="/pacientes/agendar-cita"
         />
@@ -45,7 +61,7 @@ export const Sidebar = () => {
           Icon={ClipboardList}
           title="Mis citas"
           selected={selected}
-          setSelected={setSelected}
+          setSelected={handleSelect}
           open={open}
           href="/pacientes/mis-citas"
 
@@ -54,7 +70,7 @@ export const Sidebar = () => {
           Icon={UserCog}
           title="Mis datos"
           selected={selected}
-          setSelected={setSelected}
+          setSelected={handleSelect}
           open={open}
           href="/pacientes/mis-datos"
         />
