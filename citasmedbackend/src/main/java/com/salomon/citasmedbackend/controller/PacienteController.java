@@ -51,7 +51,6 @@ public class PacienteController {
     @GetMapping("/mis-datos")
     public ResponseEntity<PacientesResponseDTO> getPacienteById(@AuthenticationPrincipal DetallesUsuario user) {
         Paciente paciente = pacienteService.obtenerPacientePorEmail(user.getUsername());
-        System.out.println(user.getAuthorities().toString());
         PacientesResponseDTO pacienteResponse = new PacientesResponseDTO(
                 paciente.getId(),
                 paciente.getUsuario().getNombreCompleto(),
@@ -64,7 +63,7 @@ public class PacienteController {
     }
 
     //UPDATE
-    @PatchMapping("/editar-perfil")
+    @PatchMapping("/editar-datos")
     @Transactional
     public ResponseEntity<?> updatePaciente(@AuthenticationPrincipal DetallesUsuario user, @RequestBody PacienteUpdateDTO usuarioDto) {
 

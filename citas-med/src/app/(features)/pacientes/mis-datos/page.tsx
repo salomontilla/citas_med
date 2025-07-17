@@ -1,31 +1,79 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input, Button, addToast } from '@heroui/react';
-import { div } from 'framer-motion/client';
+import api from '@/app/lib/axios';
 
 interface DatosUsuario {
-    nombre: string;
-    email: string;
-    documento: string;
-    telefono: string;
+    nombreCompleto?: string;
+    email?: string;
+    documento?: string;
+    telefono?: string;
+    fechaNacimiento?: string;
 }
 
 export default function PerfilUsuario() {
     const [datos, setDatos] = useState<DatosUsuario>({
-        nombre: 'Juan Pérez',
-        email: 'juan.perez@email.com',
-        documento: '123456789',
-        telefono: '3101234567',
-    });
-
+        nombreCompleto: '',
+        email: '',
+        documento: '',
+        telefono: '',
+        fechaNacimiento: ''
+        });
     const [editando, setEditando] = useState(false);
     const [loading, setLoading] = useState(false);
-
-    const handleChange = (field: keyof DatosUsuario, value: string) => {
-        setDatos({ ...datos, [field]: value });
+    const [correo, setCorreo] = useState('');
+    const [telefono, setTelefono] = useState('');
+    const [contrasena, setContrasena] = useState('');
+    
+    const obtenerDatos = () => {
+        api.get('/pacientes/mis-datos')
+        .then((response) => {
+            console.log('Datos actualizados:', response.data);
+            setDatos(response.data);
+        })
+        .catch((error) => {
+            console.log('Error al obtener los datos del usuario:', error.message);
+        });
     };
+        
+    useEffect(() => {
+        obtenerDatos();
+    }, []);
 
+    const editarDatos = () => {
+        setLoading(true);
+        setEditando(true);
+        api.patch('/pacientes/editar-datos', {
+            nombreCompleto: null,
+            email: correo,
+            contrasena: contrasena,
+            telefono: telefono,
+            documento: null,
+            fechaNacimiento: null,
+
+        })
+        .then((response) => {
+            setDatos(response.data);
+            addToast({
+                title: 'Éxito',
+                description: 'Datos actualizados correctamente.',
+                color: 'success',
+                shouldShowTimeoutProgress: true,
+                timeout: 5000,
+            });
+        })
+        .catch((error) => {
+            console.log('Error al editar los datos del usuario:', error.message);
+            addToast({
+                title: 'Error',
+                description: 'No se pudieron actualizar los datos.',
+                color: 'danger',
+                shouldShowTimeoutProgress: true,
+                timeout: 5000,
+            });
+        });
+    }
     const guardarCambios = () => {
         setLoading(true);
         setLoading(false);
@@ -40,7 +88,7 @@ export default function PerfilUsuario() {
     };
 
     return (
-        <div className='min-h-fit w-full flex items-center justify-center bg-blue-50 px-4'>
+        <div className='min-h-fit w-full flex items-center justify-center bg-blue-50 px-4 py-8 md:py-0'>
             <section className="w-full bg-blue-200 rounded-2xl max-w-4xl shadow-md">
                 <div className='h-20 flex justify-center items-center rounded-t-2xl bg-gradient-to-r from-blue-500 to-blue-800'>
                     <h1 className='text-white text-2xl font-bold'>Mis Datos</h1>
@@ -50,44 +98,42 @@ export default function PerfilUsuario() {
                     <div className="flex flex-col gap-4 items-center mb-6">
                         <img src="/medico.jpg" alt="doctor" className='rounded-full h-24 w-24 object-cover' />
                         <div className='flex flex-col items-center'>
-                            <h1 className='font-bold text-xl'>{datos.nombre}</h1>
+                            <h1 className='font-bold text-xl'>{datos.nombreCompleto}</h1>
                             <span className="text-sm text-gray-500">{datos.email}</span>
                         </div>
                     </div>
-
+                    <form>
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         <Input
                             label="Nombre"
                             color='primary'
-                            value={datos.nombre}
-                            onValueChange={(value) => handleChange('nombre', value)}
+                            value={datos.nombreCompleto}
                             isDisabled={true}
                         />
                         <Input
                             label="Correo Electrónico"
                             color='primary'
                             value={datos.email}
-                            onValueChange={(value) => handleChange('email', value)}
+                            onValueChange={setCorreo}
                             isDisabled={!editando}
                         />
                         <Input
                             label="Documento de Identidad"
                             color='primary'
                             value={datos.documento}
-                            onValueChange={(value) => handleChange('documento', value)}
                             isDisabled={true}
                         />
                         <Input
                             label="Teléfono"
                             color='primary'
                             value={datos.telefono}
-                            onValueChange={(value) => handleChange('telefono', value)}
+                            onValueChange={setTelefono}
                             isDisabled={!editando}
                         />
                         <Input
                             label="Fecha de nacimiento"
                             color='primary'
-                            value="01/01/1990"
+                            value= {datos.fechaNacimiento}
                             isDisabled={true}
                         />
                     </div>
@@ -108,6 +154,8 @@ export default function PerfilUsuario() {
                             </Button>
                         )}
                     </div>
+                </form>
+
                 </div>
             </section>
         </div>
