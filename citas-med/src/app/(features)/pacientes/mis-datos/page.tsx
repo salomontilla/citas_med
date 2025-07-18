@@ -29,11 +29,16 @@ export default function PerfilUsuario() {
     const obtenerDatos = () => {
         api.get('/pacientes/mis-datos')
             .then((response) => {
-                console.log('Datos actualizados:', response.data);
                 setDatos(response.data);
             })
             .catch((error) => {
-                console.log('Error al obtener los datos del usuario:', error.message);
+                addToast({
+                    title: 'Error',
+                    description: 'No se pudieron obtener los datos del usuario.',
+                    color: 'danger',
+                    shouldShowTimeoutProgress: true,
+                    timeout: 5000,
+                });
             });
     };
 
@@ -76,8 +81,7 @@ export default function PerfilUsuario() {
                     timeout: 5000,
                 });
             })
-            .catch((error) => {
-                console.log('Error al editar los datos del usuario:', error.message);
+            .catch(() => {
                 addToast({
                     title: 'Error',
                     description: 'No se pudieron actualizar los datos.',

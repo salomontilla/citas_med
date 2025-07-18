@@ -73,9 +73,6 @@ export default function SeleccionHorarioConFecha() {
         return diasSemanaMap[jsDate.getDay()];
     };
 
-    console.log("Fecha seleccionada:", formatearFecha(fechaSeleccionada));
-    console.log("Bloque seleccionado:", disponibilidades);
-
     // Función auxiliar para obtener el mes
     const obtenerMes = (fecha: CalendarDate | null): string | null => {
         if (!fecha) return null;
@@ -185,7 +182,6 @@ export const cargarDisponibilidades = (
                     setDisponibilidades(response.data || []);
                 })
                 .catch((error) => {
-                    console.error("Error al cargar las disponibilidades:", error);
                     setError(error.response?.data || "Error al cargar las disponibilidades");
                 })
                 .finally(() => setLoading(false));

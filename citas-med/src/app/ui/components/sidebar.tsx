@@ -21,7 +21,7 @@ import { Spinner } from "flowbite-react";
 
 export const Sidebar = () => {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string>("Agendar Cita");
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {

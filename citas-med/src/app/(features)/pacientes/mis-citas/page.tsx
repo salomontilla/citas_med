@@ -57,7 +57,6 @@ export default function MisCitasSection() {
     api.get(`/pacientes/mis-citas?page=${page - 1}`)
     .then((response) => {
       setCitas(response.data.content);
-      console.log('Citas obtenidas:', citas);
       setTotalPages(response.data.totalElements);
     })
     .catch((error) => {
@@ -173,7 +172,7 @@ export default function MisCitasSection() {
   }
 
   return (
-    <section className="p-6 bg-white rounded-2xl shadow-xl border border-blue-200">
+    <section className="p-6 mt-4 bg-white rounded-2xl shadow-xl border border-blue-200">
       <h2 className="text-2xl font-bold text-blue-800 mb-2 flex items-center gap-2">
         <CalendarDays className="w-6 h-6" />
         Mis Citas Médicas
@@ -482,7 +481,6 @@ const ModalCancelarCita = ({ isOpen, onOpenChange, idCita, onCancelSuccess }: Mo
   const [isVisibleAlert, setIsVisibleAlert] = useState(false);
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
-  console.log("ID de cita en ModalCancelarCita:", idCita);
 
   const cancelarCita = () => {
     if (idCita === null) return;
