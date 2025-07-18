@@ -122,7 +122,7 @@ export default function PerfilUsuario() {
     };
 
     return (
-        <div className='min-h-fit w-full flex items-center justify-center bg-blue-50 px-4 py-8 md:py-0'>
+        <div className='min-h-screen md:min-h-fit w-full flex items-center justify-center bg-blue-50 px-4 py-8 md:py-0'>
             <section className="w-full bg-blue-200 rounded-2xl max-w-4xl shadow-md">
                 <div className='h-20 flex justify-center items-center rounded-t-2xl bg-gradient-to-r from-blue-500 to-blue-800'>
                     <h1 className='text-white text-2xl font-bold'>Mis Datos</h1>
