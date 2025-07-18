@@ -19,18 +19,12 @@ import api from '../../lib/axios';
 
 export const Sidebar = () => {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<string>(localStorage.getItem("sidebar-selected") || "Agendar Cita");
-
-  useEffect(() => {
-    const saved = localStorage.getItem("sidebar-selected");
-    if (saved) {
-      setSelected(saved);
-    }
-  }, []);
+  const [selected, setSelected] = useState<string>("Agendar Cita");
 
   // Guardar valor cuando cambia
   useEffect(() => {
     localStorage.setItem("sidebar-selected", selected);
+    console.log("Selected option saved:", selected);
   }, [selected]);
 
   const handleSelect = (item: string) => {
