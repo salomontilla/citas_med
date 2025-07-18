@@ -12,67 +12,79 @@ import {
   Button,
   useDisclosure,
   Alert,
+  Skeleton,
 } from "@heroui/react";
 import api from '../../lib/axios';
+import { Spinner } from "flowbite-react";
 
 
 
 export const Sidebar = () => {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<string>("Agendar Cita");
+  const [selected, setSelected] = useState<string | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Guardar valor cuando cambia
   useEffect(() => {
-    localStorage.setItem("sidebar-selected", selected);
-    console.log("Selected option saved:", selected);
-  }, [selected]);
+    const saved = localStorage.getItem("sidebar-selected");
+    if (saved) setSelected(saved);
+    setIsLoaded(true);
+  }, []);
 
-  const handleSelect = (item: string) => {
-    setSelected(item);
+  const handleSelect = (option: string) => {
+    setSelected(option);
+    localStorage.setItem("sidebar-selected", option);
   };
 
   return (
-    <motion.nav
-      layout
-      className="fixed z-10 md:sticky top-0 h-screen shrink-0 border-r border-slate-300 bg-white p-2"
-      style={{
-        width: open ? "225px" : "fit-content",
-      }}
-    >
-      <TitleSection open={open} />
+    
+      <motion.nav
+        layout
+        className="fixed z-10 md:sticky top-0 h-screen shrink-0 border-r border-slate-300 bg-white p-2"
+        style={{
+          width: open ? "225px" : "fit-content",
+        }}
+      >
+        <TitleSection open={open} />
 
-      <div className="space-y-1">
-        <Option
-          Icon={CalendarDays}
-          title="Agendar Cita"
-          selected={selected}
-          setSelected={handleSelect}
-          open={open}
-          href="/pacientes/agendar-cita"
-        />
+        <div className="space-y-1">
+          <Skeleton className="rounded-lg" isLoaded={isLoaded}>
+          <Option
+            Icon={CalendarDays}
+            title="Agendar Cita"
+            selected={selected}
+            setSelected={handleSelect}
+            open={open}
+            href="/pacientes/agendar-cita"
+          />
+          </Skeleton>
 
-        <Option
-          Icon={ClipboardList}
-          title="Mis citas"
-          selected={selected}
-          setSelected={handleSelect}
-          open={open}
-          href="/pacientes/mis-citas"
+          <Skeleton className="rounded-lg" isLoaded={isLoaded}>
+          <Option
+            Icon={ClipboardList}
+            title="Mis citas"
+            selected={selected }
+            setSelected={handleSelect}
+            open={open}
+            href="/pacientes/mis-citas"
 
-        />
-        <Option
-          Icon={UserCog}
-          title="Mis datos"
-          selected={selected}
-          setSelected={handleSelect}
-          open={open}
-          href="/pacientes/mis-datos"
-        />
-        <OptionLogout open={open} />
-      </div>
+          />
+          </Skeleton>
+          <Skeleton className="rounded-lg" isLoaded={isLoaded}>
+          <Option
+            Icon={UserCog}
+            title="Mis datos"
+            selected={selected}
+            setSelected={handleSelect}
+            open={open}
+            href="/pacientes/mis-datos"
+          />
+          </Skeleton>
+          <OptionLogout open={open} />
+        </div>
 
-      <ToggleClose open={open} setOpen={setOpen} />
-    </motion.nav>
+        <ToggleClose open={open} setOpen={setOpen} />
+      </motion.nav>
+    
   );
 };
 type OptionLogoutProps = {
@@ -230,15 +242,15 @@ const TitleSection = ({ open }: TitleSectionProps) => {
   const [nombre, setNombre] = useState("");
   const [rol, setRol] = useState("");
 
-  useEffect(() =>{
+  useEffect(() => {
     api.get("/auth/me")
-    .then((r) =>{
-      setNombre(r.data.nombre);
-      setRol(r.data.rol);
-    }).catch((error) => {
-      console.log("Error al obtener los datos del usuario:", error.response.status);
-    })
-  },[]);
+      .then((r) => {
+        setNombre(r.data.nombre);
+        setRol(r.data.rol);
+      }).catch((error) => {
+        console.log("Error al obtener los datos del usuario:", error.response.status);
+      })
+  }, []);
   return (
     <div className="mb-3 border-b border-slate-300 pb-3">
       <div className="flex cursor-auto items-center justify-between rounded-md transition-colors">
