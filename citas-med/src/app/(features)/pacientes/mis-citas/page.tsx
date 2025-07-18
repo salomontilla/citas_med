@@ -57,6 +57,7 @@ export default function MisCitasSection() {
     api.get(`/pacientes/mis-citas?page=${page - 1}`)
     .then((response) => {
       setCitas(response.data.content);
+      console.log('Citas obtenidas:', citas);
       setTotalPages(response.data.totalElements);
     })
     .catch((error) => {
@@ -71,20 +72,8 @@ export default function MisCitasSection() {
   useEffect(() => {
     obtenerCitas();
   }, [page, isEditarCitaExitoso]);
+
   if (errorCargarCitas) return <div className="text-red-500 text-center">{errorCargarCitas}</div>;
-  if(citas.length === 0 ) {
-    return (
-      <Card className="p-6 bg-white rounded-2xl shadow-xl border border-blue-200">
-        <h2 className="text-2xl font-bold text-blue-800 mb-2 flex items-center gap-2">
-          <CalendarDays className="w-6 h-6" />
-          Mis Citas Médicas
-        </h2>
-        <p className="text-blue-700 mb-6 text-sm">
-          No tienes citas registradas.
-        </p>
-      </Card>
-    );
-  }
 
   const handleEditarCita = (idCita: number, idMedico: number, estado: string) => {
     setIdCitaSeleccionada(null);
@@ -138,12 +127,12 @@ export default function MisCitasSection() {
             className={`text-xs font-semibold px-2 py-1 rounded-lg ${item.estado === "PENDIENTE"
               ? "bg-yellow-100 text-yellow-700"
               : item.estado === "CONFIRMADA"
-                ? "bg-blue-100 text-blue-700"
-                : item.estado === "ATENDIDA"
-                  ? "bg-green-100 text-green-700"
-                  : item.estado === "CANCELADA"
-                    ? "bg-red-100 text-red-700"
-                    : "bg-gray-100 text-gray-700"
+              ? "bg-blue-100 text-blue-700"
+              : item.estado === "ATENDIDA"
+              ? "bg-green-100 text-green-700"
+              : item.estado === "CANCELADA"
+              ? "bg-red-100 text-red-700"
+              : "bg-gray-100 text-gray-700"
               }`}
           >
             {item.estado}
@@ -221,10 +210,10 @@ export default function MisCitasSection() {
           <TableColumn key="acciones">Acciones</TableColumn>
         </TableHeader>
         <TableBody
-          emptyContent="No tienes citas registradas."
+          emptyContent={"No tienes citas registradas."}
           items={citas}
           loadingContent={<Spinner />}
-          loadingState={loadingState}
+          isLoading={loading}
         >
           {
             (item: Cita) => {
