@@ -72,6 +72,19 @@ export default function MisCitasSection() {
     obtenerCitas();
   }, [page, isEditarCitaExitoso]);
   if (errorCargarCitas) return <div className="text-red-500 text-center">{errorCargarCitas}</div>;
+  if(citas.length === 0 ) {
+    return (
+      <Card className="p-6 bg-white rounded-2xl shadow-xl border border-blue-200">
+        <h2 className="text-2xl font-bold text-blue-800 mb-2 flex items-center gap-2">
+          <CalendarDays className="w-6 h-6" />
+          Mis Citas Médicas
+        </h2>
+        <p className="text-blue-700 mb-6 text-sm">
+          No tienes citas registradas.
+        </p>
+      </Card>
+    );
+  }
 
   const handleEditarCita = (idCita: number, idMedico: number, estado: string) => {
     setIdCitaSeleccionada(null);

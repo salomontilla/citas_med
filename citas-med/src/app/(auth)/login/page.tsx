@@ -108,15 +108,7 @@ export default function LoginPage() {
               />
               <a href="#" className="text-sm text-blue-600 hover:underline">¿Olvidaste tu contraseña?</a>
               
-              <Alert
-                color={isInvalid ? "danger" : "success"}
-                className="w-full mt-3"
-                description={description}
-                title={title}
-                isVisible={isVisible}
-                variant="faded"
-                onClose={() => setIsVisible(false)}
-              />
+              
               
             </div>
             <Button

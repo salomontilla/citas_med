@@ -19,27 +19,41 @@ export default function PerfilUsuario() {
         documento: '',
         telefono: '',
         fechaNacimiento: ''
-        });
+    });
     const [editando, setEditando] = useState(false);
     const [loading, setLoading] = useState(false);
     const [correo, setCorreo] = useState('');
     const [telefono, setTelefono] = useState('');
     const [contrasena, setContrasena] = useState('');
-    
+
     const obtenerDatos = () => {
         api.get('/pacientes/mis-datos')
-        .then((response) => {
-            console.log('Datos actualizados:', response.data);
-            setDatos(response.data);
-        })
-        .catch((error) => {
-            console.log('Error al obtener los datos del usuario:', error.message);
-        });
+            .then((response) => {
+                console.log('Datos actualizados:', response.data);
+                setDatos(response.data);
+            })
+            .catch((error) => {
+                console.log('Error al obtener los datos del usuario:', error.message);
+            });
     };
-        
+
+    // Obtener los datos del usuario al cargar el componente
     useEffect(() => {
         obtenerDatos();
     }, []);
+
+    // Actualizar el correo electrónico al cargar el componente
+    useEffect(() => {
+        if (datos.email) {
+            setCorreo(datos.email);
+        }
+    }, [datos.email]);
+    // Obtener el teléfono del usuario al cargar el componente
+    useEffect(() => {
+        if (datos.telefono) {
+            setTelefono(datos.telefono);
+        }
+    }, [datos.telefono]);
 
     const editarDatos = () => {
         setLoading(true);
@@ -47,44 +61,64 @@ export default function PerfilUsuario() {
         api.patch('/pacientes/editar-datos', {
             nombreCompleto: null,
             email: correo,
-            contrasena: contrasena,
             telefono: telefono,
             documento: null,
             fechaNacimiento: null,
 
         })
-        .then((response) => {
-            setDatos(response.data);
-            addToast({
-                title: 'Éxito',
-                description: 'Datos actualizados correctamente.',
-                color: 'success',
-                shouldShowTimeoutProgress: true,
-                timeout: 5000,
+            .then((response) => {
+                setDatos(response.data);
+                addToast({
+                    title: 'Éxito',
+                    description: 'Datos actualizados correctamente.',
+                    color: 'success',
+                    shouldShowTimeoutProgress: true,
+                    timeout: 5000,
+                });
+            })
+            .catch((error) => {
+                console.log('Error al editar los datos del usuario:', error.message);
+                addToast({
+                    title: 'Error',
+                    description: 'No se pudieron actualizar los datos.',
+                    color: 'danger',
+                    shouldShowTimeoutProgress: true,
+                    timeout: 5000,
+                });
             });
-        })
-        .catch((error) => {
-            console.log('Error al editar los datos del usuario:', error.message);
+    }
+    const guardarCambios = () => {
+        setLoading(true);
+        if (!correo || !telefono) {
+            // Campos vacíos
             addToast({
                 title: 'Error',
-                description: 'No se pudieron actualizar los datos.',
+                description: 'Por favor, completa todos los campos requeridos.',
                 color: 'danger',
                 shouldShowTimeoutProgress: true,
                 timeout: 5000,
             });
-        });
-    }
-    const guardarCambios = () => {
-        setLoading(true);
+            setLoading(false);
+            return;
+        }
+
+        if (correo === datos.email && telefono === datos.telefono) {
+            // Nada ha cambiado
+            addToast({
+                title: 'Sin cambios',
+                description: 'No hiciste ningún cambio en los datos.',
+                color: 'warning',
+                shouldShowTimeoutProgress: true,
+                timeout: 5000,
+            });
+            setLoading(false);
+            return;
+        }
+
+
+        editarDatos();
         setLoading(false);
         setEditando(false);
-        addToast({
-            title: 'Cambios guardados',
-            description: 'Tu perfil fue actualizado con éxito.',
-            color: 'success',
-            shouldShowTimeoutProgress: true,
-            timeout: 5000,
-        });
     };
 
     return (
@@ -103,58 +137,58 @@ export default function PerfilUsuario() {
                         </div>
                     </div>
                     <form>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                        <Input
-                            label="Nombre"
-                            color='primary'
-                            value={datos.nombreCompleto}
-                            isDisabled={true}
-                        />
-                        <Input
-                            label="Correo Electrónico"
-                            color='primary'
-                            value={datos.email}
-                            onValueChange={setCorreo}
-                            isDisabled={!editando}
-                        />
-                        <Input
-                            label="Documento de Identidad"
-                            color='primary'
-                            value={datos.documento}
-                            isDisabled={true}
-                        />
-                        <Input
-                            label="Teléfono"
-                            color='primary'
-                            value={datos.telefono}
-                            onValueChange={setTelefono}
-                            isDisabled={!editando}
-                        />
-                        <Input
-                            label="Fecha de nacimiento"
-                            color='primary'
-                            value= {datos.fechaNacimiento}
-                            isDisabled={true}
-                        />
-                    </div>
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                            <Input
+                                label="Nombre"
+                                color='primary'
+                                value={datos.nombreCompleto}
+                                isDisabled={true}
+                            />
+                            <Input
+                                label="Correo Electrónico"
+                                color='primary'
+                                value={correo}
+                                onValueChange={setCorreo}
+                                isDisabled={!editando}
+                            />
+                            <Input
+                                label="Documento de Identidad"
+                                color='primary'
+                                value={datos.documento}
+                                isDisabled={true}
+                            />
+                            <Input
+                                label="Teléfono"
+                                color='primary'
+                                value={datos.telefono}
+                                onValueChange={setTelefono}
+                                isDisabled={!editando}
+                            />
+                            <Input
+                                label="Fecha de nacimiento"
+                                color='primary'
+                                value={datos.fechaNacimiento}
+                                isDisabled={true}
+                            />
+                        </div>
 
-                    <div className="flex justify-end mt-10 gap-4">
-                        {editando ? (
-                            <>
-                                <Button color="default" onPress={() => setEditando(false)} isDisabled={loading}>
-                                    Cancelar
+                        <div className="flex justify-end mt-10 gap-4">
+                            {editando ? (
+                                <>
+                                    <Button color="default" onPress={() => setEditando(false)} isDisabled={loading}>
+                                        Cancelar
+                                    </Button>
+                                    <Button color="primary" onPress={guardarCambios} isLoading={loading}>
+                                        Guardar
+                                    </Button>
+                                </>
+                            ) : (
+                                <Button color="primary" onPress={() => setEditando(true)}>
+                                    Editar perfil
                                 </Button>
-                                <Button color="primary" onPress={guardarCambios} isLoading={loading}>
-                                    Guardar
-                                </Button>
-                            </>
-                        ) : (
-                            <Button color="primary" onPress={() => setEditando(true)}>
-                                Editar perfil
-                            </Button>
-                        )}
-                    </div>
-                </form>
+                            )}
+                        </div>
+                    </form>
 
                 </div>
             </section>

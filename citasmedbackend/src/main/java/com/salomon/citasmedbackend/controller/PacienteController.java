@@ -1,5 +1,6 @@
 package com.salomon.citasmedbackend.controller;
 
+import com.salomon.citasmedbackend.domain.jwt.JwtUtil;
 import com.salomon.citasmedbackend.domain.medico.MedicoResponseDTO;
 import com.salomon.citasmedbackend.domain.paciente.*;
 import com.salomon.citasmedbackend.domain.usuario.DetallesUsuario;
@@ -10,8 +11,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -25,6 +30,8 @@ import java.net.URI;
 public class PacienteController {
     private final PacienteService pacienteService;
     private final MedicoService medicoService;
+    private final UserDetailsService userDetailsService;
+    private final JwtUtil jwtService;
 
     //CREATE
     @PostMapping("/register")
@@ -70,14 +77,21 @@ public class PacienteController {
         Paciente paciente = pacienteService.obtenerPacientePorEmail(user.getUsername());
         Paciente pacienteActualizado = pacienteService.actualizarPaciente(paciente.getId(), usuarioDto);
 
-        return ResponseEntity.ok(new PacientesResponseDTO(
-                pacienteActualizado.getId(),
-                pacienteActualizado.getUsuario().getNombreCompleto(),
-                pacienteActualizado.getUsuario().getDocumento(),
-                pacienteActualizado.getUsuario().getEmail(),
-                pacienteActualizado.getUsuario().getTelefono(),
-                pacienteActualizado.getFechaNacimiento()
-        ));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(pacienteActualizado.getUsuario().getEmail());
+        String nuevoToken = jwtService.generateToken((DetallesUsuario) userDetails);
+        // Crea cookie segura
+        ResponseCookie cookie = ResponseCookie.from("token", nuevoToken)
+                .httpOnly(true)
+                .secure(false) // Cambiar a true en producción
+                .path("/")
+                .maxAge(3600) // 1 hora
+                .sameSite("Strict")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body("Datos actualizados y nuevo token emitido.");
+
     }
 
     @GetMapping("/ver-medicos")
