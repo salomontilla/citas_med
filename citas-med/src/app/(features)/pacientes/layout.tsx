@@ -8,7 +8,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <>
       <section className="w-full flex min-h-full">
         <Sidebar />
-        <main className="ml-[56px] px-3 flex-1 md:ml-0 md:p-10 bg-blue-50 ">
+        <main className="ml-[56px] overflow-hidden px-3 min-h-screen flex-1 md:ml-0 md:p-10 bg-blue-50 ">
           <Providers>
             {children}
             <SessionExpiredModal />

@@ -45,7 +45,7 @@ export default function PacienteDashboard() {
 
         <MedicoGrid />
       </section>
-      <section className='p-8 rounded-2xl shadow-xl border border-blue-200 bg-gray-50 mt-6'>
+      <section className='p-8 rounded-2xl shadow-xl border border-blue-200 bg-gray-50 my-6'>
         <AgendarCita />
       </section>
     </div>
