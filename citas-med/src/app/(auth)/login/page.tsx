@@ -42,7 +42,7 @@ export default function LoginPage() {
         } else if (rol === "PACIENTE") {
           router.push("/pacientes/agendar-cita");
         } else if (rol === "MEDICO") {
-          router.push("/dashboard/medicos");
+          router.push("/medicos/ver-citas");
         }
       });
 

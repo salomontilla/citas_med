@@ -70,12 +70,12 @@ public class CitaController {
         Medico medico = medicoService.obtenerMedicoPorEmail(user.getUsername());
         Page<Cita> citas = citaService.obtenerCitasPorMedicoId(medico.getId(), pageable);
 
-        Page<CitaResponseDTO> citasResponse = citas
-                .map(cita -> new CitaResponseDTO(
+        Page<CitaMedicosResponseDTO> citasResponse = citas
+                .map(cita -> new CitaMedicosResponseDTO(
                         cita.getId(),
                         cita.getPaciente().getId(),
-                        cita.getMedico().getUsuario().getNombreCompleto(),
-                        cita.getMedico().getEspecialidad(),
+                        cita.getPaciente().getUsuario().getNombreCompleto(),
+                        cita.getPaciente().getUsuario().getDocumento(),
                         cita.getFecha().toString(),
                         cita.getHora().toString(),
                         cita.getEstado().toString()
