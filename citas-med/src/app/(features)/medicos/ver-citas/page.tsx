@@ -85,9 +85,9 @@ export default function VerCitas() {
           <span
             className={`text-xs font-semibold px-2 py-1 rounded-lg ${item.estado === "PENDIENTE"
               ? "bg-yellow-100 text-yellow-700"
-              : item.estado === "CONFIRMADA"
-              ? "bg-blue-100 text-blue-700"
               : item.estado === "ATENDIDA"
+              ? "bg-blue-100 text-blue-700"
+              : item.estado === "CONFIRMADA"
               ? "bg-green-100 text-green-700"
               : item.estado === "CANCELADA"
               ? "bg-red-100 text-red-700"

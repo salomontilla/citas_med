@@ -50,25 +50,14 @@ export const Sidebar = () => {
           <Skeleton className="rounded-lg" isLoaded={isLoaded}>
           <Option
             Icon={CalendarDays}
-            title="Agendar Cita"
+            title="Citas Programadas"
             selected={selected}
             setSelected={handleSelect}
             open={open}
-            href="/pacientes/agendar-cita"
+            href="/medicos/ver-citas"
           />
           </Skeleton>
 
-          <Skeleton className="rounded-lg" isLoaded={isLoaded}>
-          <Option
-            Icon={ClipboardList}
-            title="Mis citas"
-            selected={selected }
-            setSelected={handleSelect}
-            open={open}
-            href="/pacientes/mis-citas"
-
-          />
-          </Skeleton>
           <Skeleton className="rounded-lg" isLoaded={isLoaded}>
           <Option
             Icon={UserCog}
@@ -76,7 +65,7 @@ export const Sidebar = () => {
             selected={selected}
             setSelected={handleSelect}
             open={open}
-            href="/pacientes/mis-datos"
+            href="/medicos/mis-datos"
           />
           </Skeleton>
           <OptionLogout open={open} />
