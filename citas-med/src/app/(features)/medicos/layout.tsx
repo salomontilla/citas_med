@@ -1,5 +1,5 @@
 import Providers from "@/app/lib/providers";
-import { Sidebar } from "../../ui/components/sidebarMedicos";
+import { Sidebar } from "../../ui/components/sidebarPacientes";
 import SessionExpiredModal from "@/app/(auth)/token/sessionExpiredModal";
 
 
