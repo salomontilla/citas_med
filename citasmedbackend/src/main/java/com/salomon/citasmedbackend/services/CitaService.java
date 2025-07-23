@@ -268,6 +268,37 @@ public class CitaService {
     }
 
 
+    public String confirmarCita(Long id, String emailUsuario) {
+        // Buscar el usuario por su email
+        Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        System.out.println("Usuario encontrado: " + usuario.getId());
 
+        // Verificar que el usuario tenga rol de medico
+        Medico medico = medicoRepository.findMedicoByUsuarioIdAndUsuarioActivo(usuario.getId())
+                .orElseThrow(() -> new RuntimeException("Medico no encontrado o inactivo"));
 
+        // Buscar la cita por su ID
+        Cita cita = citasRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
+
+        // Verificar que la cita pertenece al medico autenticado
+        if (!cita.getMedico().getId().equals(medico.getId())) {
+            throw new RuntimeException("No tienes permiso para cancelar esta cita");
+        }
+
+        // Validar si ya está cancelada
+        if (cita.getEstado() == EstadoCita.CANCELADA) {
+            return "La cita está cancelada.";
+        }
+        if (cita.getEstado() == EstadoCita.CONFIRMADA) {
+            return "La cita ya está confirmada.";
+        }
+
+        // Confirma la cita
+        cita.setEstado(EstadoCita.CONFIRMADA);
+
+        citasRepository.save(cita);
+        return "Cita confirmada correctamente.";
+    }
 }

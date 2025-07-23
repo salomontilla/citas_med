@@ -15,6 +15,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -125,6 +126,12 @@ public class CitaController {
         );
 
         return ResponseEntity.ok(response);
+    }
+    @PatchMapping("/medicos/confirmar-cita/{id}")
+    public ResponseEntity<?> confirmarCita(@PathVariable Long id,
+                                                  @AuthenticationPrincipal DetallesUsuario user) {
+
+        return ResponseEntity.ok(citaService.confirmarCita(id, user.getUsername()));
     }
     @PatchMapping("/pacientes/cancelar-cita/{id}")
     public ResponseEntity<?> cancelarCita(@PathVariable Long id,

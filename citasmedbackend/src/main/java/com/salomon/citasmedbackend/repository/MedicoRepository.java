@@ -25,4 +25,6 @@ public interface MedicoRepository extends JpaRepository<Medico, Long> {
     @Query("SELECT DISTINCT c.paciente FROM Cita c WHERE c.medico.id = :medicoId")
     Page<Paciente> findPacientesByMedicoId(@Param("medicoId") Long medicoId, Pageable pageable);
 
+    @Query("SELECT m FROM Medico m WHERE m.usuario.id = :usuarioId AND m.usuario.activo = true")
+    Optional<Medico> findMedicoByUsuarioIdAndUsuarioActivo(Long usuarioId);
 }

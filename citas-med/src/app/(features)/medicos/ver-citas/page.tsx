@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { CalendarCheck, CalendarDays, Check, Clock4, IdCard, UserCircle2, XCircle } from 'lucide-react';
-import { Button, Card, Pagination, Skeleton, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@heroui/react';
+import { addToast, Button, Card, Pagination, Skeleton, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@heroui/react';
 import api from '@/app/lib/axios';
 import { Key } from '@react-types/shared';
+import { add } from 'date-fns';
 
 interface Cita {
   id: string;
@@ -99,8 +100,22 @@ export default function VerCitas() {
 
         );
       case "acciones":
-            function handleConfirmarCita(arg0: number): void {
-                throw new Error('Function not implemented.');
+            function handleConfirmarCita(id: number): void {
+                api.patch(`/medicos/confirmar-cita/${id}`)
+                    .then(() => {
+                        obtenerCitas();
+                        addToast({
+                            title: 'Cita confirmada',
+                            description: 'La cita ha sido confirmada exitosamente.',
+                            color: 'success',
+                            shouldShowTimeoutProgress: true,
+                            timeout: 5000,
+                        });
+                        
+                    })
+                    .catch(() => {
+                        setErrorCargarCitas("No se pudo confirmar la cita.");
+                    });
             }
 
             function handleCancelarCita(arg0: number, estado: string): void {
@@ -113,24 +128,24 @@ export default function VerCitas() {
 
         return (
           <div className="flex items-center gap-2">
-            <Tooltip content="Confirmar cita" placement="top">
+            <Tooltip content="Marcar como cita atendida" placement="top">
               <Button
                 isIconOnly
                 isDisabled={item.estado === "CANCELADA" || item.estado === "ATENDIDA"}
                 color="primary"
                 variant="light"
-                onPress={() => handleConfirmarCita(parseInt(item.id))}
+                onPress={() => handleAtendidaCita(parseInt(item.id))}
               >
                 <CalendarCheck className="w-4 h-4" />
               </Button>
             </Tooltip>
-            <Tooltip content="Marcar como cita atendida" placement="top">
+            <Tooltip content="Confirmar Cita" placement="top">
               <Button
                 isIconOnly
-                isDisabled={item.estado === "CANCELADA" || item.estado === "ATENDIDA"}
+                isDisabled={item.estado === "CANCELADA" || item.estado === "ATENDIDA" || item.estado === "CONFIRMADA"}
                 color="success"
                 variant="light"
-                onPress={() => handleAtendidaCita(parseInt(item.id))}
+                onPress={() =>  handleConfirmarCita(parseInt(item.id)) }
               >
                 <Check className="w-4 h-4" />
               </Button>
