@@ -147,5 +147,11 @@ public class CitaController {
         return ResponseEntity.ok(citaService.cancelarCitaMedico(id, user.getUsername()));
     }
 
+    @PatchMapping("/medicos/atender-cita/{id}")
+    public ResponseEntity<?> atenderCita(@PathVariable Long id,
+                                         @AuthenticationPrincipal DetallesUsuario user) {
+        return ResponseEntity.ok(citaService.atenderCita(id, user.getUsername()));
+    }
+
 
 }

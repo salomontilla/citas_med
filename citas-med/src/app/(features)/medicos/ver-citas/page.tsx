@@ -136,8 +136,21 @@ export default function VerCitas() {
                     });
             }
 
-            function handleAtendidaCita(arg0: number): void {
-                throw new Error('Function not implemented.');
+            function handleAtenderCita(arg0: number): void {
+                api.patch(`/medicos/atender-cita/${arg0}`)
+                    .then(() => {
+                        obtenerCitas();
+                        addToast({
+                            title: 'Cita atendida',
+                            description: 'La cita ha sido marcada como atendida.',
+                            color: 'success',
+                            shouldShowTimeoutProgress: true,
+                            timeout: 5000,
+                        });
+                    })
+                    .catch(() => {
+                        setErrorCargarCitas("No se pudo marcar la cita como atendida.");
+                    });
             }
 
         return (
@@ -148,7 +161,7 @@ export default function VerCitas() {
                 isDisabled={item.estado === "CANCELADA" || item.estado === "ATENDIDA"}
                 color="primary"
                 variant="light"
-                onPress={() => handleAtendidaCita(parseInt(item.id))}
+                onPress={() => handleAtenderCita(parseInt(item.id))}
               >
                 <CalendarCheck className="w-4 h-4" />
               </Button>
