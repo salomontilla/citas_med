@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,19 @@ public class ValidationExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errores);
     }
+    @ExceptionHandler(EmailYaEnUsoException.class)
+    public ResponseEntity<Map<String, String>> manejarEmailYaEnUso(EmailYaEnUsoException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(DocumentoEnUsoException.class)
+    public ResponseEntity<Map<String, String>> manejarDocumentoYaEnUso(DocumentoEnUsoException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
@@ -38,6 +52,7 @@ public class ValidationExceptionHandler {
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
+
 
     @ExceptionHandler({ HttpMessageNotReadableException.class })
     public ResponseEntity<?> handleEnumConversionError(HttpMessageNotReadableException ex) {

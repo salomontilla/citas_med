@@ -74,7 +74,7 @@ export default function RegisterForm() {
       setIsVisibleAlert(true);  
       setIsLoading(false);
       setTitle("Error al crear cuenta");
-      setDescription(error.response.data);
+      setDescription(error.message);
       console.log(error.response.data);
     })
 

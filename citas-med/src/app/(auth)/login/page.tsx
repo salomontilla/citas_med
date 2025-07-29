@@ -47,7 +47,7 @@ export default function LoginPage() {
       });
 
     }).catch((error: any) => {
-      const msg = error.response.data || "Error al iniciar sesión";
+      const msg = error.message || "Error al iniciar sesión";
       setDescription(msg);
       setTitle("Error");
       setIsInvalid(true);

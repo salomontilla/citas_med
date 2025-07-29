@@ -5,20 +5,20 @@ import { Input, Button, addToast } from '@heroui/react';
 import api from '@/app/lib/axios';
 
 interface DatosUsuario {
-    nombreCompleto?: string;
+    nombre?: string;
     email?: string;
     documento?: string;
     telefono?: string;
-    fechaNacimiento?: string;
+    especialidad?: string;
 }
 
 export default function PerfilUsuario() {
     const [datos, setDatos] = useState<DatosUsuario>({
-        nombreCompleto: '',
+        nombre: '',
         email: '',
         documento: '',
         telefono: '',
-        fechaNacimiento: ''
+        especialidad: ''
     });
     const [editando, setEditando] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -27,14 +27,16 @@ export default function PerfilUsuario() {
     const [contrasena, setContrasena] = useState('');
 
     const obtenerDatos = () => {
-        api.get('/pacientes/mis-datos')
+        api.get('/medicos/mis-datos')
             .then((response) => {
                 setDatos(response.data);
+                console.log(response.data);
             })
             .catch((error) => {
+                console.error('Error al obtener los datos del usuario:', error);
                 addToast({
                     title: 'Error',
-                    description: 'No se pudieron obtener los datos del usuario.',
+                    description: error.message || 'No se pudieron obtener los datos del usuario.',
                     color: 'danger',
                     shouldShowTimeoutProgress: true,
                     timeout: 5000,
@@ -63,12 +65,9 @@ export default function PerfilUsuario() {
     const editarDatos = () => {
         setLoading(true);
         setEditando(true);
-        api.patch('/pacientes/editar-datos', {
-            nombreCompleto: null,
+        api.patch('/medicos/editar-datos', {
             email: correo,
             telefono: telefono,
-            documento: null,
-            fechaNacimiento: null,
 
         })
             .then((response) => {
@@ -80,11 +79,12 @@ export default function PerfilUsuario() {
                     shouldShowTimeoutProgress: true,
                     timeout: 5000,
                 });
+                setEditando(false);
             })
-            .catch(() => {
+            .catch((error) => {
                 addToast({
                     title: 'Error',
-                    description: 'No se pudieron actualizar los datos.',
+                    description: error.response.data.message || 'No se pudieron actualizar los datos.',
                     color: 'danger',
                     shouldShowTimeoutProgress: true,
                     timeout: 5000,
@@ -119,10 +119,8 @@ export default function PerfilUsuario() {
             return;
         }
 
-
         editarDatos();
         setLoading(false);
-        setEditando(false);
     };
 
     return (
@@ -136,7 +134,7 @@ export default function PerfilUsuario() {
                     <div className="flex flex-col gap-4 items-center mb-6">
                         <img src="/medico.jpg" alt="doctor" className='rounded-full h-24 w-24 object-cover' />
                         <div className='flex flex-col items-center'>
-                            <h1 className='font-bold text-xl'>{datos.nombreCompleto}</h1>
+                            <h1 className='font-bold text-xl'>{datos.nombre}</h1>
                             <span className="text-sm text-gray-500">{datos.email}</span>
                         </div>
                     </div>
@@ -145,11 +143,12 @@ export default function PerfilUsuario() {
                             <Input
                                 label="Nombre"
                                 color='primary'
-                                value={datos.nombreCompleto}
+                                value={datos.nombre}
                                 isDisabled={true}
                             />
                             <Input
                                 label="Correo Electrónico"
+                                type='email'
                                 color='primary'
                                 value={correo}
                                 onValueChange={setCorreo}
@@ -164,14 +163,14 @@ export default function PerfilUsuario() {
                             <Input
                                 label="Teléfono"
                                 color='primary'
-                                value={datos.telefono}
+                                value={telefono}
                                 onValueChange={setTelefono}
                                 isDisabled={!editando}
                             />
                             <Input
-                                label="Fecha de nacimiento"
+                                label="Especialidad"
                                 color='primary'
-                                value={datos.fechaNacimiento}
+                                value={datos.especialidad}
                                 isDisabled={true}
                             />
                         </div>

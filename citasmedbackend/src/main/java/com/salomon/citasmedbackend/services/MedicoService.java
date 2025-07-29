@@ -4,6 +4,8 @@ import com.salomon.citasmedbackend.domain.medico.*;
 import com.salomon.citasmedbackend.domain.paciente.Paciente;
 import com.salomon.citasmedbackend.domain.usuario.Rol;
 import com.salomon.citasmedbackend.domain.usuario.Usuario;
+import com.salomon.citasmedbackend.infra.errors.DocumentoEnUsoException;
+import com.salomon.citasmedbackend.infra.errors.EmailYaEnUsoException;
 import com.salomon.citasmedbackend.repository.MedicoRepository;
 import com.salomon.citasmedbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -78,13 +79,13 @@ public class MedicoService {
         if (medicoResponseDTO.email() != null &&
                 !medicoResponseDTO.email().equals(medico.getUsuario().getEmail()) &&
                 userRepository.existsByEmail(medicoResponseDTO.email())) {
-            throw new RuntimeException("El email ya está en uso");
+            throw new EmailYaEnUsoException("El email ya está en uso");
         }
 
         if (medicoResponseDTO.documento() != null &&
                 !medicoResponseDTO.documento().equals(medico.getUsuario().getDocumento()) &&
                 userRepository.existsByDocumento(medicoResponseDTO.documento())) {
-            throw new RuntimeException("El documento ya está registrado");
+            throw new DocumentoEnUsoException("El documento ya está registrado");
         }
 
         // Ahora sí se actualizan los datos
@@ -135,13 +136,13 @@ public class MedicoService {
         if (medicoResponseDTO.email() != null &&
                 !medicoResponseDTO.email().equals(medico.getUsuario().getEmail()) &&
                 userRepository.existsByEmail(medicoResponseDTO.email())) {
-            throw new RuntimeException("El email ya está en uso");
+            throw new EmailYaEnUsoException("El email ya está en uso");
         }
 
         if (medicoResponseDTO.documento() != null &&
                 !medicoResponseDTO.documento().equals(medico.getUsuario().getDocumento()) &&
                 userRepository.existsByDocumento(medicoResponseDTO.documento())) {
-            throw new RuntimeException("El documento ya está registrado");
+            throw new DocumentoEnUsoException("El documento ya está registrado");
         }
 
         // Ahora sí se actualizan los datos
