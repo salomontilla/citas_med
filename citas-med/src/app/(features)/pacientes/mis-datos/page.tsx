@@ -164,7 +164,7 @@ export default function PerfilUsuario() {
                             <Input
                                 label="Teléfono"
                                 color='primary'
-                                value={datos.telefono}
+                                value={telefono}
                                 onValueChange={setTelefono}
                                 isDisabled={!editando}
                             />

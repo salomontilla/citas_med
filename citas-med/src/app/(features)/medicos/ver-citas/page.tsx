@@ -118,8 +118,22 @@ export default function VerCitas() {
                     });
             }
 
-            function handleCancelarCita(arg0: number, estado: string): void {
-                throw new Error('Function not implemented.');
+            function handleCancelarCita(id: number, estado: string): void {
+
+                api.patch(`/medicos/cancelar-cita/${id}`)
+                    .then(() => {
+                        obtenerCitas();
+                        addToast({
+                            title: 'Cita cancelada',
+                            description: 'La cita ha sido cancelada exitosamente.',
+                            color: 'danger',
+                            shouldShowTimeoutProgress: true,
+                            timeout: 5000,
+                        });
+                    })
+                    .catch(() => {
+                        setErrorCargarCitas("No se pudo cancelar la cita.");
+                    });
             }
 
             function handleAtendidaCita(arg0: number): void {

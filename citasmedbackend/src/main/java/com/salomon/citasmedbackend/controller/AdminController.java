@@ -253,7 +253,7 @@ public class AdminController {
                         cita.getId(),
                         cita.getPaciente().getId(),
                         cita.getMedico().getUsuario().getNombreCompleto(),
-                        cita.getMedico().getEspecialidad(),
+                        cita .getMedico().getEspecialidad(),
                         cita.getFecha().toString(),
                         cita.getHora().toString(),
                         cita.getEstado().toString()
