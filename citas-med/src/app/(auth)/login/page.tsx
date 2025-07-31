@@ -38,7 +38,7 @@ export default function LoginPage() {
         setIsVisible(true);
 
         if (rol === "ADMIN") {
-          router.push("/dashboard/admin");
+          router.push("/admin/");
         } else if (rol === "PACIENTE") {
           router.push("/pacientes/agendar-cita");
         } else if (rol === "MEDICO") {

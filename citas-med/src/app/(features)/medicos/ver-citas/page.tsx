@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { CalendarCheck, CalendarDays, Check, Clock4, IdCard, UserCircle2, XCircle } from 'lucide-react';
-import { addToast, Button, Card, Pagination, Skeleton, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@heroui/react';
+import { addToast, Button, Pagination, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@heroui/react';
 import api from '@/app/lib/axios';
 import { Key } from '@react-types/shared';
-import { add } from 'date-fns';
 
 interface Cita {
   id: string;
-  fecha: string; // ISO
+  fecha: string;
   hora: string;
   nombrePaciente: string;
   documento: string;
@@ -30,7 +29,7 @@ export default function VerCitas() {
 
   const obtenerCitas = () => {
     setLoading(true);
-    api.get(`/medicos/mis-citas?page=${page-1}&size=${rowsPerPage}`)
+    api.get(`/medicos/mis-citas?page=${page - 1}&size=${rowsPerPage}`)
       .then((response) => {
         setCitas(response.data.content);
         setTotalPages(response.data.totalElements);
@@ -74,7 +73,7 @@ export default function VerCitas() {
           </div>
         );
       case "documento":
-        
+
         return (
           <div className="flex items-center gap-2 text-blue-800 font-medium">
             <IdCard className="w-4 h-4" />
@@ -87,12 +86,12 @@ export default function VerCitas() {
             className={`text-xs font-semibold px-2 py-1 rounded-lg ${item.estado === "PENDIENTE"
               ? "bg-yellow-100 text-yellow-700"
               : item.estado === "ATENDIDA"
-              ? "bg-blue-100 text-blue-700"
-              : item.estado === "CONFIRMADA"
-              ? "bg-green-100 text-green-700"
-              : item.estado === "CANCELADA"
-              ? "bg-red-100 text-red-700"
-              : "bg-gray-100 text-gray-700"
+                ? "bg-blue-100 text-blue-700"
+                : item.estado === "CONFIRMADA"
+                  ? "bg-green-100 text-green-700"
+                  : item.estado === "CANCELADA"
+                    ? "bg-red-100 text-red-700"
+                    : "bg-gray-100 text-gray-700"
               }`}
           >
             {item.estado}
@@ -100,58 +99,58 @@ export default function VerCitas() {
 
         );
       case "acciones":
-            function handleConfirmarCita(id: number): void {
-                api.patch(`/medicos/confirmar-cita/${id}`)
-                    .then(() => {
-                        obtenerCitas();
-                        addToast({
-                            title: 'Cita confirmada',
-                            description: 'La cita ha sido confirmada exitosamente.',
-                            color: 'success',
-                            shouldShowTimeoutProgress: true,
-                            timeout: 5000,
-                        });
-                        
-                    })
-                    .catch(() => {
-                        setErrorCargarCitas("No se pudo confirmar la cita.");
-                    });
-            }
+        function handleConfirmarCita(id: number): void {
+          api.patch(`/medicos/confirmar-cita/${id}`)
+            .then(() => {
+              obtenerCitas();
+              addToast({
+                title: 'Cita confirmada',
+                description: 'La cita ha sido confirmada exitosamente.',
+                color: 'success',
+                shouldShowTimeoutProgress: true,
+                timeout: 5000,
+              });
 
-            function handleCancelarCita(id: number, estado: string): void {
+            })
+            .catch(() => {
+              setErrorCargarCitas("No se pudo confirmar la cita.");
+            });
+        }
 
-                api.patch(`/medicos/cancelar-cita/${id}`)
-                    .then(() => {
-                        obtenerCitas();
-                        addToast({
-                            title: 'Cita cancelada',
-                            description: 'La cita ha sido cancelada exitosamente.',
-                            color: 'danger',
-                            shouldShowTimeoutProgress: true,
-                            timeout: 5000,
-                        });
-                    })
-                    .catch(() => {
-                        setErrorCargarCitas("No se pudo cancelar la cita.");
-                    });
-            }
+        function handleCancelarCita(id: number, estado: string): void {
 
-            function handleAtenderCita(arg0: number): void {
-                api.patch(`/medicos/atender-cita/${arg0}`)
-                    .then(() => {
-                        obtenerCitas();
-                        addToast({
-                            title: 'Cita atendida',
-                            description: 'La cita ha sido marcada como atendida.',
-                            color: 'success',
-                            shouldShowTimeoutProgress: true,
-                            timeout: 5000,
-                        });
-                    })
-                    .catch(() => {
-                        setErrorCargarCitas("No se pudo marcar la cita como atendida.");
-                    });
-            }
+          api.patch(`/medicos/cancelar-cita/${id}`)
+            .then(() => {
+              obtenerCitas();
+              addToast({
+                title: 'Cita cancelada',
+                description: 'La cita ha sido cancelada exitosamente.',
+                color: 'danger',
+                shouldShowTimeoutProgress: true,
+                timeout: 5000,
+              });
+            })
+            .catch(() => {
+              setErrorCargarCitas("No se pudo cancelar la cita.");
+            });
+        }
+
+        function handleAtenderCita(arg0: number): void {
+          api.patch(`/medicos/atender-cita/${arg0}`)
+            .then(() => {
+              obtenerCitas();
+              addToast({
+                title: 'Cita atendida',
+                description: 'La cita ha sido marcada como atendida.',
+                color: 'success',
+                shouldShowTimeoutProgress: true,
+                timeout: 5000,
+              });
+            })
+            .catch(() => {
+              setErrorCargarCitas("No se pudo marcar la cita como atendida.");
+            });
+        }
 
         return (
           <div className="flex items-center gap-2">
@@ -172,12 +171,12 @@ export default function VerCitas() {
                 isDisabled={item.estado === "CANCELADA" || item.estado === "ATENDIDA" || item.estado === "CONFIRMADA"}
                 color="success"
                 variant="light"
-                onPress={() =>  handleConfirmarCita(parseInt(item.id)) }
+                onPress={() => handleConfirmarCita(parseInt(item.id))}
               >
                 <Check className="w-4 h-4" />
               </Button>
             </Tooltip>
-            
+
             <Tooltip content="Cancelar cita" placement="top">
               <Button
                 isIconOnly
@@ -199,6 +198,7 @@ export default function VerCitas() {
 
   return (
     <div className="p-6 space-y-6">
+
       <h1 className="text-2xl font-bold flex items-center gap-2">
         <CalendarDays className="w-6 h-6 text-primary" /> Citas Próximas
       </h1>
