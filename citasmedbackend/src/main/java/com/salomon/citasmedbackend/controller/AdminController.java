@@ -10,6 +10,7 @@ import com.salomon.citasmedbackend.domain.disponibilidad.UpdateDisponibilidadDTO
 import com.salomon.citasmedbackend.domain.medico.*;
 import com.salomon.citasmedbackend.domain.paciente.Paciente;
 import com.salomon.citasmedbackend.domain.paciente.PacienteUpdateDTO;
+import com.salomon.citasmedbackend.domain.paciente.PacientesResponseAdminDTO;
 import com.salomon.citasmedbackend.domain.paciente.PacientesResponseDTO;
 import com.salomon.citasmedbackend.domain.usuario.DetallesUsuario;
 import com.salomon.citasmedbackend.domain.usuario.UserResponseDTO;
@@ -68,15 +69,16 @@ public class AdminController {
 
     // CRUD operations for Paciente
     @GetMapping("/pacientes")
-    public ResponseEntity<Page<PacientesResponseDTO>> getAllPacientes(@PageableDefault(size = 8) Pageable paginacion) {
+    public ResponseEntity<Page<PacientesResponseAdminDTO>> getAllPacientes(@PageableDefault(size = 8) Pageable paginacion) {
         Page<Paciente> pacientes = pacienteService.obtenerPacientes(paginacion);
         return ResponseEntity.ok().body(pacientes
-                .map(paciente -> new PacientesResponseDTO(
+                .map(paciente -> new PacientesResponseAdminDTO(
                         paciente.getId(),
                         paciente.getUsuario().getNombreCompleto(),
                         paciente.getUsuario().getDocumento(),
                         paciente.getUsuario().getEmail(),
                         paciente.getUsuario().getTelefono(),
+                        paciente.getUsuario().isActivo(),
                         paciente.getFechaNacimiento()
                 )));
     }
