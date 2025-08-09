@@ -47,6 +47,7 @@ export default function RegisterForm() {
     console.log(name, id, correo, telefono, contra, confirm, fecha);
     //Formato de fecha: YYYY-MM-DD
     const fechaFormateada = formatearFecha(fecha)
+    
 
 
     axios.post('http://localhost:8080/api/citasmed/pacientes/register', {

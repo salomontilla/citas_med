@@ -38,7 +38,6 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/api/citasmed/admin")
 public class AdminController {
 

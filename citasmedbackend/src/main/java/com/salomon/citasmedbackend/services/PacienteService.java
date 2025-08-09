@@ -110,8 +110,6 @@ public class PacienteService {
         userRepository.save(usuario);
         pacienteRepository.save(paciente);
 
-
-
         return paciente;
     }
 
