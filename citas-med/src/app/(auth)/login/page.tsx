@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import api from '../../lib/axios';
 import { useTokenStore } from '@/app/store/tokenStore';
+import { AxiosError } from 'axios';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -47,7 +48,7 @@ export default function LoginPage() {
       });
 
     }).catch((error: any) => {
-      const msg = error.message || "Error al iniciar sesión";
+      const msg = error.response?.data || "Error al iniciar sesión";
       setDescription(msg);
       setTitle("Error");
       setIsInvalid(true);

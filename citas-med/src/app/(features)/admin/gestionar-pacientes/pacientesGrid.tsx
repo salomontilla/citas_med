@@ -1,8 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Card, Pagination, Select, SelectItem, Spinner } from '@heroui/react';
+import { Button, Card, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Pagination, Select, SelectItem, Spinner } from '@heroui/react';
 import { useMedicoStore } from '@/app/store/medicoStore';
 import api from '@/app/lib/axios';
+import { useRouter } from 'next/navigation';
 
 type Paciente = {
     id: number;
@@ -23,9 +24,10 @@ export default function GridPacientes() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [pacienteSeleccionado, setPacienteSeleccionado] = useState<Paciente | null>(null);
-
+    const router = useRouter();
+    
     const [page, setPage] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [totalPages, setTotalPages] = useState(0);
 
     useEffect(() => {
@@ -48,7 +50,6 @@ export default function GridPacientes() {
         ? pacientes
         : pacientes.filter((paciente) => paciente.estado === estadoSeleccionado);
 
-    // 2. Luego hace paginación sobre los filtrados
 
 
     const paginatedPacientes = pacientesFiltrados.slice(
@@ -63,6 +64,13 @@ export default function GridPacientes() {
 
     if (loading) return <Spinner />
     if (error) return <div className="text-red-500 text-center">{error}</div>;
+
+    const handlePacienteSeleccionado = (paciente: Paciente) => {
+        setPacienteSeleccionado((prev) => prev?.id === paciente.id ? null : paciente);
+        router.push(`/admin/gestionar-pacientes/${paciente.id}`);
+       
+    };
+
     return (
         <section className="flex flex-col gap-4">
             {/* FILTRO */}
@@ -83,17 +91,18 @@ export default function GridPacientes() {
 
             {/* Muestra los pacientes filtrados y paginados */}
             {paginatedPacientes.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2">
                     {paginatedPacientes.map((paciente) => (
                         <Card
                             isPressable
                             key={paciente.id}
-                            onPress={() => setPacienteSeleccionado(paciente)}
+                            onPress={() => handlePacienteSeleccionado(paciente)}
                             className={`group relative flex flex-col justify-between p-4 rounded-2xl border transition-all duration-300 shadow-sm max-w-72 cursor-pointer
-    ${pacienteSeleccionado?.id === paciente.id
+                            ${pacienteSeleccionado?.id === paciente.id
                                     ? "border-blue-600 bg-blue-50 text-blue-900 shadow-md"
                                     : "bg-white hover:bg-blue-100 border-gray-200"
-                                }`}
+                                }`
+                            }
                         >
                             <div className="relative w-full h-40 mb-4 overflow-hidden rounded-xl">
                                 <img
@@ -125,18 +134,18 @@ export default function GridPacientes() {
 
             {/* PAGINADOR */}
             {totalPages > 0 ? (
-            <div className="flex w-full justify-center">
-              <Pagination
-                isCompact
-                showControls
-                showShadow
-                color="primary"
-                page={page}
-                total={totalPages}
-                onChange={(currentPage) => setPage(currentPage)}
-              />
-            </div>
-          ) : null}
+                <div className="flex w-full justify-center">
+                    <Pagination
+                        isCompact
+                        showControls
+                        showShadow
+                        color="primary"
+                        page={page}
+                        total={totalPages}
+                        onChange={(currentPage) => setPage(currentPage)}
+                    />
+                </div>
+            ) : null}
 
         </section>
     );
