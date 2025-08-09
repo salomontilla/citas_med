@@ -1,7 +1,7 @@
 'use client'
 import api from '@/app/lib/axios'
 import { EyeFilledIcon, EyeSlashFilledIcon } from '@/app/ui/components/passwordEyes';
-import { addToast, Button, DatePicker, Input } from '@heroui/react';
+import { addToast, Button, DatePicker, Input, Skeleton, Spinner } from '@heroui/react';
 import { use, useEffect, useState } from 'react'
 import { CalendarDate, today, getLocalTimeZone } from "@internationalized/date";
 import { formatearFecha } from '@/app/lib/utils';
@@ -40,6 +40,7 @@ export default function InfoPaciente({
     const [telefono, setTelefono] = useState('');
     const [contrasena, setContrasena] = useState<string | null>('');
     const [fechaFormateada, setFechaFormateada] = useState<CalendarDate | null>(null);
+    const [isLoadingInfo, setIsLoadingInfo] = useState(true);
 
     const toggleVisibility = () => setIsVisible(!isVisible);
     const [isVisible, setIsVisible] = useState(false);
@@ -48,7 +49,6 @@ export default function InfoPaciente({
         api.get(`/admin/pacientes/${id}`)
             .then((response) => {
                 setDatos(response.data);
-                console.log(response.data);
             })
             .catch((error) => {
                 addToast({
@@ -58,6 +58,9 @@ export default function InfoPaciente({
                     shouldShowTimeoutProgress: true,
                     timeout: 5000,
                 });
+            })
+            .finally(() => {
+                setIsLoadingInfo(false);
             });
     };
 
@@ -95,10 +98,10 @@ export default function InfoPaciente({
     const editarDatos = () => {
         setLoading(true);
         setEditando(true);
-        
+
         // Create an object with only the changed fields
         const changedFields: Partial<DatosPaciente> = {};
-        
+
         if (nombreCompleto !== datos.nombreCompleto) {
             changedFields.nombreCompleto = nombreCompleto;
         }
@@ -120,7 +123,7 @@ export default function InfoPaciente({
         if (contrasena !== datos.contrasena && contrasena && contrasena.trim() !== '') {
             changedFields.contrasena = contrasena;
         }
-        
+
         api.patch(`admin/pacientes/editar/${id}`, changedFields)
             .then((response) => {
                 setDatos(response.data);
@@ -144,7 +147,7 @@ export default function InfoPaciente({
     }
     const guardarCambios = () => {
         setLoading(true);
-        if (!correo || !telefono  || !nombreCompleto || !documento || !fechaFormateada) {
+        if (!correo || !telefono || !nombreCompleto || !documento || !fechaFormateada) {
             // Campos vacíos
             addToast({
                 title: 'Error',
@@ -185,6 +188,7 @@ export default function InfoPaciente({
         setLoading(false);
         setEditando(false);
     };
+    console.log(isLoadingInfo)
 
     return (
         <div className='min-h-screen md:min-h-fit w-full flex items-center justify-center bg-blue-50 px-4 py-8 md:py-0'>
@@ -203,61 +207,73 @@ export default function InfoPaciente({
                     </div>
                     <form>
                         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                            <Input
-                                label="Nombre"
-                                color='primary'
-                                value={nombreCompleto}
-                                onValueChange={setNombreCompleto}
-                                isDisabled={!editando}
-                            />
-                            <Input
-                                label="Correo Electrónico"
-                                color='primary'
-                                value={correo}
-                                onValueChange={setCorreo}
-                                isDisabled={!editando}
-                            />
-                            <Input
-                                label="Documento de Identidad"
-                                color='primary'
-                                value={documento}
-                                onValueChange={setDocumento}
-                                isDisabled={!editando}
-                            />
-                            <Input
-                                label="Teléfono"
-                                color='primary'
-                                value={telefono}
-                                onValueChange={setTelefono}
-                                isDisabled={!editando}
-                            />
-                            <DatePicker
-                                showMonthAndYearPickers
-                                color="primary"
-                                value={fechaFormateada}
-                                onChange={(value) => setFechaFormateada(value)}
-                                label="Fecha de nacimiento"
-                                className="rounded-2xl"
-                                isDisabled={!editando}
-                                maxValue={today(getLocalTimeZone())} />
-
-                            <Input
-                                color="primary"
-                                onValueChange={setContrasena}
-                                isDisabled={!editando}
-                                endContent={
-                                    <button
-                                        aria-label="toggle password visibility"
-                                        className="focus:outline-none"
-                                        type="button"
-                                        onClick={toggleVisibility}
-                                    >
-                                        {isVisible ? <EyeSlashFilledIcon /> : <EyeFilledIcon />}
-                                    </button>
-                                }
-                                label="Cambiar contraseña"
-                                type={isVisible ? "text" : "password"}
-                            />
+                            <Skeleton isLoaded={!isLoadingInfo} className='rounded-2xl bg-blue-100'>
+                                <Input
+                                    label="Nombre"
+                                    color='primary'
+                                    value={nombreCompleto}
+                                    onValueChange={setNombreCompleto}
+                                    isDisabled={!editando}
+                                />
+                            </Skeleton>
+                            <Skeleton isLoaded={!isLoadingInfo} className='rounded-2xl bg-blue-100'>
+                                <Input
+                                    label="Correo Electrónico"
+                                    color='primary'
+                                    value={correo}
+                                    onValueChange={setCorreo}
+                                    isDisabled={!editando}
+                                />
+                            </Skeleton>
+                            <Skeleton isLoaded={!isLoadingInfo} className='rounded-2xl bg-blue-100'>
+                                <Input
+                                    label="Documento de Identidad"
+                                    color='primary'
+                                    value={documento}
+                                    onValueChange={setDocumento}
+                                    isDisabled={!editando}
+                                />
+                            </Skeleton>
+                            <Skeleton isLoaded={!isLoadingInfo} className='rounded-2xl bg-blue-100'>
+                                <Input
+                                    label="Teléfono"
+                                    color='primary'
+                                    value={telefono}
+                                    onValueChange={setTelefono}
+                                    isDisabled={!editando}
+                                />
+                            </Skeleton>
+                            <Skeleton isLoaded={!isLoadingInfo} className='rounded-2xl bg-blue-100'>
+                                <DatePicker
+                                    showMonthAndYearPickers
+                                    color="primary"
+                                    value={fechaFormateada}
+                                    onChange={(value) => setFechaFormateada(value)}
+                                    label="Fecha de nacimiento"
+                                    className="rounded-2xl"
+                                    isDisabled={!editando}
+                                    maxValue={today(getLocalTimeZone())}
+                                />
+                            </Skeleton>
+                            <Skeleton isLoaded={!isLoadingInfo} className='rounded-2xl bg-blue-100'>
+                                <Input
+                                    color="primary"
+                                    onValueChange={setContrasena}
+                                    isDisabled={!editando}
+                                    endContent={
+                                        <button
+                                            aria-label="toggle password visibility"
+                                            className="focus:outline-none"
+                                            type="button"
+                                            onClick={toggleVisibility}
+                                        >
+                                            {isVisible ? <EyeSlashFilledIcon /> : <EyeFilledIcon />}
+                                        </button>
+                                    }
+                                    label="Cambiar contraseña"
+                                    type={isVisible ? "text" : "password"}
+                                />
+                            </Skeleton>
                         </div>
 
                         <div className="flex justify-end mt-10 gap-4">
@@ -282,12 +298,10 @@ export default function InfoPaciente({
             </section>
         </div>
 
+
+
     );
 
 
-    return (
-        <div>
-            <p>{id}</p>
-        </div>
-    )
+
 }
