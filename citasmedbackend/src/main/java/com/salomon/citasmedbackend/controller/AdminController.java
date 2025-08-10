@@ -91,7 +91,8 @@ public class AdminController {
                 paciente.getUsuario().getDocumento(),
                 paciente.getUsuario().getEmail(),
                 paciente.getUsuario().getTelefono(),
-                paciente.getFechaNacimiento()
+                paciente.getFechaNacimiento(),
+                paciente.getUsuario().isActivo()
         ));
     }
 
@@ -105,7 +106,8 @@ public class AdminController {
                 pacienteActualizado.getUsuario().getDocumento(),
                 pacienteActualizado.getUsuario().getEmail(),
                 pacienteActualizado.getUsuario().getTelefono(),
-                pacienteActualizado.getFechaNacimiento()
+                pacienteActualizado.getFechaNacimiento(),
+                pacienteActualizado.getUsuario().isActivo()
         ));
     }
 

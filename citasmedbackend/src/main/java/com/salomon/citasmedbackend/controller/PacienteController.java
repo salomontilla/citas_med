@@ -45,7 +45,8 @@ public class PacienteController {
                 nuevoPaciente.getUsuario().getDocumento(),
                 nuevoPaciente.getUsuario().getEmail(),
                 nuevoPaciente.getUsuario().getTelefono(),
-                nuevoPaciente.getFechaNacimiento()
+                nuevoPaciente.getFechaNacimiento(),
+                nuevoPaciente.getUsuario().isActivo()
         );
         URI location = uriBuilder
                 .path("/api/citasmed/pacientes/{id}")
@@ -64,7 +65,8 @@ public class PacienteController {
                 paciente.getUsuario().getDocumento(),
                 paciente.getUsuario().getEmail(),
                 paciente.getUsuario().getTelefono(),
-                paciente.getFechaNacimiento()
+                paciente.getFechaNacimiento(),
+                paciente.getUsuario().isActivo()
         );
         return ResponseEntity.ok(pacienteResponse);
     }

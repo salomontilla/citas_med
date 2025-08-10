@@ -62,7 +62,8 @@ public class MedicoController {
                         paciente.getUsuario().getDocumento(),
                         paciente.getUsuario().getEmail(),
                         paciente.getUsuario().getTelefono(),
-                        paciente.getFechaNacimiento()
+                        paciente.getFechaNacimiento(),
+                        paciente.getUsuario().isActivo()
                 )
         ));
     }

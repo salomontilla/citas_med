@@ -1,7 +1,7 @@
 'use client'
 import api from '@/app/lib/axios'
 import { EyeFilledIcon, EyeSlashFilledIcon } from '@/app/ui/components/passwordEyes';
-import { addToast, Button, DatePicker, Input, Skeleton, Spinner } from '@heroui/react';
+import { addToast, Button, Chip, DatePicker, Input, Skeleton, Spinner } from '@heroui/react';
 import { use, useEffect, useState } from 'react'
 import { CalendarDate, today, getLocalTimeZone } from "@internationalized/date";
 import { formatearFecha } from '@/app/lib/utils';
@@ -18,6 +18,7 @@ export default function InfoPaciente({
         telefono?: string;
         fechaNacimiento?: string;
         contrasena?: string;
+        isActivo?: boolean;
     }
 
     const { id } = use(params)
@@ -28,7 +29,8 @@ export default function InfoPaciente({
         documento: '',
         telefono: '',
         fechaNacimiento: '',
-        contrasena: ''
+        contrasena: '',
+        isActivo: undefined
     });
     const [editando, setEditando] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -69,7 +71,7 @@ export default function InfoPaciente({
         obtenerDatos();
     }, []);
 
-    // Actualizar el correo electrónico al cargar el componente
+    // Actualizar los estados locales con los datos obtenidos
     useEffect(() => {
         if (datos.email) {
             setCorreo(datos.email);
@@ -194,6 +196,28 @@ export default function InfoPaciente({
         setEditando(false);
     }
 
+    function handleDesactivar(): void {
+        api.delete(`admin/pacientes/${id}`)
+            .then(() => {
+                addToast({
+                    title: 'Éxito',
+                    description: 'La cuenta ha sido desactivada.',
+                    color: 'success',
+                    shouldShowTimeoutProgress: true,
+                    timeout: 5000,
+                });
+            })
+            .catch(() => {
+                addToast({
+                    title: 'Error',
+                    description: 'No se pudo desactivar la cuenta.',
+                    color: 'danger',
+                    shouldShowTimeoutProgress: true,
+                    timeout: 5000,
+                });
+            });
+    }
+
     return (
         <div className='min-h-screen md:min-h-fit w-full flex items-center justify-center bg-blue-50 px-4 py-8 md:py-0'>
             <section className="w-full bg-blue-200 rounded-2xl max-w-4xl shadow-md">
@@ -204,9 +228,12 @@ export default function InfoPaciente({
                 <div className="bg-white w-full p-8 rounded-b-2xl">
                     <div className="flex flex-col gap-4 items-center mb-6">
                         <img src="/medico.jpg" alt="doctor" className='rounded-full h-24 w-24 object-cover' />
-                        <div className='flex flex-col items-center'>
+                        <div className='flex flex-col items-center gap-1'>
                             <h1 className='font-bold text-xl'>{datos.nombreCompleto}</h1>
                             <span className="text-sm text-gray-500">{datos.email}</span>
+                            <Chip color={datos.isActivo ? 'danger' : 'success'}>
+                                {datos.isActivo ? 'Inactivo' : 'Activo'}
+                            </Chip>
                         </div>
                     </div>
                     <form>
@@ -281,6 +308,9 @@ export default function InfoPaciente({
                         </div>
 
                         <div className="flex justify-end mt-10 gap-4">
+                            <Button color="danger" onPress={() => handleDesactivar()}>
+                                Desactivar cuenta
+                            </Button>
                             {editando ? (
                                 <>
                                     <Button color="default" onPress={() => handleCancelar()} isDisabled={loading}>
