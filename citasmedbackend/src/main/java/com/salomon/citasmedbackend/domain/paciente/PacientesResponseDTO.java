@@ -11,6 +11,6 @@ public record PacientesResponseDTO(
         String email,
         String telefono,
         Date fechaNacimiento,
-        boolean activo
+        boolean isActivo
 ) {
 }

@@ -5,6 +5,7 @@ import { addToast, Button, Chip, DatePicker, Input, Skeleton, Spinner } from '@h
 import { use, useEffect, useState } from 'react'
 import { CalendarDate, today, getLocalTimeZone } from "@internationalized/date";
 import { formatearFecha } from '@/app/lib/utils';
+import { is } from 'date-fns/locale';
 
 export default function InfoPaciente({
     params,
@@ -30,7 +31,7 @@ export default function InfoPaciente({
         telefono: '',
         fechaNacimiento: '',
         contrasena: '',
-        isActivo: undefined
+        isActivo: true
     });
     const [editando, setEditando] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -43,6 +44,7 @@ export default function InfoPaciente({
     const [contrasena, setContrasena] = useState<string | null>('');
     const [fechaFormateada, setFechaFormateada] = useState<CalendarDate | null>(null);
     const [isLoadingInfo, setIsLoadingInfo] = useState(true);
+    const [isPacienteActive, setIsPacienteActive] = useState<boolean | undefined>(undefined);
 
     const toggleVisibility = () => setIsVisible(!isVisible);
     const [isVisible, setIsVisible] = useState(false);
@@ -51,6 +53,8 @@ export default function InfoPaciente({
         api.get(`/admin/pacientes/${id}`)
             .then((response) => {
                 setDatos(response.data);
+                setIsPacienteActive(response.data.isActivo);
+                console.log(response.data);
             })
             .catch((error) => {
                 addToast({
@@ -85,7 +89,6 @@ export default function InfoPaciente({
         if (datos.documento) {
             setDocumento(datos.documento);
         }
-        console.log(datos.fechaNacimiento);
         if (datos.fechaNacimiento) {
             const fechaParts = datos.fechaNacimiento.split('-');
             if (fechaParts.length === 3) {
@@ -96,6 +99,7 @@ export default function InfoPaciente({
             setContrasena(datos.contrasena);
         }
     }, [datos]);
+    console.log(datos.isActivo)
 
     const editarDatos = () => {
         setLoading(true);
@@ -190,13 +194,13 @@ export default function InfoPaciente({
         setLoading(false);
         setEditando(false);
     };
-    console.log(isLoadingInfo)
 
     function handleCancelar(): void {
         setEditando(false);
     }
 
     function handleDesactivar(): void {
+        setIsPacienteActive(false);
         api.delete(`admin/pacientes/${id}`)
             .then(() => {
                 addToast({
@@ -231,8 +235,8 @@ export default function InfoPaciente({
                         <div className='flex flex-col items-center gap-1'>
                             <h1 className='font-bold text-xl'>{datos.nombreCompleto}</h1>
                             <span className="text-sm text-gray-500">{datos.email}</span>
-                            <Chip color={datos.isActivo ? 'danger' : 'success'}>
-                                {datos.isActivo ? 'Inactivo' : 'Activo'}
+                            <Chip color={isPacienteActive ? 'success' : 'danger'}>
+                                {isPacienteActive ? 'Activo' : 'Inactivo'}
                             </Chip>
                         </div>
                     </div>

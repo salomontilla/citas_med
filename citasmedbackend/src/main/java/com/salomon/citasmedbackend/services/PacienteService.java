@@ -1,11 +1,8 @@
 package com.salomon.citasmedbackend.services;
 
-import com.salomon.citasmedbackend.domain.jwt.JwtUtil;
 import com.salomon.citasmedbackend.domain.paciente.Paciente;
 import com.salomon.citasmedbackend.domain.paciente.PacienteRegisterDTO;
 import com.salomon.citasmedbackend.domain.paciente.PacienteUpdateDTO;
-import com.salomon.citasmedbackend.domain.paciente.PacientesResponseDTO;
-import com.salomon.citasmedbackend.domain.usuario.DetallesUsuario;
 import com.salomon.citasmedbackend.domain.usuario.Rol;
 import com.salomon.citasmedbackend.domain.usuario.Usuario;
 import com.salomon.citasmedbackend.repository.PacienteRepository;
@@ -13,16 +10,10 @@ import com.salomon.citasmedbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
-import java.util.List;
-import java.util.Optional;
 
 import static com.salomon.citasmedbackend.infra.utils.FechaUtils.convertirFecha;
 
@@ -65,7 +56,7 @@ public class PacienteService {
     }
 
     public Page<Paciente> obtenerPacientes(Pageable paginacion) {
-        Page<Paciente> pacientes = pacienteRepository.findAllByUsuarioActivoTrue(paginacion);
+        Page<Paciente> pacientes = pacienteRepository.findAll(paginacion);
         if (pacientes.isEmpty()) {
             return Page.empty();
         }
@@ -74,7 +65,7 @@ public class PacienteService {
 
     public Paciente obtenerPacientePorId(Long id){
 
-        return pacienteRepository.findByIdAndUsuarioActivo(id)
+        return pacienteRepository.findPacienteById(id)
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado o inactivo"));
     }
 

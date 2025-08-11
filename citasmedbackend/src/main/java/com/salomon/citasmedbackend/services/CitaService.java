@@ -7,7 +7,6 @@ import com.salomon.citasmedbackend.domain.medico.Medico;
 import com.salomon.citasmedbackend.domain.paciente.Paciente;
 import com.salomon.citasmedbackend.domain.usuario.Usuario;
 import com.salomon.citasmedbackend.repository.*;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -83,7 +82,7 @@ public class CitaService {
     }
 
     public Page<Cita> obtenerCitasPorPacienteId(Long pacienteId, Pageable pageable) {
-        Paciente paciente = pacienteRepository.findByIdAndUsuarioActivo(pacienteId)
+        Paciente paciente = pacienteRepository.findPacienteById(pacienteId)
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado o inactivo"));
         return citasRepository.findByPacienteId(paciente.getId(), pageable);
 
