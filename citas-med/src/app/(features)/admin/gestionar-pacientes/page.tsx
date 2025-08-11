@@ -1,5 +1,4 @@
 import { Table } from "lucide-react";
-import TableExample from "./tableExample";
 import PacientesGrid from "./pacientesGrid";
 
 export default function PacienteDashboard() {

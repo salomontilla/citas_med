@@ -1,11 +1,12 @@
 'use client'
 import api from '@/app/lib/axios'
 import { EyeFilledIcon, EyeSlashFilledIcon } from '@/app/ui/components/passwordEyes';
-import { addToast, Button, Chip, DatePicker, Input, Skeleton, Spinner } from '@heroui/react';
+import { addToast, Button, Chip, DatePicker, Input, Link, Skeleton, Spinner } from '@heroui/react';
 import { use, useEffect, useState } from 'react'
 import { CalendarDate, today, getLocalTimeZone } from "@internationalized/date";
 import { formatearFecha } from '@/app/lib/utils';
 import { is } from 'date-fns/locale';
+import router from 'next/router';
 
 export default function InfoPaciente({
     params,
@@ -199,8 +200,9 @@ export default function InfoPaciente({
         setEditando(false);
     }
 
-    function handleDesactivar(): void {
-        setIsPacienteActive(false);
+    function handleEstadoPaciente(): void {
+        setIsPacienteActive(!isPacienteActive);
+        if(isPacienteActive) {
         api.delete(`admin/pacientes/${id}`)
             .then(() => {
                 addToast({
@@ -220,6 +222,27 @@ export default function InfoPaciente({
                     timeout: 5000,
                 });
             });
+        }else{
+            api.patch(`admin/pacientes/activar/${id}`)
+                .then(() => {
+                    addToast({
+                        title: 'Éxito',
+                        description: 'La cuenta ha sido reactivada.',
+                        color: 'success',
+                        shouldShowTimeoutProgress: true,
+                        timeout: 5000,
+                    });
+                })
+                .catch(() => {
+                    addToast({
+                        title: 'Error',
+                        description: 'No se pudo reactivar la cuenta.',
+                        color: 'danger',
+                        shouldShowTimeoutProgress: true,
+                        timeout: 5000,
+                    });
+                });
+        }
     }
 
     return (
@@ -311,9 +334,12 @@ export default function InfoPaciente({
                             </Skeleton>
                         </div>
 
-                        <div className="flex justify-end mt-10 gap-4">
-                            <Button color="danger" onPress={() => handleDesactivar()}>
-                                Desactivar cuenta
+                        <div className="flex flex-col md:flex-row justify-end mt-10 gap-4">
+                            <Button className='left-0' onPress={() => router.back()}>
+                                <Link href='/admin/gestionar-pacientes'>Volver</Link>
+                            </Button>
+                            <Button color={isPacienteActive ? "danger" : "success"} onPress={() => handleEstadoPaciente()}>
+                                {isPacienteActive ? "Desactivar cuenta" : "Activar cuenta"}
                             </Button>
                             {editando ? (
                                 <>
