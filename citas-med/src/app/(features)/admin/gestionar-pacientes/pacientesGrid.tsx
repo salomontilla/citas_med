@@ -1,16 +1,17 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Button, Card, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Pagination, Select, SelectItem, Spinner } from '@heroui/react';
+import { Button, Card, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Pagination, Select, SelectItem, Spinner } from '@heroui/react';
 import { useMedicoStore } from '@/app/store/medicoStore';
 import api from '@/app/lib/axios';
 import { useRouter } from 'next/navigation';
+import { Search } from 'lucide-react';
 
 type Paciente = {
     id: number;
     nombreCompleto: string;
     documento: string;
     email: string;
-    estado: string;
+    isActivo: boolean;
     telefono: string;
     fechaNacimiento: string;
 }
@@ -24,8 +25,9 @@ export default function GridPacientes() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [pacienteSeleccionado, setPacienteSeleccionado] = useState<Paciente | null>(null);
+    const [busqueda, setBusqueda] = useState("");
     const router = useRouter();
-    
+
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [totalPages, setTotalPages] = useState(0);
@@ -34,9 +36,7 @@ export default function GridPacientes() {
         api.get(`/admin/pacientes?page=${page - 1}&size=${rowsPerPage}`)
             .then((response) => {
                 setPacientes(response.data.content);
-                console.log(response.data.totalPages);
                 setTotalPages(response.data.totalPages);
-                console.log(pacientes);
             })
             .catch((error) => {
                 setError(error.message || "No se pudieron cargar los pacientes.");
@@ -44,23 +44,34 @@ export default function GridPacientes() {
             .finally(() => setLoading(false));
     }, [page]);
 
+    // 1️⃣ Filtro combinado por estado y por nombre
+    const pacientesFiltrados = pacientes
+        // Filtro por estado
+        .filter((paciente) => {
+            if (estadoSeleccionado === "Todos") return true;
+            return estadoSeleccionado === "Activo" ? paciente.isActivo : !paciente.isActivo;
+        })
+        // Filtro por nombre
+        .filter((paciente) =>
+            paciente.nombreCompleto.toLowerCase().includes(busqueda.toLowerCase())
+        );
+        console.log(pacientesFiltrados.length);
 
-    // 1. Filtra primero
-    const pacientesFiltrados = estadoSeleccionado === "Todos"
-        ? pacientes
-        : pacientes.filter((paciente) => paciente.estado === estadoSeleccionado);
+    // 2️⃣ Calcular total de páginas
+    useEffect(() => {
+        setTotalPages(totalPages);
+    }, [pacientesFiltrados, rowsPerPage]);
 
-
-
+    // 3️⃣ Aplicar paginación
     const paginatedPacientes = pacientesFiltrados.slice(
         (currentPage - 1) * rowsPerPage,
         currentPage * rowsPerPage
     );
 
-    // 3. Reinicia página al cambiar filtro
+    // 4️⃣ Reiniciar página al cambiar estado o búsqueda
     useEffect(() => {
         setCurrentPage(1);
-    }, [estadoSeleccionado]);
+    }, [estadoSeleccionado, busqueda]);
 
     if (loading) return <Spinner />
     if (error) return <div className="text-red-500 text-center">{error}</div>;
@@ -68,26 +79,38 @@ export default function GridPacientes() {
     const handlePacienteSeleccionado = (paciente: Paciente) => {
         setPacienteSeleccionado((prev) => prev?.id === paciente.id ? null : paciente);
         router.push(`/admin/gestionar-pacientes/${paciente.id}`);
-       
+
     };
+    console.log(paginatedPacientes.length, totalPages);
 
     return (
-        <section className="flex flex-col gap-4">
-            {/* FILTRO */}
-            <Select
-                color='primary'
-                label="Busca por especialidad"
-                labelPlacement='outside'
-                className="max-w-xs z-0"
-                value={estadoSeleccionado}
-                onChange={(e) => setEstadoSeleccionado(e.target.value)}
-            >
-                {estados.map((estado) => (
-                    <SelectItem key={estado}>
-                        {estado}
-                    </SelectItem>
-                ))}
-            </Select>
+        <section className="flex flex-col  gap-4">
+            <div className="flex gap-4">
+                <Input
+                    startContent={<Search />}
+                    isClearable
+                    className='max-w-xs'
+                    placeholder="Buscar paciente"
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                />
+                {/* FILTRO */}
+                <Select
+                    color='primary'
+                    label="Busca por estado"
+                    labelPlacement='inside'
+                    className="max-w-xs z-0"
+                    value={estadoSeleccionado}
+                    onChange={(e) => setEstadoSeleccionado(e.target.value)}
+                >
+                    {estados.map((estado) => (
+                        <SelectItem key={estado}>
+                            {estado}
+                        </SelectItem>
+                    ))}
+                </Select>
+            </div>
+            
 
             {/* Muestra los pacientes filtrados y paginados */}
             {paginatedPacientes.length > 0 ? (

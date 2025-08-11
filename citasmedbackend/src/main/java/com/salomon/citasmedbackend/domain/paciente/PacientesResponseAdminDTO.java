@@ -8,7 +8,7 @@ public record PacientesResponseAdminDTO (
         String documento,
         String email,
         String telefono,
-        Boolean activo,
+        Boolean isActivo,
         Date fechaNacimiento
 ) {
 }

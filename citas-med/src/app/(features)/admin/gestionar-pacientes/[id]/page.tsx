@@ -335,9 +335,11 @@ export default function InfoPaciente({
                         </div>
 
                         <div className="flex flex-col md:flex-row justify-end mt-10 gap-4">
-                            <Button className='left-0' onPress={() => router.back()}>
-                                <Link href='/admin/gestionar-pacientes'>Volver</Link>
-                            </Button>
+                            <div className="flex-1 flex justify-start">
+                                <Button className='left-0' onPress={() => router.back()}>
+                                    <Link href='/admin/gestionar-pacientes'>Volver</Link>
+                                </Button>
+                            </div>
                             <Button color={isPacienteActive ? "danger" : "success"} onPress={() => handleEstadoPaciente()}>
                                 {isPacienteActive ? "Desactivar cuenta" : "Activar cuenta"}
                             </Button>
