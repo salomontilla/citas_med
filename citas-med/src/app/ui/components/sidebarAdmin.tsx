@@ -24,6 +24,7 @@ export const Sidebar = () => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
+    localStorage.setItem("sidebar-selected", 'Gestionar Pacientes');
     const saved = localStorage.getItem("sidebar-selected");
     if (saved) setSelected(saved);
     setIsLoaded(true);

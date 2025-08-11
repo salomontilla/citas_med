@@ -68,8 +68,12 @@ public class AdminController {
 
     // CRUD operations for Paciente
     @GetMapping("/pacientes")
-    public ResponseEntity<Page<PacientesResponseAdminDTO>> getAllPacientes(@PageableDefault(size = 8) Pageable paginacion) {
-        Page<Paciente> pacientes = pacienteService.obtenerPacientes(paginacion);
+    public ResponseEntity<Page<PacientesResponseAdminDTO>> getAllPacientes(
+            @PageableDefault(size = 8) Pageable paginacion,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String estado
+            ) {
+        Page<Paciente> pacientes = pacienteService.obtenerPacientes(paginacion, search, estado);
         return ResponseEntity.ok().body(pacientes
                 .map(paciente -> new PacientesResponseAdminDTO(
                         paciente.getId(),

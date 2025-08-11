@@ -55,12 +55,24 @@ public class PacienteService {
         return paciente;
     }
 
-    public Page<Paciente> obtenerPacientes(Pageable paginacion) {
-        Page<Paciente> pacientes = pacienteRepository.findAll(paginacion);
-        if (pacientes.isEmpty()) {
-            return Page.empty();
+    public Page<Paciente> obtenerPacientes(Pageable pageable, String search, String estado) {
+        boolean activo = "Activo".equalsIgnoreCase(estado);
+        boolean inactivo = "Inactivo".equalsIgnoreCase(estado);
+
+        if (search != null && !search.isEmpty()) {
+            if (estado != null && !estado.equalsIgnoreCase("Todos")) {
+                return pacienteRepository.findByUsuario_NombreCompletoContainingIgnoreCaseAndUsuario_Activo(
+                        search, activo, pageable
+                );
+            }
+            return pacienteRepository.findByUsuario_NombreCompletoContainingIgnoreCase(search, pageable);
         }
-        return pacientes;
+
+        if (estado != null && !estado.equalsIgnoreCase("Todos")) {
+            return pacienteRepository.findByUsuario_Activo(activo, pageable);
+        }
+
+        return pacienteRepository.findAll(pageable);
     }
 
     public Paciente obtenerPacientePorId(Long id){

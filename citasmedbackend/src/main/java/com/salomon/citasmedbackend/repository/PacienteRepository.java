@@ -23,4 +23,10 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findPacienteByUsuarioIdActivo(@Param("usuarioId") Long usuarioId);
 
 
+    Page<Paciente> findByUsuario_NombreCompletoContainingIgnoreCase(String nombre, Pageable pageable);
+
+    Page<Paciente> findByUsuario_Activo(boolean activo, Pageable pageable);
+
+    Page<Paciente> findByUsuario_NombreCompletoContainingIgnoreCaseAndUsuario_Activo(
+            String nombre, boolean activo, Pageable pageable);
 }

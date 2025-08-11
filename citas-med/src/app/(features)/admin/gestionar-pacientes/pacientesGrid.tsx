@@ -33,16 +33,23 @@ export default function GridPacientes() {
     const [totalPages, setTotalPages] = useState(0);
 
     useEffect(() => {
-        api.get(`/admin/pacientes?page=${page - 1}&size=${rowsPerPage}`)
-            .then((response) => {
-                setPacientes(response.data.content);
-                setTotalPages(response.data.totalPages);
+        api.get("/admin/pacientes", {
+            params: {
+                page: currentPage - 1,
+                size: rowsPerPage,
+                search: busqueda || null,
+                estado: estadoSeleccionado
+            }
+        })
+            .then((res) => {
+                setPacientes(res.data.content);
+                setTotalPages(res.data.totalPages);
             })
-            .catch((error) => {
-                setError(error.message || "No se pudieron cargar los pacientes.");
+            .catch((err) => {
+                setError(err.message);
             })
             .finally(() => setLoading(false));
-    }, [page]);
+    }, [currentPage, rowsPerPage, busqueda, estadoSeleccionado]);
 
     // 1️⃣ Filtro combinado por estado y por nombre
     const pacientesFiltrados = pacientes
@@ -55,7 +62,7 @@ export default function GridPacientes() {
         .filter((paciente) =>
             paciente.nombreCompleto.toLowerCase().includes(busqueda.toLowerCase())
         );
-        console.log(pacientesFiltrados.length);
+    console.log(pacientesFiltrados.length);
 
     // 2️⃣ Calcular total de páginas
     useEffect(() => {
@@ -89,6 +96,7 @@ export default function GridPacientes() {
                 <Input
                     startContent={<Search />}
                     isClearable
+                    onClear={() => setBusqueda("")}
                     className='max-w-xs'
                     placeholder="Buscar paciente"
                     value={busqueda}
@@ -110,7 +118,7 @@ export default function GridPacientes() {
                     ))}
                 </Select>
             </div>
-            
+
 
             {/* Muestra los pacientes filtrados y paginados */}
             {paginatedPacientes.length > 0 ? (
