@@ -333,8 +333,8 @@ export default function InfoPaciente({
 
                         <div className="flex flex-col md:flex-row justify-end mt-10 gap-4">
                             <div className="flex-1 flex justify-start">
-                                <Button className='left-0' onPress={() => router.back()}>
-                                    <Link href='/admin/gestionar-pacientes'>Volver</Link>
+                                <Button className='left-0' variant='light'>
+                                    <Link href='/admin/gestionar-medicos'>Volver</Link>
                                 </Button>
                             </div>
                             <Button color={isMedicoActive ? "danger" : "success"} onPress={() => handleEstadoMedico()}>
