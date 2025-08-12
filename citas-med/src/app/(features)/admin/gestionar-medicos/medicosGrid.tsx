@@ -62,7 +62,6 @@ export default function Gridmedicos() {
         .filter((medico) =>
             medico.nombre.toLowerCase().includes(busqueda.toLowerCase())
         );
-    console.log(medicosFiltrados.length);
 
     // 2️⃣ Calcular total de páginas
     useEffect(() => {

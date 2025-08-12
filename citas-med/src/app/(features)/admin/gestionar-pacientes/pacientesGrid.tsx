@@ -62,7 +62,6 @@ export default function GridPacientes() {
         .filter((paciente) =>
             paciente.nombreCompleto.toLowerCase().includes(busqueda.toLowerCase())
         );
-    console.log(pacientesFiltrados.length);
 
     // 2️⃣ Calcular total de páginas
     useEffect(() => {

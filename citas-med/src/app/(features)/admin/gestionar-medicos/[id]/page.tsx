@@ -103,7 +103,6 @@ export default function InfoPaciente({
             setEspecialidad(datos.especialidad);
         }
     }, [datos]);
-    console.log(datos.isActivo)
 
     const editarDatos = () => {
         setLoading(true);
