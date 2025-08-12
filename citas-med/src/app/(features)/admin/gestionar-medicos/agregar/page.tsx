@@ -25,15 +25,20 @@ export default function AgregarMedicoPage() {
         documento: "",
     });
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
 
     const handleChange = (field: keyof MedicoFormData, value: string) => {
         setForm((prev) => ({ ...prev, [field]: value }));
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        console.log(form)
+        setIsLoading(true);
         api.post("/admin/medicos/register", form)
-            .then(() => {
+        .then(() => {
+            
                 addToast({
                     title: "Éxito",
                     description: "Médico agregado correctamente",
@@ -59,6 +64,9 @@ export default function AgregarMedicoPage() {
                     shouldShowTimeoutProgress: true,
                     timeout: 5000,
                 });
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
     };
 
@@ -71,98 +79,112 @@ export default function AgregarMedicoPage() {
             >
                 ← Volver atrás
             </Link>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <Input
+                    label="Nombre completo"
+                    placeholder="Ingrese el nombre"
+                    value={form.nombreCompleto}
+                    onChange={(e) => handleChange("nombreCompleto", e.target.value)}
+                    startContent={<User2 className="w-4 h-4 text-gray-500" />}
+                    isClearable
+                    onClear={() => handleChange("nombreCompleto", "")}
+                    color="primary"
+                    errorMessage="Campo requerido"
+                    isRequired={true}
+                />
 
-            <Input
-                label="Nombre completo"
-                placeholder="Ingrese el nombre"
-                value={form.nombreCompleto}
-                onChange={(e) => handleChange("nombreCompleto", e.target.value)}
-                startContent={<User2 className="w-4 h-4 text-gray-500" />}
-                isClearable
-                onClear={() => handleChange("nombreCompleto", "")}
-                color="primary"
-                errorMessage="Campo requerido"
-                required
-            />
+                <Select
+                    label="Especialidad"
+                    placeholder="Seleccione una especialidad"
+                    selectedKeys={form.especialidad ? [form.especialidad] : []}
+                    onSelectionChange={(keys) =>
+                        handleChange("especialidad", Array.from(keys)[0] as string)
+                    }
+                    color="primary"
+                    isRequired={true}
+                    errorMessage="Campo requerido"
+                >
+                    <SelectItem key="PEDIATRIA">Pediatría</SelectItem>
+                    <SelectItem key="CARDIOLOGIA">Cardiología</SelectItem>
+                    <SelectItem key="GENERAL">Medicina General</SelectItem>
 
-            <Select
-                label="Especialidad"
-                placeholder="Seleccione una especialidad"
-                selectedKeys={form.especialidad ? [form.especialidad] : []}
-                onSelectionChange={(keys) =>
-                    handleChange("especialidad", Array.from(keys)[0] as string)
-                }
-                color="primary"
-            >
-                <SelectItem key="pediatria">Pediatría</SelectItem>
-                <SelectItem key="cardiologia">Cardiología</SelectItem>
-                <SelectItem key="dermatologia">Dermatología</SelectItem>
-            </Select>
+                </Select>
 
-            <Input
-                label="Teléfono"
-                placeholder="Ingrese el teléfono"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={form.telefono}
-                onChange={(e) => handleChange("telefono", e.target.value)}
-                startContent={<Phone className="w-4 h-4 text-gray-500" />}
-                isClearable
-                onClear={() => handleChange("telefono", "")}
-                color="primary"
-            />
+                <Input
+                    label="Teléfono"
+                    placeholder="Ingrese el teléfono"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={form.telefono}
+                    onChange={(e) => handleChange("telefono", e.target.value)}
+                    startContent={<Phone className="w-4 h-4 text-gray-500" />}
+                    isClearable
+                    onClear={() => handleChange("telefono", "")}
+                    color="primary"
+                    errorMessage="Campo requerido"
+                    isRequired={true}
+                />
 
-            <Input
-                label="Correo electrónico"
-                placeholder="Ingrese el correo"
-                type="email"
-                value={form.email}
-                onChange={(e) => handleChange("email", e.target.value)}
-                startContent={<Mail className="w-4 h-4 text-gray-500" />}
-                isClearable
-                onClear={() => handleChange("email", "")}
-                color="primary"
-            />
+                <Input
+                    label="Correo electrónico"
+                    placeholder="Ingrese el correo"
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => handleChange("email", e.target.value)}
+                    startContent={<Mail className="w-4 h-4 text-gray-500" />}
+                    isClearable
+                    onClear={() => handleChange("email", "")}
+                    color="primary"
+                    errorMessage="Campo requerido"
+                    isRequired={true}
+                />
 
-            <Input
-                label="Contraseña"
-                placeholder="Ingrese la contraseña"
-                value={form.contrasena}
-                onChange={(e) => handleChange("contrasena", e.target.value)}
-                startContent={<Lock className="w-4 h-4 text-gray-500" />}
-                color="primary"
-                type={isPasswordVisible ? "text" : "password"}
-                endContent={
-                    <button
-                        aria-label="toggle password visibility"
-                        className="focus:outline-none"
-                        type="button"
-                        tabIndex={-1}
-                        onClick={togglePasswordVisibility}
-                    >
-                        {isPasswordVisible ? <EyeSlashFilledIcon /> : <EyeFilledIcon />}
-                    </button>
-                }
-            />
+                <Input
+                    label="Contraseña"
+                    placeholder="Ingrese la contraseña"
+                    value={form.contrasena}
+                    onChange={(e) => handleChange("contrasena", e.target.value)}
+                    startContent={<Lock className="w-4 h-4 text-gray-500" />}
+                    color="primary"
+                    type={isPasswordVisible ? "text" : "password"}
+                    endContent={
+                        <button
+                            aria-label="toggle password visibility"
+                            className="focus:outline-none"
+                            type="button"
+                            onClick={togglePasswordVisibility}
+                        >
+                            {isPasswordVisible ? <EyeSlashFilledIcon /> : <EyeFilledIcon />}
+                        </button>
+                    }
+                    errorMessage="Campo requerido"
+                    isRequired={true}
+                />
 
-            <Input
-                label="Documento"
-                placeholder="Número de documento"
-                value={form.documento}
-                onChange={(e) => handleChange("documento", e.target.value)}
-                startContent={<FileText className="w-4 h-4 text-gray-500" />}
-                isClearable
-                onClear={() => handleChange("documento", "")}
-                color="primary"
-            />
+                <Input
+                    label="Documento"
+                    placeholder="Número de documento"
+                    value={form.documento}
+                    onChange={(e) => handleChange("documento", e.target.value)}
+                    startContent={<FileText className="w-4 h-4 text-gray-500" />}
+                    isClearable
+                    onClear={() => handleChange("documento", "")}
+                    color="primary"
+                    errorMessage="Campo requerido"
+                    isRequired={true}
+                />
 
-            <Button
-                className="w-full"
-                color="primary"
-                onPress={() => handleSubmit()}
-            >
-                Registrar
-            </Button>
+                <Button
+                    type="submit"
+                    isLoading={isLoading}
+                    className="p-6"
+                    radius="lg"
+                    color="primary"
+                >
+                    Registrar
+                </Button>
+            </form>
+
         </div>
     );
 }
