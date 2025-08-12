@@ -4,7 +4,7 @@ import { Button, Card, Input, Modal, ModalBody, ModalContent, ModalFooter, Modal
 import { useMedicoStore } from '@/app/store/medicoStore';
 import api from '@/app/lib/axios';
 import { useRouter } from 'next/navigation';
-import { Search } from 'lucide-react';
+import { Link, Plus, Search } from 'lucide-react';
 
 type Medico = {
     id: number;
@@ -179,6 +179,18 @@ export default function Gridmedicos() {
                     />
                 </div>
             ) : null}
+            <div className="flex justify-end">
+                <Button
+                    color="success"
+                    startContent={<Plus className='text-white' />}
+                    onPress={() => router.push("/admin/gestionar-medicos/agregar")}
+                    className="mt-4 max-w-sm text-white"
+                >
+                    <Link href="/admin/gestionar-medicos/agregar">
+                        Agregar Médico
+                    </Link>
+                </Button>
+            </div>
 
         </section>
     );
