@@ -2,7 +2,9 @@
 import React, { useState } from "react";
 import { addToast, Button, Input, Select, SelectItem, User } from "@heroui/react";
 import api from "@/app/lib/axios";
-import { FileText, Lock, Mail, Phone, User2 } from "lucide-react";
+import { Eye, FileText, Lock, Mail, Phone, User2 } from "lucide-react";
+import Link from "next/link";
+import { EyeFilledIcon, EyeSlashFilledIcon } from "@/app/ui/components/passwordEyes";
 
 interface MedicoFormData {
     nombreCompleto: string;
@@ -22,10 +24,12 @@ export default function AgregarMedicoPage() {
         contrasena: "",
         documento: "",
     });
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
 
     const handleChange = (field: keyof MedicoFormData, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
+        setForm((prev) => ({ ...prev, [field]: value }));
+    };
 
     const handleSubmit = () => {
         api.post("/admin/medicos/register", form)
@@ -59,76 +63,106 @@ export default function AgregarMedicoPage() {
     };
 
     return (
-            <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-lg space-y-4">
-                <h2 className="text-2xl font-bold text-center">Registro de Médico</h2>
+        <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-lg space-y-4">
+            <h2 className="text-2xl font-bold text-center">Registro de Médico</h2>
+            <Link
+                href="/admin/gestionar-medicos"
+                className="text-primary hover:underline text-sm flex items-center gap-1 mb-2"
+            >
+                ← Volver atrás
+            </Link>
 
-                <Input
-                    label="Nombre completo"
-                    placeholder="Ingrese el nombre"
-                    value={form.nombreCompleto}
-                    onChange={(e) => handleChange("nombreCompleto", e.target.value)}
-                    startContent={<User2 className="w-4 h-4 text-gray-500" />}
-                    isClearable
-                />
+            <Input
+                label="Nombre completo"
+                placeholder="Ingrese el nombre"
+                value={form.nombreCompleto}
+                onChange={(e) => handleChange("nombreCompleto", e.target.value)}
+                startContent={<User2 className="w-4 h-4 text-gray-500" />}
+                isClearable
+                onClear={() => handleChange("nombreCompleto", "")}
+                color="primary"
+                errorMessage="Campo requerido"
+                required
+            />
 
-                <Select
-                    label="Especialidad"
-                    placeholder="Seleccione una especialidad"
-                    selectedKeys={form.especialidad ? [form.especialidad] : []}
-                    onSelectionChange={(keys) =>
-                        handleChange("especialidad", Array.from(keys)[0] as string)
-                    }
-                >
-                    <SelectItem key="pediatria">Pediatría</SelectItem>
-                    <SelectItem key="cardiologia">Cardiología</SelectItem>
-                    <SelectItem key="dermatologia">Dermatología</SelectItem>
-                </Select>
+            <Select
+                label="Especialidad"
+                placeholder="Seleccione una especialidad"
+                selectedKeys={form.especialidad ? [form.especialidad] : []}
+                onSelectionChange={(keys) =>
+                    handleChange("especialidad", Array.from(keys)[0] as string)
+                }
+                color="primary"
+            >
+                <SelectItem key="pediatria">Pediatría</SelectItem>
+                <SelectItem key="cardiologia">Cardiología</SelectItem>
+                <SelectItem key="dermatologia">Dermatología</SelectItem>
+            </Select>
 
-                <Input
-                    label="Teléfono"
-                    placeholder="Ingrese el teléfono"
-                    type="tel"
-                    value={form.telefono}
-                    onChange={(e) => handleChange("telefono", e.target.value)}
-                    startContent={<Phone className="w-4 h-4 text-gray-500" />}
-                    isClearable
-                />
+            <Input
+                label="Teléfono"
+                placeholder="Ingrese el teléfono"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={form.telefono}
+                onChange={(e) => handleChange("telefono", e.target.value)}
+                startContent={<Phone className="w-4 h-4 text-gray-500" />}
+                isClearable
+                onClear={() => handleChange("telefono", "")}
+                color="primary"
+            />
 
-                <Input
-                    label="Correo electrónico"
-                    placeholder="Ingrese el correo"
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => handleChange("email", e.target.value)}
-                    startContent={<Mail className="w-4 h-4 text-gray-500" />}
-                    isClearable
-                />
+            <Input
+                label="Correo electrónico"
+                placeholder="Ingrese el correo"
+                type="email"
+                value={form.email}
+                onChange={(e) => handleChange("email", e.target.value)}
+                startContent={<Mail className="w-4 h-4 text-gray-500" />}
+                isClearable
+                onClear={() => handleChange("email", "")}
+                color="primary"
+            />
 
-                <Input
-                    label="Contraseña"
-                    placeholder="Ingrese la contraseña"
-                    type="password"
-                    value={form.contrasena}
-                    onChange={(e) => handleChange("contrasena", e.target.value)}
-                    startContent={<Lock className="w-4 h-4 text-gray-500" />}
-                />
+            <Input
+                label="Contraseña"
+                placeholder="Ingrese la contraseña"
+                value={form.contrasena}
+                onChange={(e) => handleChange("contrasena", e.target.value)}
+                startContent={<Lock className="w-4 h-4 text-gray-500" />}
+                color="primary"
+                type={isPasswordVisible ? "text" : "password"}
+                endContent={
+                    <button
+                        aria-label="toggle password visibility"
+                        className="focus:outline-none"
+                        type="button"
+                        tabIndex={-1}
+                        onClick={togglePasswordVisibility}
+                    >
+                        {isPasswordVisible ? <EyeSlashFilledIcon /> : <EyeFilledIcon />}
+                    </button>
+                }
+            />
 
-                <Input
-                    label="Documento"
-                    placeholder="Número de documento"
-                    value={form.documento}
-                    onChange={(e) => handleChange("documento", e.target.value)}
-                    startContent={<FileText className="w-4 h-4 text-gray-500" />}
-                    isClearable
-                />
+            <Input
+                label="Documento"
+                placeholder="Número de documento"
+                value={form.documento}
+                onChange={(e) => handleChange("documento", e.target.value)}
+                startContent={<FileText className="w-4 h-4 text-gray-500" />}
+                isClearable
+                onClear={() => handleChange("documento", "")}
+                color="primary"
+            />
 
-                <Button
-                    className="w-full"
-                    color="primary"
-                    onPress={() => handleSubmit()}
-                >
-                    Registrar
-                </Button>
-            </div>
-        );
+            <Button
+                className="w-full"
+                color="primary"
+                onPress={() => handleSubmit()}
+            >
+                Registrar
+            </Button>
+        </div>
+    );
 }

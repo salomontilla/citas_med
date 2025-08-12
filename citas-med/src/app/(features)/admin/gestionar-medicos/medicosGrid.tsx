@@ -4,7 +4,9 @@ import { Button, Card, Input, Modal, ModalBody, ModalContent, ModalFooter, Modal
 import { useMedicoStore } from '@/app/store/medicoStore';
 import api from '@/app/lib/axios';
 import { useRouter } from 'next/navigation';
-import { Link, Plus, Search } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
+import Link from 'next/link';
+
 
 type Medico = {
     id: number;
