@@ -6,25 +6,25 @@ import api from '@/app/lib/axios';
 import { useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
 
-type Paciente = {
+type Medico = {
     id: number;
-    nombreCompleto: string;
+    nombre: string;
     documento: string;
     email: string;
     isActivo: boolean;
     telefono: string;
-    fechaNacimiento: string;
+    especialidad: string;
 }
 
 const estados = ["Todos", "Activo", "Inactivo"];
 
-export default function GridPacientes() {
+export default function Gridmedicos() {
     const [currentPage, setCurrentPage] = useState(1);
     const [estadoSeleccionado, setEstadoSeleccionado] = useState("Todos");
-    const [pacientes, setPacientes] = useState<Paciente[]>([]);
+    const [medicos, setMedicos] = useState<Medico[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [pacienteSeleccionado, setPacienteSeleccionado] = useState<Paciente | null>(null);
+    const [medicoSeleccionado, setMedicoSeleccionado] = useState<Medico | null>(null);
     const [busqueda, setBusqueda] = useState("");
     const router = useRouter();
 
@@ -33,7 +33,7 @@ export default function GridPacientes() {
     const [totalPages, setTotalPages] = useState(0);
 
     useEffect(() => {
-        api.get("/admin/pacientes", {
+        api.get("/admin/medicos", {
             params: {
                 page: currentPage - 1,
                 size: rowsPerPage,
@@ -42,7 +42,7 @@ export default function GridPacientes() {
             }
         })
             .then((res) => {
-                setPacientes(res.data.content);
+                setMedicos(res.data.content);
                 setTotalPages(res.data.totalPages);
             })
             .catch((err) => {
@@ -52,25 +52,25 @@ export default function GridPacientes() {
     }, [currentPage, rowsPerPage, busqueda, estadoSeleccionado]);
 
     // 1️⃣ Filtro combinado por estado y por nombre
-    const pacientesFiltrados = pacientes
+    const medicosFiltrados = medicos
         // Filtro por estado
-        .filter((paciente) => {
+        .filter((medico) => {
             if (estadoSeleccionado === "Todos") return true;
-            return estadoSeleccionado === "Activo" ? paciente.isActivo : !paciente.isActivo;
+            return estadoSeleccionado === "Activo" ? medico.isActivo : !medico.isActivo;
         })
         // Filtro por nombre
-        .filter((paciente) =>
-            paciente.nombreCompleto.toLowerCase().includes(busqueda.toLowerCase())
+        .filter((medico) =>
+            medico.nombre.toLowerCase().includes(busqueda.toLowerCase())
         );
-    console.log(pacientesFiltrados.length);
+    console.log(medicosFiltrados.length);
 
     // 2️⃣ Calcular total de páginas
     useEffect(() => {
         setTotalPages(totalPages);
-    }, [pacientesFiltrados, rowsPerPage]);
+    }, [medicosFiltrados, rowsPerPage]);
 
     // 3️⃣ Aplicar paginación
-    const paginatedPacientes = pacientesFiltrados.slice(
+    const paginatedMedicos = medicosFiltrados.slice(
         (currentPage - 1) * rowsPerPage,
         currentPage * rowsPerPage
     );
@@ -83,9 +83,9 @@ export default function GridPacientes() {
     if (loading) return <Spinner />
     if (error) return <div className="text-red-500 text-center">{error}</div>;
 
-    const handlePacienteSeleccionado = (paciente: Paciente) => {
-        setPacienteSeleccionado((prev) => prev?.id === paciente.id ? null : paciente);
-        router.push(`/admin/gestionar-pacientes/${paciente.id}`);
+    const handleMedicoSeleccionado = (medico: Medico) => {
+        setMedicoSeleccionado((prev) => prev?.id === medico.id ? null : medico);
+        router.push(`/admin/gestionar-medicos/${medico.id}`);
 
     };
 
@@ -97,7 +97,7 @@ export default function GridPacientes() {
                     isClearable
                     onClear={() => setBusqueda("")}
                     className='max-w-xs'
-                    placeholder="Buscar paciente"
+                    placeholder="Buscar medico"
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                 />
@@ -119,16 +119,16 @@ export default function GridPacientes() {
             </div>
 
 
-            {/* Muestra los pacientes filtrados y paginados */}
-            {paginatedPacientes.length > 0 ? (
+            {/* Muestra los medicos filtrados y paginados */}
+            {paginatedMedicos.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2">
-                    {paginatedPacientes.map((paciente) => (
+                    {paginatedMedicos.map((medico) => (
                         <Card
                             isPressable
-                            key={paciente.id}
-                            onPress={() => handlePacienteSeleccionado(paciente)}
+                            key={medico.id}
+                            onPress={() => handleMedicoSeleccionado(medico)}
                             className={`group relative flex flex-col justify-between p-4 rounded-2xl border transition-all duration-300 shadow-sm max-w-72 cursor-pointer
-                            ${pacienteSeleccionado?.id === paciente.id
+                            ${medicoSeleccionado?.id === medico.id
                                     ? "border-blue-600 bg-blue-50 text-blue-900 shadow-md"
                                     : "bg-white hover:bg-blue-100 border-gray-200"
                                 }`
@@ -137,28 +137,32 @@ export default function GridPacientes() {
                             <div className="relative w-full h-40 mb-4 overflow-hidden rounded-xl">
                                 <img
                                     src="/medico.jpg"
-                                    alt={`Foto de ${paciente.nombreCompleto}`}
+                                    alt={`Foto de ${medico.nombre}`}
                                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
                                 />
                             </div>
 
                             <div className="space-y-1">
-                                <h3 className="text-lg font-bold truncate">{paciente.nombreCompleto}</h3>
+                                <h3 className="text-lg font-bold truncate">{medico.nombre}</h3>
                                 <p className="text-sm text-gray-600 truncate group-hover:text-gray-800">
-                                    {paciente.email}
+                                    {medico.email}
+                                </p>
+
+                                <p className="text-sm text-gray-600 truncate group-hover:text-gray-800">
+                                    {medico.especialidad}
                                 </p>
                             </div>
 
                             <div className="mt-3 text-xs text-gray-500 flex justify-between">
-                                <span>📞 {paciente.telefono}</span>
-                                <span>🆔 {paciente.documento}</span>
+                                <span>📞 {medico.telefono}</span>
+                                <span>🆔 {medico.documento}</span>
                             </div>
                         </Card>
 
                     ))}
                 </div>
             ) : (
-                <div className="text-center text-blue-700 font-medium">No hay pacientes disponibles para esta especialidad.</div>
+                <div className="text-center text-blue-700 font-medium">No hay médicos disponibles.</div>
             )}
 
 

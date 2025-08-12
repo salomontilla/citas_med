@@ -1,12 +1,13 @@
 'use client'
 import api from '@/app/lib/axios'
 import { EyeFilledIcon, EyeSlashFilledIcon } from '@/app/ui/components/passwordEyes';
-import { addToast, Button, Chip, DatePicker, Input, Link, Skeleton, Spinner } from '@heroui/react';
+import { addToast, Button, Chip, DatePicker, Input, Link, Select, SelectItem, Skeleton, Spinner } from '@heroui/react';
 import { use, useEffect, useState } from 'react'
 import { CalendarDate, today, getLocalTimeZone } from "@internationalized/date";
 import { formatearFecha } from '@/app/lib/utils';
 import { is } from 'date-fns/locale';
 import router from 'next/router';
+import { Stethoscope } from 'lucide-react';
 
 export default function InfoPaciente({
     params,
@@ -40,9 +41,16 @@ export default function InfoPaciente({
     const [correo, setCorreo] = useState('');
     const [telefono, setTelefono] = useState('');
     const [contrasena, setContrasena] = useState<string | null>('');
-    const [especialidad, setEspecialidad] = useState<string | null>('');
+    const [especialidad, setEspecialidad] = useState<string>('');
     const [isLoadingInfo, setIsLoadingInfo] = useState(true);
     const [isMedicoActive, setIsMedicoActive] = useState<boolean | undefined>(undefined);
+
+    // Lista de especialidades disponibles
+    const especialidades = [
+        { key: 'general', nombre: 'General' },
+        { key: 'pediatria', nombre: 'Pediatría' },
+        { key: 'cardiologia', nombre: 'Cardiología' }
+    ];
 
     const toggleVisibility = () => setIsVisible(!isVisible);
     const [isVisible, setIsVisible] = useState(false);
@@ -83,6 +91,7 @@ export default function InfoPaciente({
         if (datos.nombre) {
             setNombre(datos.nombre);
         }
+
         if (datos.documento) {
             setDocumento(datos.documento);
         }
@@ -97,10 +106,10 @@ export default function InfoPaciente({
         setEditando(true);
 
         // Create an object with only the changed fields
-        const changedFields: Partial<DatosPaciente> = {};
+        const changedFields: Partial<DatosMedico> = {};
 
-        if (nombreCompleto !== datos.nombreCompleto) {
-            changedFields.nombreCompleto = nombreCompleto;
+        if (nombre !== datos.nombre) {
+            changedFields.nombre = nombre;
         }
         if (correo !== datos.email) {
             changedFields.email = correo;
@@ -111,15 +120,10 @@ export default function InfoPaciente({
         if (documento !== datos.documento) {
             changedFields.documento = documento;
         }
-        if (formatearFecha(fechaFormateada) !== datos.fechaNacimiento) {
-            const fechaFormateadaStr = formatearFecha(fechaFormateada);
-            if (fechaFormateadaStr) {
-                changedFields.fechaNacimiento = fechaFormateadaStr;
-            }
+        if (especialidad !== datos.especialidad) {
+            changedFields.especialidad = especialidad;
         }
-        if (contrasena !== datos.contrasena && contrasena && contrasena.trim() !== '') {
-            changedFields.contrasena = contrasena;
-        }
+
 
         api.patch(`admin/pacientes/editar/${id}`, changedFields)
             .then((response) => {
@@ -144,7 +148,7 @@ export default function InfoPaciente({
     }
     const guardarCambios = () => {
         setLoading(true);
-        if (!correo || !telefono || !nombreCompleto || !documento || !fechaFormateada) {
+        if (!correo || !telefono || !nombre || !documento || !especialidad) {
             // Campos vacíos
             addToast({
                 title: 'Error',
@@ -159,13 +163,13 @@ export default function InfoPaciente({
 
         // Check if any field has changed
         const hasChanges = (
-            nombreCompleto !== datos.nombreCompleto ||
+            nombre !== datos.nombre ||
             correo !== datos.email ||
             telefono !== datos.telefono ||
             documento !== datos.documento ||
-            formatearFecha(fechaFormateada) !== datos.fechaNacimiento ||
-            (contrasena !== datos.contrasena && contrasena && contrasena.trim() !== '')
+            especialidad !== datos.especialidad
         );
+
 
         if (!hasChanges) {
             // Nada ha cambiado
@@ -190,30 +194,30 @@ export default function InfoPaciente({
         setEditando(false);
     }
 
-    function handleEstadoPaciente(): void {
-        setIsPacienteActive(!isPacienteActive);
-        if(isPacienteActive) {
-        api.delete(`admin/pacientes/${id}`)
-            .then(() => {
-                addToast({
-                    title: 'Éxito',
-                    description: 'La cuenta ha sido desactivada.',
-                    color: 'success',
-                    shouldShowTimeoutProgress: true,
-                    timeout: 5000,
+    function handleEstadoMedico(): void {
+        setIsMedicoActive(!isMedicoActive);
+        if (isMedicoActive) {
+            api.delete(`admin/medicos/${id}`)
+                .then(() => {
+                    addToast({
+                        title: 'Éxito',
+                        description: 'La cuenta ha sido desactivada.',
+                        color: 'success',
+                        shouldShowTimeoutProgress: true,
+                        timeout: 5000,
+                    });
+                })
+                .catch(() => {
+                    addToast({
+                        title: 'Error',
+                        description: 'No se pudo desactivar la cuenta.',
+                        color: 'danger',
+                        shouldShowTimeoutProgress: true,
+                        timeout: 5000,
+                    });
                 });
-            })
-            .catch(() => {
-                addToast({
-                    title: 'Error',
-                    description: 'No se pudo desactivar la cuenta.',
-                    color: 'danger',
-                    shouldShowTimeoutProgress: true,
-                    timeout: 5000,
-                });
-            });
-        }else{
-            api.patch(`admin/pacientes/activar/${id}`)
+        } else {
+            api.patch(`admin/medicos/activar/${id}`)
                 .then(() => {
                     addToast({
                         title: 'Éxito',
@@ -246,10 +250,10 @@ export default function InfoPaciente({
                     <div className="flex flex-col gap-4 items-center mb-6">
                         <img src="/medico.jpg" alt="doctor" className='rounded-full h-24 w-24 object-cover' />
                         <div className='flex flex-col items-center gap-1'>
-                            <h1 className='font-bold text-xl'>{datos.nombreCompleto}</h1>
+                            <h1 className='font-bold text-xl'>{datos.nombre}</h1>
                             <span className="text-sm text-gray-500">{datos.email}</span>
-                            <Chip color={isPacienteActive ? 'success' : 'danger'}>
-                                {isPacienteActive ? 'Activo' : 'Inactivo'}
+                            <Chip color={isMedicoActive ? 'success' : 'danger'}>
+                                {isMedicoActive ? 'Activo' : 'Inactivo'}
                             </Chip>
                         </div>
                     </div>
@@ -259,8 +263,8 @@ export default function InfoPaciente({
                                 <Input
                                     label="Nombre"
                                     color='primary'
-                                    value={nombreCompleto}
-                                    onValueChange={setNombreCompleto}
+                                    value={nombre}
+                                    onValueChange={setNombre}
                                     isDisabled={!editando}
                                 />
                             </Skeleton>
@@ -292,16 +296,19 @@ export default function InfoPaciente({
                                 />
                             </Skeleton>
                             <Skeleton isLoaded={!isLoadingInfo} className='rounded-2xl bg-blue-100'>
-                                <DatePicker
-                                    showMonthAndYearPickers
-                                    color="primary"
-                                    value={fechaFormateada}
-                                    onChange={(value) => setFechaFormateada(value)}
-                                    label="Fecha de nacimiento"
-                                    className="rounded-2xl"
+                                <Select
+                                    className="max-full"
                                     isDisabled={!editando}
-                                    maxValue={today(getLocalTimeZone())}
-                                />
+                                    label="Cambiar especialidad"
+                                    color="primary"
+                                    disabledKeys={[especialidad.toLowerCase()]}
+                                    placeholder={`Actual: ${datos?.especialidad || "Ninguna"}`}
+                                    startContent={<Stethoscope />}
+                                >
+                                    {especialidades.map((esp) => (
+                                        <SelectItem key={esp.key}>{esp.nombre}</SelectItem>
+                                    ))}
+                                </Select>
                             </Skeleton>
                             <Skeleton isLoaded={!isLoadingInfo} className='rounded-2xl bg-blue-100'>
                                 <Input
@@ -330,8 +337,8 @@ export default function InfoPaciente({
                                     <Link href='/admin/gestionar-pacientes'>Volver</Link>
                                 </Button>
                             </div>
-                            <Button color={isPacienteActive ? "danger" : "success"} onPress={() => handleEstadoPaciente()}>
-                                {isPacienteActive ? "Desactivar cuenta" : "Activar cuenta"}
+                            <Button color={isMedicoActive ? "danger" : "success"} onPress={() => handleEstadoMedico()}>
+                                {isMedicoActive ? "Desactivar cuenta" : "Activar cuenta"}
                             </Button>
                             {editando ? (
                                 <>

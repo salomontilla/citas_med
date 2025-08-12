@@ -50,12 +50,24 @@ public class MedicoService {
         return nuevoMedico;
     }
 
-    public Page<Medico> obtenerMedicos(Pageable pageable) {
-        Page<Medico> medicos = medicoRepository.findAllByUsuarioActivoTrue(pageable);
-        if (medicos.isEmpty()) {
-            return Page.empty();
+    public Page<Medico> obtenerMedicos(Pageable pageable, String search, String estado) {
+        boolean activo = "Activo".equalsIgnoreCase(estado);
+        boolean inactivo = "Inactivo".equalsIgnoreCase(estado);
+
+        if (search != null && !search.isEmpty()) {
+            if (estado != null && !estado.equalsIgnoreCase("Todos")) {
+                return medicoRepository.findByUsuario_NombreCompletoContainingIgnoreCaseAndUsuario_Activo(
+                        search, activo, pageable
+                );
+            }
+            return medicoRepository.findByUsuario_NombreCompletoContainingIgnoreCase(search, pageable);
         }
-        return medicos;
+
+        if (estado != null && !estado.equalsIgnoreCase("Todos")) {
+            return medicoRepository.findByUsuario_Activo(activo, pageable);
+        }
+
+        return medicoRepository.findAll(pageable);
     }
 
     public Medico obtenerMedicoPorId(Long id) {

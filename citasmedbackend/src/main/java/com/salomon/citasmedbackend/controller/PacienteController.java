@@ -97,9 +97,11 @@ public class PacienteController {
     }
 
     @GetMapping("/ver-medicos")
-    public ResponseEntity<Page<MedicoResponseDTO>> getAllMedicos (@PageableDefault(size = 4) Pageable paginacion) {
+    public ResponseEntity<Page<MedicoResponseDTO>> getAllMedicos (@PageableDefault(size = 8) Pageable paginacion,
+                                                                  @RequestParam(required = false) String search,
+                                                                  @RequestParam(required = false) String estado) {
 
-        return ResponseEntity.ok(medicoService.obtenerMedicos(paginacion).map(
+        return ResponseEntity.ok(medicoService.obtenerMedicos(paginacion, search, estado).map(
                 medico -> new MedicoResponseDTO(
                         medico.getId(),
                         medico.getUsuario().getNombreCompleto(),

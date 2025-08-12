@@ -27,4 +27,10 @@ public interface MedicoRepository extends JpaRepository<Medico, Long> {
 
     @Query("SELECT m FROM Medico m WHERE m.usuario.id = :usuarioId AND m.usuario.activo = true")
     Optional<Medico> findMedicoByUsuarioIdAndUsuarioActivo(Long usuarioId);
+
+    Page<Medico> findByUsuario_NombreCompletoContainingIgnoreCaseAndUsuario_Activo(String search, boolean activo, Pageable pageable);
+
+    Page<Medico> findByUsuario_NombreCompletoContainingIgnoreCase(String search, Pageable pageable);
+
+    Page<Medico> findByUsuario_Activo(boolean activo, Pageable pageable);
 }
