@@ -19,29 +19,30 @@ type Paciente = {
 const estados = ["Todos", "Activo", "Inactivo"];
 
 export default function GridPacientes() {
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(0);
     const [estadoSeleccionado, setEstadoSeleccionado] = useState("Todos");
     const [pacientes, setPacientes] = useState<Paciente[]>([]);
+    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [pacienteSeleccionado, setPacienteSeleccionado] = useState<Paciente | null>(null);
     const [busqueda, setBusqueda] = useState("");
     const router = useRouter();
 
-    const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [totalPages, setTotalPages] = useState(0);
 
     useEffect(() => {
         api.get("/admin/pacientes", {
             params: {
-                page: currentPage - 1,
+                page: page - 1,
                 size: rowsPerPage,
                 search: busqueda || null,
                 estado: estadoSeleccionado
             }
         })
             .then((res) => {
+                console.log(currentPage)
                 setPacientes(res.data.content);
                 setTotalPages(res.data.totalPages);
             })
@@ -49,7 +50,7 @@ export default function GridPacientes() {
                 setError(err.message);
             })
             .finally(() => setLoading(false));
-    }, [currentPage, rowsPerPage, busqueda, estadoSeleccionado]);
+    }, [currentPage, rowsPerPage, busqueda, estadoSeleccionado, page]);
 
     // 1️⃣ Filtro combinado por estado y por nombre
     const pacientesFiltrados = pacientes
@@ -157,7 +158,7 @@ export default function GridPacientes() {
                     ))}
                 </div>
             ) : (
-                <div className="text-center text-blue-700 font-medium">No hay pacientes disponibles para esta especialidad.</div>
+                <div className="text-center text-blue-700 font-medium">No hay pacientes disponibles.</div>
             )}
 
 

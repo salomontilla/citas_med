@@ -21,6 +21,7 @@ const estados = ["Todos", "Activo", "Inactivo"];
 export default function Gridmedicos() {
     const [currentPage, setCurrentPage] = useState(1);
     const [estadoSeleccionado, setEstadoSeleccionado] = useState("Todos");
+    const [page, setPage] = useState(1);
     const [medicos, setMedicos] = useState<Medico[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -28,14 +29,13 @@ export default function Gridmedicos() {
     const [busqueda, setBusqueda] = useState("");
     const router = useRouter();
 
-    const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [totalPages, setTotalPages] = useState(0);
 
     useEffect(() => {
         api.get("/admin/medicos", {
             params: {
-                page: currentPage - 1,
+                page: page - 1,
                 size: rowsPerPage,
                 search: busqueda || null,
                 estado: estadoSeleccionado
@@ -49,7 +49,7 @@ export default function Gridmedicos() {
                 setError(err.message);
             })
             .finally(() => setLoading(false));
-    }, [currentPage, rowsPerPage, busqueda, estadoSeleccionado]);
+    }, [currentPage, rowsPerPage, busqueda, estadoSeleccionado, page]);
 
     // 1️⃣ Filtro combinado por estado y por nombre
     const medicosFiltrados = medicos
