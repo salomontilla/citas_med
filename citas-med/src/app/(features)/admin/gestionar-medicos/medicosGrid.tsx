@@ -11,8 +11,8 @@ type Medico = {
     nombre: string;
     documento: string;
     email: string;
-    isActivo: boolean;
     telefono: string;
+    isActivo: boolean;
     especialidad: string;
 }
 

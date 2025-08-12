@@ -8,6 +8,7 @@ import { formatearFecha } from '@/app/lib/utils';
 import { is } from 'date-fns/locale';
 import router from 'next/router';
 import { Stethoscope } from 'lucide-react';
+import type { Selection } from "@heroui/react";
 
 export default function InfoPaciente({
     params,
@@ -21,6 +22,7 @@ export default function InfoPaciente({
         telefono?: string;
         especialidad?: string;
         isActivo?: boolean;
+        contrasena?: string;
     }
 
     const { id } = use(params)
@@ -31,7 +33,8 @@ export default function InfoPaciente({
         documento: '',
         telefono: '',
         especialidad: '',
-        isActivo: true
+        isActivo: true,
+        contrasena: ''
     });
     const [editando, setEditando] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -42,6 +45,7 @@ export default function InfoPaciente({
     const [telefono, setTelefono] = useState('');
     const [contrasena, setContrasena] = useState<string | null>('');
     const [especialidad, setEspecialidad] = useState<string>('');
+    const [especialidadSeleccionada, setEspecialidadSeleccionada] = useState<Selection>(new Set());
     const [isLoadingInfo, setIsLoadingInfo] = useState(true);
     const [isMedicoActive, setIsMedicoActive] = useState<boolean | undefined>(undefined);
 
@@ -120,12 +124,17 @@ export default function InfoPaciente({
         if (documento !== datos.documento) {
             changedFields.documento = documento;
         }
-        if (especialidad !== datos.especialidad) {
-            changedFields.especialidad = especialidad;
+        //esta condicion obtiene el valor de la especialidad seleccionada que viene de un set
+        if (Array.from(especialidadSeleccionada)[0] !== datos.especialidad) {
+            const valor = Array.from(especialidadSeleccionada)[0].toString().toUpperCase();
+            changedFields.especialidad = String(valor);
         }
 
+        if (contrasena) {
+            changedFields.contrasena = contrasena;
+        }
 
-        api.patch(`admin/pacientes/editar/${id}`, changedFields)
+        api.patch(`admin/medicos/editar/${id}`, changedFields)
             .then((response) => {
                 setDatos(response.data);
                 addToast({
@@ -167,7 +176,7 @@ export default function InfoPaciente({
             correo !== datos.email ||
             telefono !== datos.telefono ||
             documento !== datos.documento ||
-            especialidad !== datos.especialidad
+            especialidadSeleccionada !== datos.especialidad
         );
 
 
@@ -301,6 +310,7 @@ export default function InfoPaciente({
                                     isDisabled={!editando}
                                     label="Cambiar especialidad"
                                     color="primary"
+                                    onSelectionChange={setEspecialidadSeleccionada}
                                     disabledKeys={[especialidad.toLowerCase()]}
                                     placeholder={`Actual: ${datos?.especialidad || "Ninguna"}`}
                                     startContent={<Stethoscope />}

@@ -58,8 +58,8 @@ public class Medico {
 
     public void actualizarMedicoAdmin(ActualizarMedicoAdminDTO medicoResponseDTO)
 {
-        if (medicoResponseDTO.nombreCompleto() != null) {
-            this.usuario.setNombreCompleto(medicoResponseDTO.nombreCompleto());
+        if (medicoResponseDTO.nombre() != null) {
+            this.usuario.setNombreCompleto(medicoResponseDTO.nombre());
         }
         if (medicoResponseDTO.email() != null) {
             this.usuario.setEmail(medicoResponseDTO.email());

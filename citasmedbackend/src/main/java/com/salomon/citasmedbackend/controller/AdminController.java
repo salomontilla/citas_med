@@ -150,31 +150,33 @@ public class AdminController {
     }
 
     @GetMapping("/medicos")
-    public ResponseEntity<Page<MedicoResponseDTO>> getAllMedicos (@PageableDefault(size = 8) Pageable paginacion,
+    public ResponseEntity<Page<MedicoResponseAdminDTO>> getAllMedicos (@PageableDefault(size = 8) Pageable paginacion,
                                                                   @RequestParam(required = false) String search,
                                                                   @RequestParam(required = false) String estado) {
 
         return ResponseEntity.ok(medicoService.obtenerMedicos(paginacion, search, estado).map(
-                medico -> new MedicoResponseDTO(
+                medico -> new MedicoResponseAdminDTO(
                         medico.getId(),
                         medico.getUsuario().getNombreCompleto(),
                         medico.getUsuario().getEmail(),
                         medico.getUsuario().getDocumento(),
                         medico.getUsuario().getTelefono(),
+                        medico.getUsuario().isActivo(),
                         medico.getEspecialidad().toString()
                 )
         ));
     }
 
     @GetMapping("/medicos/{id}")
-    public ResponseEntity<MedicoResponseDTO> getMedicoById(@PathVariable Long id) {
+    public ResponseEntity<MedicoResponseAdminDTO> getMedicoById(@PathVariable Long id) {
         Medico medico = medicoService.obtenerMedicoPorId(id);
-        return ResponseEntity.ok(new MedicoResponseDTO(
+        return ResponseEntity.ok(new MedicoResponseAdminDTO(
                 medico.getId(),
                 medico.getUsuario().getNombreCompleto(),
                 medico.getUsuario().getEmail(),
                 medico.getUsuario().getDocumento(),
                 medico.getUsuario().getTelefono(),
+                medico.getUsuario().isActivo(),
                 medico.getEspecialidad().toString()
         ));
     }
