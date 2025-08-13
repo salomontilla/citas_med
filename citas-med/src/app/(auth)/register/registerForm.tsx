@@ -101,22 +101,20 @@ export default function RegisterForm() {
           size="lg"
           type="text"
           errorMessage="Campo requerido"
-          required
+          isRequired
         />
       </div>
 
       <div>
         <Input
-
           onValueChange={setCorreo}
-
           label="Correo electrónico"
           labelPlacement="outside"
           color="primary"
           size="lg"
           type="email"
           errorMessage="Campo requerido o inválido"
-          required
+          isRequired
         />
       </div>
 

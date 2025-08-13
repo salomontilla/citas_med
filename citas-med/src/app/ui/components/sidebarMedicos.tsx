@@ -67,6 +67,16 @@ export const Sidebar = () => {
             href="/medicos/mis-datos"
           />
           </Skeleton>
+          <Skeleton className="rounded-lg" isLoaded={isLoaded}>
+          <Option
+            Icon={ClipboardList}
+            title="Mi Horario"
+            selected={selected}
+            setSelected={handleSelect}
+            open={open}
+            href="/medicos/mis-horarios"
+          />
+          </Skeleton>
           <OptionLogout open={open} />
         </div>
 
