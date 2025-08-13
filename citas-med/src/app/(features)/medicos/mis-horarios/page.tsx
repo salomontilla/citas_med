@@ -17,6 +17,7 @@ type Horario = {
 
 export default function GestionHorarios() {
     const [horarios, setHorarios] = useState<Horario[]>([]);
+    const [isEditando, setIsEditando] = useState<boolean>(false);
 
     const obtenerHorarios = () => {
         api.get("/medicos/mis-disponibilidades")
@@ -33,11 +34,12 @@ export default function GestionHorarios() {
         obtenerHorarios();
     }, []);
 
+    // Agregar un nuevo horario con datos por defecto
     const agregarHorario = () => {
         setHorarios([
             ...horarios,
             {
-                id: 0, 
+                id: 0,
                 diaSemana: "LUNES",
                 horaInicio: "",
                 horaFin: ""
@@ -45,39 +47,67 @@ export default function GestionHorarios() {
         ]);
     };
 
+    //
     const actualizarHorario = (index: number, campo: string, valor: string) => {
         const nuevos = [...horarios];
         nuevos[index] = { ...nuevos[index], [campo]: valor };
         setHorarios(nuevos);
     };
 
+    const handleEditarHorarios = (id: number, index: number) => {
+        
+        api.patch(`/medicos/editar-disponibilidades/${id}`, horarios[index])
+            .then(() => {
+                addToast({
+                    title: "Horario actualizado",
+                    description: "El horario se ha actualizado correctamente.",
+                    color: "success",
+                    shouldShowTimeoutProgress: true,
+                    timeout: 5000,
+                });
+            })
+            .catch((error) => {
+                addToast({
+                    title: "Error al actualizar horario",
+                    description: "Ha ocurrido un error al actualizar el horario.",
+                    color: "danger",
+                    shouldShowTimeoutProgress: true,
+                    timeout: 5000,
+                });
+            }); 
+    };
+
     const handleEliminarHorario = (index: number) => {
-        api.delete(`/medicos/eliminar-disponibilidad/${horarios[index].id}`)
-        .then(() => {
+        if (horarios[index].id === 0) {
             setHorarios(horarios.filter((_, i) => i !== index));
-            addToast({
-                title: "Horario eliminado",
-                description: "El horario se ha eliminado correctamente.",
-                color: "success",
-                shouldShowTimeoutProgress: true,
-                timeout: 5000,
+            return;
+        }
+        api.delete(`/medicos/eliminar-disponibilidad/${horarios[index].id}`)
+            .then(() => {
+                setHorarios(horarios.filter((_, i) => i !== index));
+                addToast({
+                    title: "Horario eliminado",
+                    description: "El horario se ha eliminado correctamente.",
+                    color: "success",
+                    shouldShowTimeoutProgress: true,
+                    timeout: 5000,
+                });
+            })
+            .catch((error) => {
+                addToast({
+                    title: "Error al eliminar horario",
+                    description: "Ha ocurrido un error al eliminar el horario.",
+                    color: "danger",
+                    shouldShowTimeoutProgress: true,
+                    timeout: 5000,
+                });
             });
-        })
-        .catch((error) => {
-            addToast({
-                title: "Error al eliminar horario",
-                description: "Ha ocurrido un error al eliminar el horario.",
-                color: "danger",
-                shouldShowTimeoutProgress: true,
-                timeout: 5000,
-            });
-        });
     };
 
     function handleGuardarHorario(index: number): void {
-        console.log("Guardando horario:", horarios[index]);
         api.post("/medicos/registrar-disponibilidad", horarios[index])
             .then(() => {
+
                 addToast({
                     title: "Horario guardado",
                     description: "El horario se ha guardado correctamente.",
@@ -122,6 +152,7 @@ export default function GestionHorarios() {
                     }}
                 >
                     <Select
+                        isDisabled={!isEditando}
                         label="Día"
                         color="primary"
                         className="w-full sm:w-40"
@@ -137,6 +168,7 @@ export default function GestionHorarios() {
                     <span className="font-medium sm:hidden">De</span>
 
                     <Input
+                        isDisabled={!isEditando}
                         type="time"
                         size="lg"
                         className="w-full sm:w-32"
@@ -150,6 +182,7 @@ export default function GestionHorarios() {
                     <span className="font-medium sm:hidden">a</span>
 
                     <Input
+                        isDisabled={!isEditando}
                         type="time"
                         color="primary"
                         size="lg"
@@ -160,13 +193,24 @@ export default function GestionHorarios() {
                     />
 
                     <div className="flex gap-2 mt-2 sm:mt-0">
-                        <Button
-                            color="primary"
-                            type="submit"
-                            className="w-full sm:w-auto"
-                        >
-                            Guardar
-                        </Button>
+                        {
+                            isEditando ? 
+                                <Button 
+                                color="warning" 
+                                onPress={() => handleEditarHorarios(horario.id, index)} 
+                                className="w-full sm:w-auto"
+                                >
+                                    Editar
+                                </Button> :
+                                <Button
+                                    color="primary"
+                                    type="submit"
+                                    className="w-full sm:w-auto"
+                                    isDisabled={horario.id !== 0}
+                                >
+                                    Guardar
+                                </Button>
+                        }
                         <Button
                             color="danger"
                             onPress={() => handleEliminarHorario(index)}
@@ -177,10 +221,14 @@ export default function GestionHorarios() {
                     </div>
                 </form>
             ))}
-
-            <Button color="primary" onPress={() => agregarHorario()} className="w-full sm:w-auto">
-                Agregar horario
-            </Button>
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+                <Button color="primary" onPress={() => agregarHorario()} className="w-full sm:w-auto">
+                    Agregar horario
+                </Button>
+                <Button color="warning" onPress={() => setIsEditando(!isEditando)} className="w-full sm:w-auto">
+                    Editar Horarios
+                </Button>
+            </div>
         </div>
     );
 }
