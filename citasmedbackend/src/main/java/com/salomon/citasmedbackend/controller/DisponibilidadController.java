@@ -100,4 +100,15 @@ public class DisponibilidadController {
         List<String> bloquesDisponibles = disponibilidadService.obtenerBloquesDisponibles(medicoId, fecha);
         return ResponseEntity.ok(bloquesDisponibles);
     }
+
+    @DeleteMapping("/medicos/eliminar-disponibilidad/{id}")
+    public ResponseEntity<?> eliminarDisponibilidad(@PathVariable Long id,
+                                                     @AuthenticationPrincipal DetallesUsuario user) {
+        Disponibilidad disponibilidad = disponibilidadService.obtenerPorId(id);
+        if (!disponibilidad.getMedico().getUsuario().getEmail().equals(user.getUsername())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para eliminar esta disponibilidad.");
+        }
+        disponibilidadService.eliminarDisponibilidad(id);
+        return ResponseEntity.ok("Disponibilidad eliminada correctamente.");
+    }
 }

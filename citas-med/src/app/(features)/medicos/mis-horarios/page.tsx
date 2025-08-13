@@ -2,12 +2,14 @@
 import React, { useEffect, useState } from "react";
 import { Select, SelectItem, Input, Button, addToast } from "@heroui/react";
 import api from "@/app/lib/axios";
+import { add } from "date-fns";
 
 const diasSemana = [
     "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SÁBADO", "DOMINGO"
 ];
 
 type Horario = {
+    id: number;
     diaSemana: string;
     horaInicio: string;
     horaFin: string;
@@ -32,7 +34,15 @@ export default function GestionHorarios() {
     }, []);
 
     const agregarHorario = () => {
-        setHorarios([...horarios, { diaSemana: "LUNES", horaInicio: "", horaFin: "" }]);
+        setHorarios([
+            ...horarios,
+            {
+                id: 0, 
+                diaSemana: "LUNES",
+                horaInicio: "",
+                horaFin: ""
+            }
+        ]);
     };
 
     const actualizarHorario = (index: number, campo: string, valor: string) => {
@@ -42,7 +52,26 @@ export default function GestionHorarios() {
     };
 
     const handleEliminarHorario = (index: number) => {
-        setHorarios(horarios.filter((_, i) => i !== index));
+        api.delete(`/medicos/eliminar-disponibilidad/${horarios[index].id}`)
+        .then(() => {
+            setHorarios(horarios.filter((_, i) => i !== index));
+            addToast({
+                title: "Horario eliminado",
+                description: "El horario se ha eliminado correctamente.",
+                color: "success",
+                shouldShowTimeoutProgress: true,
+                timeout: 5000,
+            });
+        })
+        .catch((error) => {
+            addToast({
+                title: "Error al eliminar horario",
+                description: "Ha ocurrido un error al eliminar el horario.",
+                color: "danger",
+                shouldShowTimeoutProgress: true,
+                timeout: 5000,
+            });
+        });
     };
 
     function handleGuardarHorario(index: number): void {
