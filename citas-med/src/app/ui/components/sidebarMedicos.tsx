@@ -58,16 +58,6 @@ export const Sidebar = () => {
           </Skeleton>
 
           <Skeleton className="rounded-lg" isLoaded={isLoaded}>
-          <Option
-            Icon={UserCog}
-            title="Mis datos"
-            selected={selected}
-            setSelected={handleSelect}
-            open={open}
-            href="/medicos/mis-datos"
-          />
-          </Skeleton>
-          <Skeleton className="rounded-lg" isLoaded={isLoaded}>
             <Tooltip content="Ver mis horarios" placement="right">
               <Option
                 Icon={ClipboardList}
@@ -78,6 +68,17 @@ export const Sidebar = () => {
                 href="/medicos/mis-horarios"
               />
             </Tooltip>
+          </Skeleton>
+          
+          <Skeleton className="rounded-lg" isLoaded={isLoaded}>
+          <Option
+            Icon={UserCog}
+            title="Mis datos"
+            selected={selected}
+            setSelected={handleSelect}
+            open={open}
+            href="/medicos/mis-datos"
+          />
           </Skeleton>
           <OptionLogout open={open} />
         </div>
