@@ -30,10 +30,8 @@ export default function PerfilUsuario() {
         api.get('/medicos/mis-datos')
             .then((response) => {
                 setDatos(response.data);
-                console.log(response.data);
             })
             .catch((error) => {
-                console.error('Error al obtener los datos del usuario:', error);
                 addToast({
                     title: 'Error',
                     description: error.message || 'No se pudieron obtener los datos del usuario.',

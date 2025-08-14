@@ -14,6 +14,7 @@ import {
   Alert,
   Skeleton,
   Tooltip,
+  addToast,
 } from "@heroui/react";
 import api from '../../lib/axios';
 import { Spinner } from "flowbite-react";
@@ -26,12 +27,19 @@ export const Sidebar = () => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("sidebar-selected");
-    if (saved) setSelected(saved);
-    setIsLoaded(true);
-  }, []);
+  
+      const saved = localStorage.getItem("sidebar-selected");
 
-  const handleSelect = (option: string) => {
+      if (saved !== "Agendar Cita" && saved !== "Mis citas" && saved !== "Mis datos") {
+        setSelected("Agendar Cita");
+        localStorage.setItem("sidebar-selected", "Agendar Cita");
+      } else if (saved) {
+        setSelected(saved);
+      }
+      setIsLoaded(true);
+    }, []);
+
+    const handleSelect = (option: string) => {
     setSelected(option);
     localStorage.setItem("sidebar-selected", option);
   };
@@ -88,12 +96,13 @@ export const Sidebar = () => {
 
   );
 };
+
 type OptionLogoutProps = {
   open: boolean;
 };
 
 //Este componente maneja la opción de cerrar sesión en la barra lateral
-const OptionLogout = ({ open }: OptionLogoutProps) => {
+export const OptionLogout = ({ open }: OptionLogoutProps) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isVisibleAlert, setIsVisibleAlert] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -196,7 +205,7 @@ type OptionProps = {
   href?: string;
 };
 
-const Option = ({ Icon, title, selected, setSelected, open, href }: OptionProps) => {
+export const Option = ({ Icon, title, selected, setSelected, open, href }: OptionProps) => {
   const router = useRouter();
 
   const handleClick = () => {
@@ -242,7 +251,7 @@ const Option = ({ Icon, title, selected, setSelected, open, href }: OptionProps)
 type TitleSectionProps = {
   open: boolean;
 };
-const TitleSection = ({ open }: TitleSectionProps) => {
+export const TitleSection = ({ open }: TitleSectionProps) => {
   const [nombre, setNombre] = useState("");
   const [rol, setRol] = useState("");
 
@@ -252,7 +261,11 @@ const TitleSection = ({ open }: TitleSectionProps) => {
         setNombre(r.data.nombre);
         setRol(r.data.rol);
       }).catch((error) => {
-        console.log("Error al obtener los datos del usuario:", error.response.status);
+        addToast({
+          title: "Error",
+          description: error.message || "Error al obtener los datos del usuario",
+          color: "danger",
+        });
       })
   }, []);
   return (
@@ -310,7 +323,7 @@ type ToggleCloseProps = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const ToggleClose = ({ open, setOpen }: ToggleCloseProps) => {
+export const ToggleClose = ({ open, setOpen }: ToggleCloseProps) => {
 
   return (
     <motion.button

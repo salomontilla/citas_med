@@ -124,8 +124,12 @@ export default function InfoPaciente({
             changedFields.documento = documento;
         }
         //esta condicion obtiene el valor de la especialidad seleccionada que viene de un set
-        if (Array.from(especialidadSeleccionada)[0] !== datos.especialidad) {
-            const valor = Array.from(especialidadSeleccionada)[0].toString().toUpperCase();
+        const seleccionArray = Array.from(especialidadSeleccionada);
+        if (
+            seleccionArray.length > 0 &&
+            seleccionArray[0] !== datos.especialidad
+        ) {
+            const valor = seleccionArray[0].toString().toUpperCase();
             changedFields.especialidad = String(valor);
         }
 
