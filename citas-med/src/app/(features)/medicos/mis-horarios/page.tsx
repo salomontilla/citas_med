@@ -1,8 +1,7 @@
 "use client"
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Select, SelectItem, Input, Button, addToast, Spinner } from "@heroui/react";
 import api from "@/app/lib/axios";
-import { add } from "date-fns";
 
 const diasSemana = [
     "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SÁBADO", "DOMINGO"
@@ -19,7 +18,6 @@ export default function GestionHorarios() {
     const [horarios, setHorarios] = useState<Horario[]>([]);
     const [isEditando, setIsEditando] = useState<boolean>(false);
     const [isLoadingHorarios, setIsLoadingHorarios] = useState<boolean>(true);
-    const [isHorarioNuevo, setIsHorarioNuevo] = useState<boolean>(false);
 
     const obtenerHorarios = () => {
         api.get("/medicos/mis-disponibilidades")
@@ -63,7 +61,7 @@ export default function GestionHorarios() {
         setHorarios(nuevos);
     };
 
-    const handleEditarHorarios = (id: number, index: number) => {
+    const handleEditarHorario = (id: number, index: number) => {
 
         api.patch(`/medicos/editar-disponibilidades/${id}`, horarios[index])
             .then(() => {
@@ -213,8 +211,9 @@ export default function GestionHorarios() {
                                     isEditando ?
                                         <Button
                                             color="warning"
-                                            onPress={() => handleEditarHorarios(horario.id, index)}
+                                            onPress={() => handleEditarHorario(horario.id, index)}
                                             className="w-full sm:w-auto"
+                                            isDisabled={false}
                                         >
                                             Editar
                                         </Button> :

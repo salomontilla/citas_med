@@ -71,8 +71,8 @@ public class MedicoService {
     }
 
     public Medico obtenerMedicoPorId(Long id) {
-        return medicoRepository.findByIdAndUsuarioActivo(id).orElseThrow(
-                () -> new RuntimeException("Médico no encontrado o inactivo")
+        return medicoRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Médico no encontrado")
         );
     }
 

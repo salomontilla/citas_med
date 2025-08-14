@@ -284,6 +284,7 @@ export default function InfoPaciente({
                                 <Input
                                     label="Correo Electrónico"
                                     color='primary'
+                                    type='email'
                                     value={correo}
                                     onValueChange={setCorreo}
                                     isDisabled={!editando}

@@ -38,7 +38,7 @@ public class DisponibilidadService {
         Medico medico = medicoRepository.findByIdAndUsuarioActivo(medicoId)
                 .orElseThrow(() -> new RuntimeException("Médico no encontrado o inactivo"));
 
-        disponibilidadValidation(dto.horaInicio(), dto.horaFin(), medico, dto.diaSemana());
+        disponibilidadValidation(dto.horaInicio(), dto.horaFin(), medico, dto.diaSemana(), null);
 
         Disponibilidad disponibilidad = new Disponibilidad();
         disponibilidad.setMedico(medico);
@@ -107,7 +107,7 @@ public class DisponibilidadService {
         String horaFin = dto.horaFin() != null ? dto.horaFin() : disponibilidad.getHoraFin().toString();
 
         // Validar con los valores consolidados
-        disponibilidadValidation(horaInicio, horaFin, disponibilidad.getMedico(), dia);
+        disponibilidadValidation(horaInicio, horaFin, disponibilidad.getMedico(), dia, id);
 
         if (dto.diaSemana() != null) {
             disponibilidad.setDiaSemana(dto.diaSemana());
@@ -129,28 +129,31 @@ public class DisponibilidadService {
         return "Disponibilidad eliminada correctamente.";
     }
 
-    public void disponibilidadValidation (String hora, String horaFinal, Medico medico, DiaSemana diaSemana){
+    public void disponibilidadValidation(String hora, String horaFinal, Medico medico, DiaSemana diaSemana, Long idDisponibilidadActual) {
         LocalTime horaInicio = convertirHora(hora).toLocalTime();
         LocalTime horaFin = convertirHora(horaFinal).toLocalTime();
 
-        // 1. Validar que la horaHora de inicio sea antes que la horaHora fin
+        // 1. Validar que la hora de inicio sea antes que la hora fin
         if (!horaInicio.isBefore(horaFin)) {
             throw new IllegalArgumentException("La hora de inicio debe ser anterior a la hora de fin.");
         }
 
-        // 2. Validar que no se cruce con una disponibilidad ya existente
+        // 2. Validar que no se cruce con una disponibilidad ya existente (excepto la que estamos editando)
         List<Disponibilidad> existentes = disponibilidadRepository
                 .findByMedicoIdAndDiaSemana(medico.getId(), diaSemana);
 
-        boolean seCruza = existentes.stream().anyMatch(d ->
-                horaInicio.isBefore(d.getHoraFin().toLocalTime()) &&
-                        horaFin.isAfter(d.getHoraInicio().toLocalTime())
-        );
+        boolean seCruza = existentes.stream()
+                .filter(d -> idDisponibilidadActual == null || !d.getId().equals(idDisponibilidadActual)) // Ignorar el mismo horario
+                .anyMatch(d ->
+                        horaInicio.isBefore(d.getHoraFin().toLocalTime()) &&
+                                horaFin.isAfter(d.getHoraInicio().toLocalTime())
+                );
 
         if (seCruza) {
             throw new DisponibilidadExistenteException("Ya existe una disponibilidad para este médico que se cruza con la nueva.");
         }
     }
+
 
     public Disponibilidad obtenerPorId(Long id) {
         return disponibilidadRepository.findById(id)

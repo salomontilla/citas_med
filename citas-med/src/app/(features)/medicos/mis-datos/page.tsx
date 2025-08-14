@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Input, Button, addToast } from '@heroui/react';
 import api from '@/app/lib/axios';
+import { es } from 'date-fns/locale';
 
 interface DatosUsuario {
     nombre?: string;
@@ -10,21 +11,26 @@ interface DatosUsuario {
     documento?: string;
     telefono?: string;
     especialidad?: string;
+    contrasena?: string;
 }
 
 export default function PerfilUsuario() {
-    const [datos, setDatos] = useState<DatosUsuario>({
-        nombre: '',
-        email: '',
-        documento: '',
-        telefono: '',
-        especialidad: ''
-    });
+    const [datos, setDatos] = useState<DatosUsuario>(
+        {
+            nombre: '',
+            email: '',
+            documento: '',
+            telefono: '',
+            especialidad: '',
+            contrasena: ''
+        }
+    );
     const [editando, setEditando] = useState(false);
     const [loading, setLoading] = useState(false);
     const [correo, setCorreo] = useState<string>('');
     const [telefono, setTelefono] = useState<string>('');
     const [contrasena, setContrasena] = useState<string>('');
+    const [isLoadingInfo, setIsLoadingInfo] = useState(true);
 
     const obtenerDatos = () => {
         api.get('/medicos/mis-datos')
@@ -39,6 +45,8 @@ export default function PerfilUsuario() {
                     shouldShowTimeoutProgress: true,
                     timeout: 5000,
                 });
+            }).finally(() => {
+                setIsLoadingInfo(false);
             });
     };
 
@@ -50,24 +58,34 @@ export default function PerfilUsuario() {
     // Actualizar el correo electrónico al cargar el componente
     useEffect(() => {
         if (datos.email) {
-            setCorreo(datos.email ?? '');
+            setCorreo(datos.email);
         }
-    }, [datos.email]);
-    // Obtener el teléfono del usuario al cargar el componente
-    useEffect(() => {
         if (datos.telefono) {
             setTelefono(datos.telefono);
         }
-    }, [datos.telefono]);
+    }, [datos]);
 
     const editarDatos = () => {
         setLoading(true);
         setEditando(true);
-        api.patch('/medicos/editar-datos', {
-            email: correo,
-            telefono: telefono,
 
-        })
+        // Create an object with only the changed fields
+        const changedFields: Partial<DatosUsuario> = {};
+
+
+        if (correo !== datos.email) {
+            changedFields.email = correo;
+        }
+        if (telefono !== datos.telefono) {
+            changedFields.telefono = telefono;
+        }
+
+        if (contrasena) {
+            changedFields.contrasena = contrasena;
+        }
+
+
+        api.patch('/medicos/editar-datos', changedFields)
             .then((response) => {
                 setDatos(response.data);
                 addToast({
@@ -104,7 +122,13 @@ export default function PerfilUsuario() {
             return;
         }
 
-        if (correo === datos.email && telefono === datos.telefono) {
+
+        const hasChanges = (
+            correo !== datos.email ||
+            telefono !== datos.telefono
+        );
+
+        if (!hasChanges) {
             // Nada ha cambiado
             addToast({
                 title: 'Sin cambios',
@@ -119,6 +143,7 @@ export default function PerfilUsuario() {
 
         editarDatos();
         setLoading(false);
+        setEditando(false);
     };
 
     function handleCancelarEdicion() {
@@ -157,6 +182,7 @@ export default function PerfilUsuario() {
                                 value={correo}
                                 onValueChange={setCorreo}
                                 isDisabled={!editando}
+                                isRequired
                             />
                             <Input
                                 label="Documento de Identidad"
@@ -170,6 +196,7 @@ export default function PerfilUsuario() {
                                 value={telefono}
                                 onValueChange={setTelefono}
                                 isDisabled={!editando}
+                                isRequired
                             />
                             <Input
                                 label="Especialidad"

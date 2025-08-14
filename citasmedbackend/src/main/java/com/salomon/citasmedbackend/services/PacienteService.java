@@ -78,7 +78,7 @@ public class PacienteService {
     public Paciente obtenerPacientePorId(Long id){
 
         return pacienteRepository.findPacienteById(id)
-                .orElseThrow(() -> new RuntimeException("Paciente no encontrado o inactivo"));
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
     }
 
     public Paciente actualizarPaciente(Long id, PacienteUpdateDTO pacienteDto) {
