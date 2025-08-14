@@ -13,6 +13,7 @@ import {
   useDisclosure,
   Alert,
   Skeleton,
+  Tooltip,
 } from "@heroui/react";
 import api from '../../lib/axios';
 
@@ -59,14 +60,16 @@ export const Sidebar = () => {
           </Skeleton>
 
           <Skeleton className="rounded-lg" isLoaded={isLoaded}>
-          <Option
-            Icon={BriefcaseMedical}
-            title="Gestionar Medicos"
-            selected={selected}
-            setSelected={handleSelect}
-            open={open}
-            href="/admin/gestionar-medicos"
-          />
+            <Tooltip content="Gestionar médicos" placement="right">
+              <Option
+                Icon={BriefcaseMedical}
+                title="Gestionar Medicos"
+                selected={selected}
+                setSelected={handleSelect}
+                open={open}
+                href="/admin/gestionar-medicos"
+              />
+            </Tooltip>
           </Skeleton>
           <OptionLogout open={open} />
         </div>

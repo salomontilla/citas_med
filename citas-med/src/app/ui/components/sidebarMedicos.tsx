@@ -13,6 +13,7 @@ import {
   useDisclosure,
   Alert,
   Skeleton,
+  Tooltip,
 } from "@heroui/react";
 import api from '../../lib/axios';
 
@@ -68,14 +69,16 @@ export const Sidebar = () => {
           />
           </Skeleton>
           <Skeleton className="rounded-lg" isLoaded={isLoaded}>
-          <Option
-            Icon={ClipboardList}
-            title="Mi Horario"
-            selected={selected}
-            setSelected={handleSelect}
-            open={open}
-            href="/medicos/mis-horarios"
-          />
+            <Tooltip content="Ver mis horarios" placement="right">
+              <Option
+                Icon={ClipboardList}
+                title="Mi Horario"
+                selected={selected}
+                setSelected={handleSelect}
+                open={open}
+                href="/medicos/mis-horarios"
+              />
+            </Tooltip>
           </Skeleton>
           <OptionLogout open={open} />
         </div>
@@ -204,32 +207,31 @@ const Option = ({ Icon, title, selected, setSelected, open, href }: OptionProps)
   };
 
   return (
-    <motion.button
+    <Tooltip content={title} placement="right" isDisabled={open}>
+      <motion.button
       layout
       onClick={() => handleClick()}
       className={`relative flex h-10 w-full items-center rounded-md transition-colors ${selected === title ? "bg-blue-100 text-blue-800" : "text-slate-500 hover:bg-slate-100"}`}
-    >
+      >
       <motion.div
         layout
         className="grid h-full w-10 place-content-center text-lg"
       >
-
         <Icon />
       </motion.div>
       {open && (
         <motion.span
-          layout
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.125 }}
-          className="text-xs font-medium"
+        layout
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.125 }}
+        className="text-xs font-medium"
         >
-          {title}
+        {title}
         </motion.span>
       )}
-
-
-    </motion.button>
+      </motion.button>
+    </Tooltip>
   );
 };
 
