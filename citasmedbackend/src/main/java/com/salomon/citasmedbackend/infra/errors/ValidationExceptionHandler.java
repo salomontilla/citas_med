@@ -53,6 +53,13 @@ public class ValidationExceptionHandler {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
+    @ExceptionHandler(DisponibilidadExistenteException.class)
+    public ResponseEntity<Map<String, String>> handleDisponibilidadExistenteException(DisponibilidadExistenteException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
 
     @ExceptionHandler({ HttpMessageNotReadableException.class })
     public ResponseEntity<?> handleEnumConversionError(HttpMessageNotReadableException ex) {

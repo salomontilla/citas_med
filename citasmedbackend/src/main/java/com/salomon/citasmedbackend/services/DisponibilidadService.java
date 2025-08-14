@@ -7,6 +7,7 @@ import com.salomon.citasmedbackend.domain.disponibilidad.DisponibilidadDTO;
 import com.salomon.citasmedbackend.domain.disponibilidad.Disponibilidad;
 import com.salomon.citasmedbackend.domain.disponibilidad.UpdateDisponibilidadDTO;
 import com.salomon.citasmedbackend.domain.medico.Medico;
+import com.salomon.citasmedbackend.infra.errors.DisponibilidadExistenteException;
 import com.salomon.citasmedbackend.repository.CitaRepository;
 import com.salomon.citasmedbackend.repository.DisponibilidadRepository;
 import com.salomon.citasmedbackend.repository.MedicoRepository;
@@ -134,7 +135,7 @@ public class DisponibilidadService {
 
         // 1. Validar que la horaHora de inicio sea antes que la horaHora fin
         if (!horaInicio.isBefore(horaFin)) {
-            throw new IllegalArgumentException("La horaHora de inicio debe ser anterior a la horaHora de fin.");
+            throw new IllegalArgumentException("La hora de inicio debe ser anterior a la hora de fin.");
         }
 
         // 2. Validar que no se cruce con una disponibilidad ya existente
@@ -147,7 +148,7 @@ public class DisponibilidadService {
         );
 
         if (seCruza) {
-            throw new IllegalArgumentException("Ya existe una disponibilidad para este médico que se cruza con la nueva.");
+            throw new DisponibilidadExistenteException("Ya existe una disponibilidad para este médico que se cruza con la nueva.");
         }
     }
 

@@ -23,13 +23,16 @@ public class FechaUtils {
         }
     }
 
-    public static Time convertirHora(String horaString) {
-        try {
-            return Time.valueOf(horaString);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Formato de horaHora inválido. Usa HH:mm:ss");
-        }
-    }
+  public static Time convertirHora(String horaString) {
+      try {
+          DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+          LocalTime localTime = LocalTime.parse(horaString, formatter);
+          return Time.valueOf(localTime);
+      } catch (DateTimeParseException e) {
+          throw new IllegalArgumentException("Formato de hora inválido. Usa HH:mm");
+      }
+  }
+
 
     public static List<String> dividirEnBloquesDisponibles(LocalTime inicio, LocalTime fin) {
         List<String> bloques = new ArrayList<>();
