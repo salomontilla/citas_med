@@ -37,18 +37,18 @@ export const Sidebar = () => {
   };
 
   return (
-    
-      <motion.nav
-        layout
-        className="fixed z-10 md:sticky top-0 h-screen shrink-0 border-r border-slate-300 bg-white p-2"
-        style={{
-          width: open ? "225px" : "fit-content",
-        }}
-      >
-        <TitleSection open={open} />
 
-        <div className="space-y-1">
-          <Skeleton className="rounded-lg" isLoaded={isLoaded}>
+    <motion.nav
+      layout
+      className="fixed z-10 md:sticky top-0 h-screen shrink-0 border-r border-slate-300 bg-white p-2"
+      style={{
+        width: open ? "225px" : "fit-content",
+      }}
+    >
+      <TitleSection open={open} />
+
+      <div className="space-y-1">
+        <Skeleton className="rounded-lg" isLoaded={isLoaded}>
           <Option
             Icon={Contact}
             title="Gestionar Pacientes"
@@ -57,26 +57,26 @@ export const Sidebar = () => {
             open={open}
             href="/admin/gestionar-pacientes"
           />
-          </Skeleton>
+        </Skeleton>
 
-          <Skeleton className="rounded-lg" isLoaded={isLoaded}>
-            <Tooltip content="Gestionar médicos" placement="right">
-              <Option
-                Icon={BriefcaseMedical}
-                title="Gestionar Medicos"
-                selected={selected}
-                setSelected={handleSelect}
-                open={open}
-                href="/admin/gestionar-medicos"
-              />
-            </Tooltip>
-          </Skeleton>
-          <OptionLogout open={open} />
-        </div>
+        <Skeleton className="rounded-lg" isLoaded={isLoaded}>
+          <Tooltip content="Gestionar médicos" placement="right">
+            <Option
+              Icon={BriefcaseMedical}
+              title="Gestionar Medicos"
+              selected={selected}
+              setSelected={handleSelect}
+              open={open}
+              href="/admin/gestionar-medicos"
+            />
+          </Tooltip>
+        </Skeleton>
+        <OptionLogout open={open} />
+      </div>
 
-        <ToggleClose open={open} setOpen={setOpen} />
-      </motion.nav>
-    
+      <ToggleClose open={open} setOpen={setOpen} />
+    </motion.nav>
+
   );
 };
 type OptionLogoutProps = {
@@ -198,32 +198,34 @@ const Option = ({ Icon, title, selected, setSelected, open, href }: OptionProps)
   };
 
   return (
-    <motion.button
-      layout
-      onClick={() => handleClick()}
-      className={`relative flex h-10 w-full items-center rounded-md transition-colors ${selected === title ? "bg-blue-100 text-blue-800" : "text-slate-500 hover:bg-slate-100"}`}
-    >
-      <motion.div
+    <Tooltip content={title} placement="right" isDisabled={!open}>
+      <motion.button
         layout
-        className="grid h-full w-10 place-content-center text-lg"
+        onClick={() => handleClick()}
+        className={`relative flex h-10 w-full items-center rounded-md transition-colors ${selected === title ? "bg-blue-100 text-blue-800" : "text-slate-500 hover:bg-slate-100"}`}
       >
-
-        <Icon />
-      </motion.div>
-      {open && (
-        <motion.span
+        <motion.div
           layout
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.125 }}
-          className="text-xs font-medium"
+          className="grid h-full w-10 place-content-center text-lg"
         >
-          {title}
-        </motion.span>
-      )}
+
+          <Icon />
+        </motion.div>
+        {open && (
+          <motion.span
+            layout
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.125 }}
+            className="text-xs font-medium"
+          >
+            {title}
+          </motion.span>
+        )}
 
 
-    </motion.button>
+      </motion.button>
+    </Tooltip>
   );
 };
 
