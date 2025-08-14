@@ -20,7 +20,7 @@ export const Sidebar = () => {
     const saved = localStorage.getItem("sidebar-selected");
 
     // Por defecto 
-    if (saved !== "Citas Programadas" && saved !== "Mis datos" && saved !== "Mi Horario") {
+    if (saved !== "Citas Programadas" && saved !== "Mis datos personales" && saved !== "Mi Horario") {
       setSelected("Citas Programadas");
       localStorage.setItem("sidebar-selected", "Citas Programadas");
     } else if (saved) {
@@ -73,7 +73,7 @@ export const Sidebar = () => {
           <Skeleton className="rounded-lg" isLoaded={isLoaded}>
           <Option
             Icon={UserCog}
-            title="Mis datos"
+            title="Mis datos personales"
             selected={selected}
             setSelected={handleSelect}
             open={open}
