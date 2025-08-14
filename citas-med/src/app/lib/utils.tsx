@@ -11,5 +11,5 @@ export function formatearFecha(fecha: CalendarDate | null): string | null {
 }
 export function formatearHora(hora: string | null): string | null {
   if (!hora) return null;
-  return hora?.substring(hora?.indexOf('-') + 1) + ":00";
+  return hora?.substring(hora?.indexOf('-') + 1);
 }

@@ -51,7 +51,7 @@ export default function ConfirmacionCita({
             .post("/pacientes/citas/agendar", {
                 medicoId: medicoSeleccionado?.id,
                 fecha: fechaSeleccionada,
-                hora: horaInicio?.substring(horaInicio.indexOf("-") + 1) + ":00",
+                hora: horaInicio?.substring(horaInicio.indexOf("-") + 1),
             })
             .then(() => {
                 setIsAgendadaExitosamente(true);
