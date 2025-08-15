@@ -157,6 +157,12 @@ export default function PerfilUsuario() {
 
     };
 
+    function handleCancelarEdicion() {
+        setEditando(false);
+        setCorreo(datos.email ?? '');
+        setTelefono(datos.telefono ?? '');
+    }
+
     return (
         <div className='min-h-screen md:min-h-fit w-full flex items-center justify-center bg-blue-50 px-4 py-8 md:py-0'>
             <section className="w-full bg-blue-200 rounded-2xl max-w-4xl shadow-md">
@@ -242,7 +248,7 @@ export default function PerfilUsuario() {
                         <div className="flex justify-end mt-10 gap-4">
                             {editando ? (
                                 <>
-                                    <Button color="default" onPress={() => setEditando(false)} isDisabled={loading}>
+                                    <Button color="default" onPress={() => handleCancelarEdicion()} isDisabled={loading}>
                                         Cancelar
                                     </Button>
                                     <Button color="primary" onPress={guardarCambios} isLoading={loading}>
