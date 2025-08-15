@@ -78,9 +78,7 @@ export default function PerfilUsuario() {
         if (datos.especialidad) {
             setEspecialidad(datos.especialidad);
         }
-        if(datos.contrasena) {
-            setContrasena(datos.contrasena);
-        }
+        
     }, [datos]);
 
     const editarDatos = () => {
@@ -127,6 +125,17 @@ export default function PerfilUsuario() {
         setLoading(true);
 
 
+        if (!correo || !telefono || (editando && !contrasena)) {
+            addToast({
+                title: 'Campos vacíos',
+                description: 'Por favor completa todos los campos requeridos.',
+                color: 'danger',
+                shouldShowTimeoutProgress: true,
+                timeout: 5000,
+            });
+            setLoading(false);
+            return;
+        }
         const hasChanges = (
             correo !== datos.email ||
             telefono !== datos.telefono ||
@@ -174,41 +183,53 @@ export default function PerfilUsuario() {
                     </div>
                     <form>
                         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                            <Input
-                                label="Nombre"
-                                color='primary'
-                                value={nombre}
-                                isDisabled={true}
-                            />
-                            <Input
-                                label="Correo Electrónico"
-                                type='email'
-                                color='primary'
-                                value={correo}
-                                onValueChange={setCorreo}
-                                isDisabled={!editando}
-                                isRequired
-                            />
-                            <Input
-                                label="Documento de Identidad"
-                                color='primary'
-                                value={documento}
-                                isDisabled={true}
-                            />
-                            <Input
-                                label="Teléfono"
-                                color='primary'
-                                value={telefono}
-                                onValueChange={setTelefono}
-                                isDisabled={!editando}
-                                isRequired
-                            />
-                            <Input
-                                label="Especialidad"
-                                color='primary'
-                                value={especialidad}
-                                isDisabled={true}
-                            />
+                            <Skeleton className='bg-blue-50 rounded-xl' isLoaded={!isLoadingInfo}>
+                                <Input
+                                    label="Nombre"
+                                    color='primary'
+                                    value={nombre}
+                                    isDisabled={true}
+                                />
+                            </Skeleton>
+                            <Skeleton className='bg-blue-50 rounded-xl' isLoaded={!isLoadingInfo}>
+                                <Input
+                                    label="Correo Electrónico"
+                                    type='email'
+                                    color='primary'
+                                    value={correo}
+                                    onValueChange={setCorreo}
+                                    isDisabled={!editando}
+                                    isRequired
+                                />
+                            </Skeleton>
+
+                            <Skeleton className='bg-blue-50 rounded-xl' isLoaded={!isLoadingInfo}>
+                                <Input
+                                    label="Documento de Identidad"
+                                    color='primary'
+                                    value={documento}
+                                    isDisabled={true}
+                                />
+                            </Skeleton>
+
+                            <Skeleton className='bg-blue-50 rounded-xl' isLoaded={!isLoadingInfo}>
+                                <Input
+                                    label="Teléfono"
+                                    color='primary'
+                                    value={telefono}
+                                    onValueChange={setTelefono}
+                                    isDisabled={!editando}
+                                    isRequired
+                                />
+                            </Skeleton>
+                            <Skeleton className='bg-blue-50 rounded-xl' isLoaded={!isLoadingInfo}>
+                                <Input
+                                    label="Especialidad"
+                                    color='primary'
+                                    value={especialidad}
+                                    isDisabled={true}
+                                />
+                            </Skeleton>
                             <Skeleton className='bg-blue-50 rounded-xl' isLoaded={!isLoadingInfo}>
                                 <Input
                                     color="primary"

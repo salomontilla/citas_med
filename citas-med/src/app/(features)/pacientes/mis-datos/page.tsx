@@ -130,6 +130,18 @@ export default function PerfilUsuario() {
     const guardarCambios = () => {
         setLoading(true);
 
+        if (!correo || !telefono || !contrasena) {
+            addToast({
+                title: 'Campos vacíos',
+                description: 'Por favor, completa todos los campos requeridos.',
+                color: 'danger',
+                shouldShowTimeoutProgress: true,
+                timeout: 5000,
+            });
+            setLoading(false);
+            return;
+        }
+
         // Check if any field has changed
         const hasChanges = (
             correo !== datos.email ||

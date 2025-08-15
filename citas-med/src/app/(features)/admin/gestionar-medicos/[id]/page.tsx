@@ -182,7 +182,6 @@ export default function InfoPaciente({
             especialidadSeleccionada !== datos.especialidad
         );
 
-
         if (!hasChanges) {
             // Nada ha cambiado
             addToast({

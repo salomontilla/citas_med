@@ -102,8 +102,6 @@ public class PacienteService {
             throw new RuntimeException("El documento ya está registrado");
         }
 
-
-
         usuario.updateUsuario(pacienteDto);
         if (pacienteDto.contrasena() != null && !pacienteDto.contrasena().isBlank()) {
             String hashedPassword = passwordEncoder.encode(pacienteDto.contrasena());

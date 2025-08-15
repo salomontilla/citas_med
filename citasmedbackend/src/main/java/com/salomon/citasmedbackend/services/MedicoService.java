@@ -87,21 +87,29 @@ public class MedicoService {
                 () -> new RuntimeException("Médico no encontrado")
         );
 
+        Usuario usuario = medico.getUsuario();
+
         // Validaciones antes de actualizar
         if (medicoResponseDTO.email() != null &&
-                !medicoResponseDTO.email().equals(medico.getUsuario().getEmail()) &&
+                !medicoResponseDTO.email().equals(usuario.getEmail()) &&
                 userRepository.existsByEmail(medicoResponseDTO.email())) {
             throw new EmailYaEnUsoException("El email ya está en uso");
         }
 
         if (medicoResponseDTO.documento() != null &&
-                !medicoResponseDTO.documento().equals(medico.getUsuario().getDocumento()) &&
+                !medicoResponseDTO.documento().equals(usuario.getDocumento()) &&
                 userRepository.existsByDocumento(medicoResponseDTO.documento())) {
             throw new DocumentoEnUsoException("El documento ya está registrado");
         }
 
+
         // Ahora sí se actualizan los datos
         medico.actualizarMedico(medicoResponseDTO);
+        usuario.setContrasena(
+                medicoResponseDTO.contrasena() != null ?
+                        passwordEncoder.encode(medicoResponseDTO.contrasena()) :
+                        usuario.getContrasena()
+        );
         return medicoRepository.save(medico);
     }
 
