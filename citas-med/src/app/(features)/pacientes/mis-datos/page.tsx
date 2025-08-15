@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Input, Button, addToast } from '@heroui/react';
+import { Input, Button, addToast, Skeleton } from '@heroui/react';
 import api from '@/app/lib/axios';
 import { EyeFilledIcon, EyeSlashFilledIcon } from '@/app/ui/components/passwordEyes';
 
@@ -25,6 +25,7 @@ export default function PerfilUsuario() {
     });
     const [editando, setEditando] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [isLoadingInfo, setIsLoadingInfo] = useState(true);
 
     const [nombreCompleto, setNombreCompleto] = useState('');
     const [correo, setCorreo] = useState('');
@@ -49,6 +50,8 @@ export default function PerfilUsuario() {
                     shouldShowTimeoutProgress: true,
                     timeout: 5000,
                 });
+            }).finally(() => {
+                setIsLoadingInfo(false);
             });
     };
 
@@ -78,7 +81,7 @@ export default function PerfilUsuario() {
             setContrasena(datos.contrasena);
         }
 
-        if(datos.documento) {
+        if (datos.documento) {
             setDocumento(datos.documento);
         }
 
@@ -171,60 +174,69 @@ export default function PerfilUsuario() {
                     </div>
                     <form>
                         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                            <Input
-                                label="Nombre"
-                                color='primary'
-                                value={nombreCompleto}
-                                isDisabled={true}
-                            />
-                            <Input
-                                label="Correo Electrónico"
-                                color='primary'
-                                value={correo}
-                                onValueChange={setCorreo}
-                                isDisabled={!editando}
-                                isRequired
-                            />
-                            <Input
-                                label="Documento de Identidad"
-                                color='primary'
-                                value={documento}
-                                isDisabled={true}
-                                
-                            />
-                            <Input
-                                label="Teléfono"
-                                color='primary'
-                                value={telefono}
-                                onValueChange={setTelefono}
-                                isDisabled={!editando}
-                                isRequired
-                            />
-                            <Input
-                                label="Fecha de nacimiento"
-                                color='primary'
-                                value={fechaNacimiento}
-                                isDisabled={true}
-                            />
-
-                            <Input
-                                color="primary"
-                                onValueChange={setContrasena}
-                                isDisabled={!editando}
-                                endContent={
-                                    <button
-                                        aria-label="toggle password visibility"
-                                        className="focus:outline-none"
-                                        type="button"
-                                        onClick={togglePasswordVisibility}
-                                    >
-                                        {isPasswordVisible ? <EyeSlashFilledIcon /> : <EyeFilledIcon />}
-                                    </button>
-                                }
-                                label="Nueva contraseña"
-                                type={isPasswordVisible ? "text" : "password"}
-                            />
-
+                            <Skeleton className='bg-blue-50 rounded-xl' isLoaded={!isLoadingInfo}>
+                                <Input
+                                    label="Nombre"
+                                    color='primary'
+                                    value={nombreCompleto}
+                                    isDisabled={true}
+                                />
+                            </Skeleton>
+                            <Skeleton className='bg-blue-50 rounded-xl' isLoaded={!isLoadingInfo}>
+                                <Input
+                                    label="Correo Electrónico"
+                                    color='primary'
+                                    value={correo}
+                                    onValueChange={setCorreo}
+                                    isDisabled={!editando}
+                                    isRequired
+                                />
+                            </Skeleton>
+                            <Skeleton className='bg-blue-50 rounded-xl' isLoaded={!isLoadingInfo}>
+                                <Input
+                                    label="Documento de Identidad"
+                                    color='primary'
+                                    value={documento}
+                                    isDisabled={true}
+                                />
+                            </Skeleton>
+                            <Skeleton className='bg-blue-50 rounded-xl' isLoaded={!isLoadingInfo}>
+                                <Input
+                                    label="Teléfono"
+                                    color='primary'
+                                    value={telefono}
+                                    onValueChange={setTelefono}
+                                    isDisabled={!editando}
+                                    isRequired
+                                />
+                            </Skeleton>
+                            <Skeleton className='bg-blue-50 rounded-xl' isLoaded={!isLoadingInfo}>
+                                <Input
+                                    label="Fecha de nacimiento"
+                                    color='primary'
+                                    value={fechaNacimiento}
+                                    isDisabled={true}
+                                />
+                            </Skeleton>
+                            <Skeleton className='bg-blue-50 rounded-xl' isLoaded={!isLoadingInfo}>
+                                <Input
+                                    color="primary"
+                                    onValueChange={setContrasena}
+                                    isDisabled={!editando}
+                                    endContent={
+                                        <button
+                                            aria-label="toggle password visibility"
+                                            className="focus:outline-none"
+                                            type="button"
+                                            onClick={togglePasswordVisibility}
+                                        >
+                                            {isPasswordVisible ? <EyeSlashFilledIcon /> : <EyeFilledIcon />}
+                                        </button>
+                                    }
+                                    label="Nueva contraseña"
+                                    type={isPasswordVisible ? "text" : "password"}
+                                />
+                            </Skeleton>
                         </div>
 
                         <div className="flex justify-end mt-10 gap-4">
