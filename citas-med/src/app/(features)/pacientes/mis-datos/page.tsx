@@ -130,7 +130,7 @@ export default function PerfilUsuario() {
     const guardarCambios = () => {
         setLoading(true);
 
-        if (!correo || !telefono || !contrasena) {
+        if (!correo || !telefono) {
             addToast({
                 title: 'Campos vacíos',
                 description: 'Por favor, completa todos los campos requeridos.',

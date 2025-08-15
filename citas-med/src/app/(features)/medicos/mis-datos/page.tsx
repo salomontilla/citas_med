@@ -125,13 +125,13 @@ export default function PerfilUsuario() {
         setLoading(true);
 
 
-        if (!correo || !telefono || (editando && !contrasena)) {
+        if (!correo || !telefono) {
             addToast({
-                title: 'Campos vacíos',
-                description: 'Por favor completa todos los campos requeridos.',
-                color: 'danger',
-                shouldShowTimeoutProgress: true,
-                timeout: 5000,
+            title: 'Campos vacíos',
+            description: 'Por favor completa todos los campos requeridos.',
+            color: 'danger',
+            shouldShowTimeoutProgress: true,
+            timeout: 5000,
             });
             setLoading(false);
             return;
