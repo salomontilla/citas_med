@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Input, Button, addToast } from '@heroui/react';
 import api from '@/app/lib/axios';
+import { EyeFilledIcon, EyeSlashFilledIcon } from '@/app/ui/components/passwordEyes';
 
 interface DatosUsuario {
     nombreCompleto?: string;
@@ -10,6 +11,7 @@ interface DatosUsuario {
     documento?: string;
     telefono?: string;
     fechaNacimiento?: string;
+    contrasena?: string;
 }
 
 export default function PerfilUsuario() {
@@ -18,13 +20,21 @@ export default function PerfilUsuario() {
         email: '',
         documento: '',
         telefono: '',
-        fechaNacimiento: ''
+        fechaNacimiento: '',
+        contrasena: ''
     });
     const [editando, setEditando] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    const [nombreCompleto, setNombreCompleto] = useState('');
     const [correo, setCorreo] = useState('');
+    const [documento, setDocumento] = useState('');
     const [telefono, setTelefono] = useState('');
+    const [fechaNacimiento, setFechaNacimiento] = useState('');
     const [contrasena, setContrasena] = useState('');
+
+    const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     const obtenerDatos = () => {
         api.get('/pacientes/mis-datos')
@@ -47,30 +57,52 @@ export default function PerfilUsuario() {
         obtenerDatos();
     }, []);
 
-    // Actualizar el correo electrónico al cargar el componente
+    // Actualizar datos al cargar el componente
     useEffect(() => {
+        if (datos.nombreCompleto) {
+            setNombreCompleto(datos.nombreCompleto);
+        }
         if (datos.email) {
             setCorreo(datos.email);
         }
-    }, [datos.email]);
-    // Obtener el teléfono del usuario al cargar el componente
-    useEffect(() => {
+
         if (datos.telefono) {
             setTelefono(datos.telefono);
         }
-    }, [datos.telefono]);
+
+        if (datos.fechaNacimiento) {
+            setFechaNacimiento(datos.fechaNacimiento);
+        }
+
+        if (datos.contrasena) {
+            setContrasena(datos.contrasena);
+        }
+
+        if(datos.documento) {
+            setDocumento(datos.documento);
+        }
+
+    }, [datos]);
 
     const editarDatos = () => {
         setLoading(true);
         setEditando(true);
-        api.patch('/pacientes/editar-datos', {
-            nombreCompleto: null,
-            email: correo,
-            telefono: telefono,
-            documento: null,
-            fechaNacimiento: null,
 
-        })
+
+        const changedFields: Partial<DatosUsuario> = {};
+
+        if (correo !== datos.email) {
+            changedFields.email = correo;
+        }
+        if (telefono !== datos.telefono) {
+            changedFields.telefono = telefono;
+        }
+
+        if (contrasena !== datos.contrasena) {
+            changedFields.contrasena = contrasena;
+        }
+
+        api.patch('/pacientes/editar-datos', changedFields)
             .then((response) => {
                 setDatos(response.data);
                 addToast({
@@ -81,10 +113,11 @@ export default function PerfilUsuario() {
                     timeout: 5000,
                 });
             })
-            .catch(() => {
+            .catch((error) => {
+                console.log(error);
                 addToast({
                     title: 'Error',
-                    description: 'No se pudieron actualizar los datos.',
+                    description: error.response.data || 'No se pudieron actualizar los datos.',
                     color: 'danger',
                     shouldShowTimeoutProgress: true,
                     timeout: 5000,
@@ -93,20 +126,15 @@ export default function PerfilUsuario() {
     }
     const guardarCambios = () => {
         setLoading(true);
-        if (!correo || !telefono) {
-            // Campos vacíos
-            addToast({
-                title: 'Error',
-                description: 'Por favor, completa todos los campos requeridos.',
-                color: 'danger',
-                shouldShowTimeoutProgress: true,
-                timeout: 5000,
-            });
-            setLoading(false);
-            return;
-        }
 
-        if (correo === datos.email && telefono === datos.telefono) {
+        // Check if any field has changed
+        const hasChanges = (
+            correo !== datos.email ||
+            telefono !== datos.telefono ||
+            contrasena !== datos.contrasena
+        );
+
+        if (!hasChanges) {
             // Nada ha cambiado
             addToast({
                 title: 'Sin cambios',
@@ -123,6 +151,7 @@ export default function PerfilUsuario() {
         editarDatos();
         setLoading(false);
         setEditando(false);
+
     };
 
     return (
@@ -136,8 +165,8 @@ export default function PerfilUsuario() {
                     <div className="flex flex-col gap-4 items-center mb-6">
                         <img src="/medico.jpg" alt="doctor" className='rounded-full h-24 w-24 object-cover' />
                         <div className='flex flex-col items-center'>
-                            <h1 className='font-bold text-xl'>{datos.nombreCompleto}</h1>
-                            <span className="text-sm text-gray-500">{datos.email}</span>
+                            <h1 className='font-bold text-xl'>{nombreCompleto}</h1>
+                            <span className="text-sm text-gray-500">{correo}</span>
                         </div>
                     </div>
                     <form>
@@ -145,7 +174,7 @@ export default function PerfilUsuario() {
                             <Input
                                 label="Nombre"
                                 color='primary'
-                                value={datos.nombreCompleto}
+                                value={nombreCompleto}
                                 isDisabled={true}
                             />
                             <Input
@@ -154,12 +183,14 @@ export default function PerfilUsuario() {
                                 value={correo}
                                 onValueChange={setCorreo}
                                 isDisabled={!editando}
+                                isRequired
                             />
                             <Input
                                 label="Documento de Identidad"
                                 color='primary'
-                                value={datos.documento}
+                                value={documento}
                                 isDisabled={true}
+                                
                             />
                             <Input
                                 label="Teléfono"
@@ -167,13 +198,33 @@ export default function PerfilUsuario() {
                                 value={telefono}
                                 onValueChange={setTelefono}
                                 isDisabled={!editando}
+                                isRequired
                             />
                             <Input
                                 label="Fecha de nacimiento"
                                 color='primary'
-                                value={datos.fechaNacimiento}
+                                value={fechaNacimiento}
                                 isDisabled={true}
                             />
+
+                            <Input
+                                color="primary"
+                                onValueChange={setContrasena}
+                                isDisabled={!editando}
+                                endContent={
+                                    <button
+                                        aria-label="toggle password visibility"
+                                        className="focus:outline-none"
+                                        type="button"
+                                        onClick={togglePasswordVisibility}
+                                    >
+                                        {isPasswordVisible ? <EyeSlashFilledIcon /> : <EyeFilledIcon />}
+                                    </button>
+                                }
+                                label="Nueva contraseña"
+                                type={isPasswordVisible ? "text" : "password"}
+                            />
+
                         </div>
 
                         <div className="flex justify-end mt-10 gap-4">
