@@ -9,34 +9,6 @@ import { useMedicoStore } from "@/app/store/medicoStore";
 import ConfirmacionCita from "./confirmacionCita";
 import api from "@/app/lib/axios";
 
-// Simulamos la disponibilidad por día de la semana
-const DISPONIBILIDADES = [
-    {
-        id: 1,
-        medicoId: 1,
-        diaSemana: "LUNES",
-        bloques: ["08:00", "08:30", "09:00", "09:30"]
-    },
-    {
-        id: 2,
-        medicoId: 1,
-        diaSemana: "LUNES",
-        bloques: ["14:00", "14:30", "15:00", "15:30"]
-    },
-    {
-        id: 3,
-        medicoId: 1,
-        diaSemana: "MARTES",
-        bloques: ["10:00", "10:30"]
-    },
-    {
-        id: 4,
-        medicoId: 1,
-        diaSemana: "MIÉRCOLES",
-        bloques: ["12:00", "12:30"]
-    }
-];
-
 
 const diasSemanaMap = [
     "DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"

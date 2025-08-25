@@ -13,7 +13,6 @@ import {
 import api from '@/app/lib/axios';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { set } from 'date-fns';
 
 interface Props {
     fechaSeleccionada: string | null;
@@ -46,6 +45,7 @@ export default function ConfirmacionCita({
         setIsVisibleAlert(false);
         setDescription("");
         setTitle("");
+        setIsAgendadaExitosamente(false);
 
         api
             .post("/pacientes/citas/agendar", {
