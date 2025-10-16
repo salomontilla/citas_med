@@ -29,7 +29,15 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String token = null;
-
+        String path = request.getServletPath();
+        // Rutas que no requieren autenticacion
+        if (path.equals("/api/citasmed/auth/login")
+                || path.equals("/api/citasmed/pacientes/register")
+                || path.startsWith("/swagger")
+                || path.startsWith("/v3/api-docs")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         // Buscar en el header Authorization
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
