@@ -21,7 +21,7 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
 
     @Query("SELECT c FROM Cita c WHERE c.medico.id = :medicoId AND c.fecha = :fecha AND c.estado != 'CANCELADA'")
     List<Cita> findActivasByMedicoAndFecha(@Param("medicoId") Long medicoId, @Param("fecha") LocalDate fecha);
-
+    List<Cita> findByMedicoIdAndFecha(Long medico_id, LocalDate fecha);
     List<Cita> findByPacienteIdAndFechaBeforeAndEstado(Long pacienteId, Date fecha, EstadoCita estado);
 
 

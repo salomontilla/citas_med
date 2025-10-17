@@ -55,7 +55,7 @@ public class CitaService {
 
         Date formattedDate = convertirFecha(citaDto.fecha());
         Time formattedTime = convertirHora(citaDto.hora());
-        validarDisponibilidad(medico.getId(), formattedDate.toLocalDate(), formattedTime);
+        validarDisponibilidad(medico.getId(), formattedDate.toLocalDate(), formattedTime,null);
         Cita nuevaCita = new Cita(
                 paciente,
                 medico,
@@ -123,7 +123,7 @@ public class CitaService {
         if (cita.getEstado() == EstadoCita.CANCELADA) {
             throw new RuntimeException("No se puede editar una cita cancelada");
         }
-        return validatedCitaPaciente(citaDto, cita);
+        return validatedCitaPaciente(citaDto, cita, id);
     }
 
     public Cita actualizarCitaMedico(Long id, CitaActualizarDTO citaDto, String email) {
@@ -191,11 +191,11 @@ public class CitaService {
     }
 
 
-    private Cita validatedCitaPaciente(CitaPacienteActualizarDTO dto, Cita cita) {
+    private Cita validatedCitaPaciente(CitaPacienteActualizarDTO dto, Cita cita, Long id) {
         Date nuevaFecha = dto.fechaNueva() != null ? convertirFecha(dto.fechaNueva()) : cita.getFecha();
         Time nuevaHora = dto.horaNueva() != null ? convertirHora(dto.horaNueva()) : cita.getHora();
 
-        validarDisponibilidad(cita.getMedico().getId(), nuevaFecha.toLocalDate(), nuevaHora);
+        validarDisponibilidad(cita.getMedico().getId(), nuevaFecha.toLocalDate(), nuevaHora, id);
 
         if (dto.fechaNueva() != null) cita.setFecha(nuevaFecha);
         if (dto.horaNueva() != null) cita.setHora(nuevaHora);
@@ -223,7 +223,7 @@ public class CitaService {
         Date nuevaFecha = citaDto.fecha() != null ? convertirFecha(citaDto.fecha()) : cita.getFecha();
         Time nuevaHora = citaDto.hora() != null ? convertirHora(citaDto.hora()) : cita.getHora();
 
-        validarDisponibilidad(cita.getMedico().getId(), nuevaFecha.toLocalDate(), nuevaHora);
+        validarDisponibilidad(cita.getMedico().getId(), nuevaFecha.toLocalDate(), nuevaHora, null);
 
         if (citaDto.fecha() != null) {
             cita.setFecha(nuevaFecha);
@@ -238,14 +238,14 @@ public class CitaService {
         return citasRepository.save(cita);
     }
 
-    private void validarDisponibilidad(Long medicoId, LocalDate fechaAgendada, Time horaInicio) {
+    private void validarDisponibilidad(Long medicoId, LocalDate fechaAgendada, Time horaInicio, Long id) {
         DiaSemana dia = DIA_SEMANA_MAP.get(fechaAgendada.getDayOfWeek());
 
-        LocalDate fecha = fechaAgendada;
-        if (!fecha.isAfter(LocalDate.now()) && !fecha.isEqual(LocalDate.now())) {
+        if (fechaAgendada.isBefore(LocalDate.now())) {
             throw new RuntimeException("No se pueden agendar citas en fechas pasadas");
         }
 
+        // Verificar que el médico tenga disponibilidad ese día
         List<Disponibilidad> disponibilidad = diponibilidadRepository
                 .findDisponibilidadByMedicoIdAndDiaSemana(medicoId, dia);
         if (disponibilidad.isEmpty()) {
@@ -253,18 +253,35 @@ public class CitaService {
         }
 
         LocalTime horaInicioDeseada = horaInicio.toLocalTime();
-        LocalTime horaFin = horaInicioDeseada.plusMinutes(29);
+        LocalTime horaFinDeseada = horaInicioDeseada.plusMinutes(29);
 
         boolean dentroDeHorario = disponibilidad.stream().anyMatch(d ->
                 !horaInicioDeseada.isBefore(d.getHoraInicio().toLocalTime()) &&
-                        !horaFin.isAfter(d.getHoraFin().toLocalTime())
+                        !horaFinDeseada.isAfter(d.getHoraFin().toLocalTime())
         );
 
         if (!dentroDeHorario) {
-            throw new RuntimeException("La horaHora está fuera del horario de atención del médico");
+            throw new RuntimeException("La hora está fuera del horario de atención del médico");
         }
 
+        // Obtener las citas del médico en esa fecha
+        List<Cita> citasExistentes = citasRepository.findByMedicoIdAndFecha(medicoId, fechaAgendada);
+
+        boolean solapada = citasExistentes.stream()
+                .filter(c -> id == null || !c.getId().equals(id)) // ignorar la misma cita si se está editando
+                .anyMatch(c -> {
+                    LocalTime inicioExistente = c.getHora().toLocalTime();
+                    LocalTime finExistente = inicioExistente.plusMinutes(29);
+
+                    // Verificar si los intervalos se solapan
+                    return horaInicioDeseada.isBefore(finExistente) && horaFinDeseada.isAfter(inicioExistente);
+                });
+
+        if (solapada) {
+            throw new RuntimeException("El médico ya tiene una cita en este horario");
+        }
     }
+
 
 
     public String confirmarCita(Long id, String emailUsuario) {
