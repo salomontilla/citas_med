@@ -1,6 +1,5 @@
-import animations from '@midudev/tailwind-animations'
 const config = {
-  plugins: ["@tailwindcss/postcss", animations],
+  plugins: ["@tailwindcss/postcss"],
 };
 
 export default config;

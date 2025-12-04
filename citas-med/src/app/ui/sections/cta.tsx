@@ -24,7 +24,7 @@ export default function Cta() {
                         title="Atención Personalizada"
                         icon="/cta_card_1.svg"
                     >
-                        Nuestros profesionales están comprometidos con tu bienestar, brindándote una atención humana y adaptada a tus necesidades.
+                        Nuestros profesionales están comprometidos con tu bienestar, brindándote una atención humana.
                     </CtaCard>
 
                     <CtaCard
