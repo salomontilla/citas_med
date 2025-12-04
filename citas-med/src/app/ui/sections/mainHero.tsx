@@ -11,13 +11,13 @@ export default function MainHero() {
                 <section>
 
                 </section>
-                <section className='flex flex-col items-start justify-center gap-4 w-fit text-gray-50'>
+                <section className='animate-fade-in-up flex flex-col items-start justify-center gap-4 w-fit text-gray-50'>
                     <div className='shadow-2xs flex gap-2 bg-white rounded-2xl px-4 py-1 w-fit text-blue-800'>
                         <img src="/cta/logo_services.svg" alt="servicios" className='aspect-square object-contain' />
                         <p>Health Care</p>
                     </div>
                     <div className='flex flex-col gap-4'>
-                        <h1 className='text-5xl font-bold'>La mejor atención, los mejores doctores</h1>
+                        <h1 className='animate-fade-in-up text-5xl font-bold'>La mejor atención, los mejores doctores</h1>
                         <p className='text-lg'>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eveniet incidunt minima harum, sed natus saepe accusamus labore iste obcaecati fugiat rem. A, ratione accusantium voluptatibus in eligendi dolores porro repellat!</p>
                         <div className='flex gap-4'>
                             <Link href={'/login'}>
@@ -34,7 +34,7 @@ export default function MainHero() {
 
             <div className='relative flex flex-col px-4 sm:px-8 md:flex-row gap-8 items-center justify-center xl:justify-end w-[80%] h-fit bg-blue-600 rounded-2xl py-8 max-w-5xl '>
                 <div>
-                    <Image src="/doctor2.png" alt="Hero Image" width={300} height={500} className="left-14 bottom-0 absolute object-cover h-[700px] hidden xl:flex" />
+                    <Image src="/doctor2.png" alt="Hero Image" width={300} height={500} className=" left-14 bottom-0 absolute object-cover h-[700px] hidden xl:flex" />
                 </div>
                 <HeroCard img="card_1.svg" title="Servicio de emergencias"> Contamos con un equipo médico listo para actuar en cualquier momento.
 
