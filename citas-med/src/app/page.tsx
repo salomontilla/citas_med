@@ -1,6 +1,7 @@
 import Navbar from './ui/components/navbar';
 import MainHero from './ui/sections/mainHero';
 import Cta from './ui/sections/cta';
+import { Contact } from './ui/components/contact';
 
 export default function Home() {
   return (
@@ -12,6 +13,9 @@ export default function Home() {
       </main>
       <section id='servicios'>
         <Cta/>
+      </section>
+      <section id='contacto'>
+        <Contact />
       </section>
       <footer>
         

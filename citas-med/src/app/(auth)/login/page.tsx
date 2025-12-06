@@ -107,7 +107,7 @@ export default function LoginPage() {
                 errorMessage={"Campo requerido"}
                 required
               />
-              <a href="#" className="text-sm text-blue-600 hover:underline">¿Olvidaste tu contraseña?</a>
+              <label className='text-sm font-light mt-4'>Si olvidaste tu contraseña, contacta al administrador</label>
               <Alert
                 color={isInvalid ? "danger" : "success"}
                 className="w-full mt-3"
